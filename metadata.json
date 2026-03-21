@@ -1,7 +1,0 @@
-{
-  "name": "Executive Dining - 会食特化型口コミサイト",
-  "description": "ビジネスマンが「会食・接待」の店選びで失敗しないための、高品質なユーザー投稿型プラットフォームです。",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}
