@@ -700,6 +700,8 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
                       required
                       value={formData.author}
                       onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('お名前を入力してください')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                       placeholder="田中 太郎"
                       className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400"
                     />
@@ -765,6 +767,8 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
                     rows={5}
                     value={formData.comment}
                     onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                    onInvalid={(e) => (e.target as HTMLTextAreaElement).setCustomValidity('口コミ本文を入力してください')}
+                    onInput={(e) => (e.target as HTMLTextAreaElement).setCustomValidity('')}
                     placeholder="接待での体験を具体的にお聞かせください。スタッフの対応、雰囲気、会食の成果なども含めていただけると他のユーザーの参考になります。"
                     className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-400 resize-none"
                   />

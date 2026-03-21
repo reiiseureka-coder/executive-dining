@@ -66,6 +66,13 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 const inputCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors";
+
+const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElement>, msg = 'この項目は必須です') => {
+  e.target.setCustomValidity(msg);
+};
+const clearValidity = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  (e.target as HTMLInputElement).setCustomValidity('');
+};
 const selectCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
 
 export default function Admin() {
@@ -204,7 +211,7 @@ export default function Admin() {
           <Section title="基本情報" icon={Building2}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="店舗名（日本語）" required>
-                <input type="text" required value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="銀座 久兵衛" className={inputCls} />
+                <input type="text" required value={form.name} onChange={(e) => update('name', e.target.value)} onInvalid={(e) => setJaValidity(e, '店舗名を入力してください')} onInput={clearValidity} placeholder="銀座 久兵衛" className={inputCls} />
               </Field>
               <Field label="店舗名（英語）">
                 <input type="text" value={form.nameEn} onChange={(e) => update('nameEn', e.target.value)} placeholder="Ginza Kyubey" className={inputCls} />
@@ -217,7 +224,7 @@ export default function Admin() {
                 </select>
               </Field>
               <Field label="価格帯（表示用）" required>
-                <input type="text" required value={form.priceRange} onChange={(e) => update('priceRange', e.target.value)} placeholder="¥20,000〜¥35,000" className={inputCls} />
+                <input type="text" required value={form.priceRange} onChange={(e) => update('priceRange', e.target.value)} onInvalid={(e) => setJaValidity(e, '価格帯を入力してください')} onInput={clearValidity} placeholder="¥20,000〜¥35,000" className={inputCls} />
               </Field>
             </div>
             <Field label="店舗説明">
@@ -234,15 +241,15 @@ export default function Admin() {
                 </select>
               </Field>
               <Field label="エリア" required>
-                <input type="text" required value={form.area} onChange={(e) => update('area', e.target.value)} placeholder="銀座 / 六本木 / 梅田..." className={inputCls} />
+                <input type="text" required value={form.area} onChange={(e) => update('area', e.target.value)} onInvalid={(e) => setJaValidity(e, 'エリアを入力してください')} onInput={clearValidity} placeholder="銀座 / 六本木 / 梅田..." className={inputCls} />
               </Field>
             </div>
             <Field label="住所" required>
-              <input type="text" required value={form.address} onChange={(e) => update('address', e.target.value)} placeholder="東京都中央区銀座8-7-6" className={inputCls} />
+              <input type="text" required value={form.address} onChange={(e) => update('address', e.target.value)} onInvalid={(e) => setJaValidity(e, '住所を入力してください')} onInput={clearValidity} placeholder="東京都中央区銀座8-7-6" className={inputCls} />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="最寄り駅" required>
-                <input type="text" required value={form.nearestStation} onChange={(e) => update('nearestStation', e.target.value)} placeholder="銀座駅" className={inputCls} />
+                <input type="text" required value={form.nearestStation} onChange={(e) => update('nearestStation', e.target.value)} onInvalid={(e) => setJaValidity(e, '最寄り駅を入力してください')} onInput={clearValidity} placeholder="銀座駅" className={inputCls} />
               </Field>
               <Field label="タクシーの捕まえやすさ">
                 <select value={form.taxiEase} onChange={(e) => update('taxiEase', Number(e.target.value))} className={selectCls}>
