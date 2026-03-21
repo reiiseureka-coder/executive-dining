@@ -12,7 +12,7 @@ const CITIES = [
   { name: '東京', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&q=80&w=800' },
   { name: '大阪', image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800' },
   { name: '京都', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800' },
-  { name: '福岡', image: 'https://images.unsplash.com/photo-1512464080551-214440347719?auto=format&fit=crop&q=80&w=800' },
+  { name: '福岡', image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export default function Home({ onNavigate }: HomeProps) {
