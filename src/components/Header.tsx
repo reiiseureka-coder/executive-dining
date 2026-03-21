@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Menu, X, UtensilsCrossed, Search, Shield, LogIn, LogOut, ChevronDown } from 'lucide-react';
 import type { Page } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import RankBadge from './RankBadge';
@@ -10,172 +9,138 @@ interface HeaderProps {
 }
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const { user, profile, loading, signInWithGoogle, signOut } = useAuth();
 
-  const navItems: { label: string; page: Page }[] = [
-    { label: 'ホーム', page: 'home' },
-    { label: '店舗を探す', page: 'search' },
-    { label: '管理画面', page: 'admin' },
-  ];
+  const handleGoogleLogin = () => {
+    signInWithGoogle();
+    setShowLoginModal(false);
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <button
-            onClick={() => onNavigate('home')}
-            className="flex items-center gap-2.5 group cursor-pointer"
-          >
-            <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center group-hover:bg-indigo-400 transition-colors">
-              <UtensilsCrossed size={16} className="text-white" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-serif text-white text-base font-semibold tracking-wide">
-                Executive Dining
-              </span>
-              <span className="text-xs text-slate-400 tracking-widest hidden sm:block">
-                エグゼクティブ・ダイニング
-              </span>
-            </div>
-          </button>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <button
-                key={item.page}
-                onClick={() => onNavigate(item.page)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  currentPage === item.page
-                    ? 'bg-indigo-500/20 text-indigo-300'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          {/* Right actions */}
-          <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => onNavigate('search')}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+    <>
+      <header className="sticky top-0 z-50 glass-morphism border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo */}
+            <div
+              className="flex items-center cursor-pointer space-x-2"
+              onClick={() => onNavigate('home')}
             >
-              <Search size={18} />
-            </button>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
-              <Shield size={12} className="text-emerald-400" />
-              <span className="text-xs text-emerald-400 font-medium">厳選店</span>
+              <div className="bg-slate-900 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-xl">
+                <span className="font-serif text-2xl">E</span>
+              </div>
+              <span className="text-xl font-serif font-bold tracking-tight text-slate-900">
+                EXECUTIVE <span className="text-slate-500">DINING</span>
+              </span>
             </div>
 
-            {/* Auth area */}
-            {loading ? null : !user ? (
+            {/* Navigation */}
+            <nav className="hidden md:flex space-x-8">
               <button
-                onClick={signInWithGoogle}
-                className="flex items-center gap-1.5 px-4 py-2 bg-white text-slate-900 text-sm font-semibold rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                onClick={() => onNavigate('home')}
+                className={`text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}
               >
-                <LogIn size={15} />
-                Googleでログイン
+                ホーム
               </button>
-            ) : (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
-                >
+              <button
+                onClick={() => onNavigate('search')}
+                className={`text-sm font-medium transition-colors ${currentPage === 'search' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                お店を探す
+              </button>
+              <button
+                onClick={() => onNavigate('admin')}
+                className={`text-sm font-medium transition-colors ${currentPage === 'admin' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                掲載店登録
+              </button>
+            </nav>
+
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-4">
+              {loading ? null : !user ? (
+                <>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="hidden sm:block text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                  >
+                    ログイン
+                  </button>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-all shadow-md"
+                  >
+                    無料会員登録
+                  </button>
+                </>
+              ) : (
+                <div className="flex items-center space-x-3">
                   {profile?.avatarUrl ? (
-                    <img src={profile.avatarUrl} className="w-6 h-6 rounded-full" alt="" />
+                    <img src={profile.avatarUrl} className="w-8 h-8 rounded-full border border-slate-200" alt="" />
                   ) : (
-                    <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
                       {(profile?.displayName ?? user.email ?? '?')[0].toUpperCase()}
                     </div>
                   )}
                   {profile && <RankBadge rank={profile.rank} size="sm" />}
-                  <ChevronDown size={14} className="text-slate-400" />
-                </button>
-
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-white/10 rounded-2xl shadow-xl overflow-hidden">
-                    <div className="px-4 py-3 border-b border-white/10">
-                      <p className="text-sm font-medium text-white truncate">
-                        {profile?.displayName ?? user.email}
-                      </p>
-                      <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                    </div>
-                    <button
-                      onClick={() => { signOut(); setUserMenuOpen(false); }}
-                      className="w-full flex items-center gap-2 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                      <LogOut size={14} />
-                      ログアウト
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 bg-slate-900">
-          <div className="px-4 py-3 space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.page}
-                onClick={() => {
-                  onNavigate(item.page);
-                  setMobileOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  currentPage === item.page
-                    ? 'bg-indigo-500/20 text-indigo-300'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-            {/* Mobile auth */}
-            <div className="pt-2 border-t border-white/10">
-              {!user ? (
-                <button
-                  onClick={() => { signInWithGoogle(); setMobileOpen(false); }}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 text-sm font-semibold rounded-xl"
-                >
-                  <LogIn size={15} />
-                  Googleでログイン
-                </button>
-              ) : (
-                <div className="flex items-center justify-between px-4 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-300 truncate max-w-[160px]">
-                      {profile?.displayName ?? user.email}
-                    </span>
-                    {profile && <RankBadge rank={profile.rank} size="sm" />}
-                  </div>
-                  <button onClick={() => { signOut(); setMobileOpen(false); }} className="text-slate-400 hover:text-white cursor-pointer">
-                    <LogOut size={16} />
+                  <button
+                    onClick={() => signOut()}
+                    className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                  >
+                    ログアウト
                   </button>
                 </div>
               )}
             </div>
           </div>
         </div>
+      </header>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-8 text-center">
+              <div className="bg-slate-900 text-white w-12 h-12 flex items-center justify-center rounded-xl shadow-xl mx-auto mb-6">
+                <span className="font-serif text-3xl">E</span>
+              </div>
+              <h3 className="text-2xl font-serif font-bold text-slate-900 mb-2">Executive Dining</h3>
+              <p className="text-slate-500 text-sm mb-10">
+                ビジネスエグゼクティブのための、<br />
+                会食特化型口コミサイトへようこそ。
+              </p>
+
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center space-x-3 bg-white border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition-all shadow-sm"
+              >
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  className="w-5 h-5"
+                  alt="Google"
+                />
+                <span className="font-bold text-slate-700">Googleでログイン</span>
+              </button>
+
+              <div className="mt-8 text-xs text-slate-400">
+                続行することで、
+                <a href="#" className="underline">利用規約</a>および
+                <a href="#" className="underline">プライバシーポリシー</a>
+                に同意したものとみなされます。
+              </div>
+            </div>
+            <div className="bg-slate-50 p-6 text-center">
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </header>
+    </>
   );
 }

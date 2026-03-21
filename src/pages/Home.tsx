@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Shield, Star, ChevronRight, TrendingUp, Clock, Award, Sparkles } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import type { Page } from '../types';
 import { restaurants } from '../data/mockData';
 import RestaurantCard from '../components/RestaurantCard';
@@ -8,20 +8,11 @@ interface HomeProps {
   onNavigate: (page: Page, restaurantId?: string, searchParams?: { query?: string }) => void;
 }
 
-const QUICK_AREAS = [
-  { label: '銀座', region: '関東' },
-  { label: '六本木', region: '関東' },
-  { label: '恵比寿', region: '関東' },
-  { label: '新宿', region: '関東' },
-  { label: '大阪', region: '関西' },
-  { label: '京都', region: '関西' },
-];
-
-const STATS = [
-  { icon: Shield, value: '97%', label: '会食成功率', color: 'text-emerald-400' },
-  { icon: Star, value: '4.7', label: '平均評価', color: 'text-yellow-400' },
-  { icon: TrendingUp, value: '2,400+', label: '累計口コミ数', color: 'text-indigo-400' },
-  { icon: Award, value: '厳選', label: 'エグゼクティブ認定店', color: 'text-amber-400' },
+const CITIES = [
+  { name: '東京', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&q=80&w=800' },
+  { name: '大阪', image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800' },
+  { name: '京都', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800' },
+  { name: '福岡', image: 'https://images.unsplash.com/photo-1512464080551-214440347719?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export default function Home({ onNavigate }: HomeProps) {
@@ -33,111 +24,89 @@ export default function Home({ onNavigate }: HomeProps) {
   };
 
   return (
-    <div>
+    <div className="animate-in fade-in duration-700">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-slate-900">
-        {/* Background elements */}
+      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?w=1600&auto=format&fit=crop')] bg-cover bg-center opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-900/50" />
-          {/* Decorative orbs */}
-          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl" />
+          <img
+            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=2000"
+            className="w-full h-full object-cover brightness-[0.4]"
+            alt="Hero background"
+          />
         </div>
+        <div className="relative z-10 text-center px-4">
+          <h1 className="text-4xl md:text-6xl font-serif text-white mb-6 tracking-tight">
+            会食の成否は、<br className="md:hidden" />店選びで決まる。
+          </h1>
+          <p className="text-slate-300 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+            ビジネスエグゼクティブのための、会食特化型口コミサイト。<br className="hidden md:block" />
+            リアルな声に基づいた、失敗しない接待体験を。
+          </p>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="max-w-4xl">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 mb-8">
-              <Sparkles size={14} className="text-indigo-400" />
-              <span className="text-indigo-300 text-sm font-medium">AI × ビジネス会食特化プラットフォーム</span>
-            </div>
-
-            {/* Headline */}
-            <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
-              会食の成否は、
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
-                店選びで決まる。
-              </span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl leading-relaxed">
-              料理の味だけでない。<strong className="text-white">個室の機密性</strong>、
-              <strong className="text-white">接客の洗練さ</strong>、
-              <strong className="text-white">タクシーの捕まえやすさ</strong>まで。
-              <br />
-              ビジネスエグゼクティブが本当に必要な情報を、AIが分析してお届けします。
-            </p>
-
-            {/* Search bar */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <div className="flex-1 relative">
-                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="エリア、料理ジャンル、シーンで検索..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:bg-white/15 transition-all text-base"
-                />
-              </div>
-              <button
-                onClick={handleSearch}
-                className="flex items-center justify-center gap-2 px-8 py-4 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-2xl transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 cursor-pointer whitespace-nowrap"
-              >
-                <Search size={18} />
-                店を探す
-              </button>
-            </div>
-
-            {/* Quick area buttons */}
-            <div className="flex flex-wrap gap-2">
-              <span className="text-slate-400 text-sm py-2">エリアで絞り込み:</span>
-              {QUICK_AREAS.map((area) => (
-                <button
-                  key={area.label}
-                  onClick={() => onNavigate('search', undefined, { query: area.label })}
-                  className="px-4 py-1.5 bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 rounded-full text-sm text-slate-300 hover:text-white transition-all cursor-pointer"
-                >
-                  {area.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Stats bar */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-black/30 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10">
-              {STATS.map((stat) => (
-                <div key={stat.label} className="flex items-center gap-3 p-5">
-                  <stat.icon size={20} className={stat.color} />
-                  <div>
-                    <div className={`font-bold text-xl ${stat.color}`}>{stat.value}</div>
-                    <div className="text-slate-400 text-xs">{stat.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="bg-white p-2 rounded-full shadow-2xl flex max-w-2xl mx-auto">
+            <input
+              type="text"
+              placeholder="エリア、ジャンル、キーワードで検索..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="flex-grow px-6 py-3 rounded-full focus:outline-none text-slate-800"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition-all flex items-center gap-2"
+            >
+              <Search size={16} /> 検索
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Value Proposition */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-indigo-50 rounded-full px-4 py-1.5 mb-4">
-              <Shield size={14} className="text-indigo-500" />
-              <span className="text-indigo-600 text-sm font-medium">なぜ Executive Dining なのか</span>
+      {/* Featured Areas */}
+      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">主要エリアから探す</h2>
+            <p className="text-slate-500">全国のビジネス拠点から最適な一軒を。</p>
+          </div>
+          <button
+            onClick={() => onNavigate('search')}
+            className="text-slate-900 font-semibold flex items-center hover:translate-x-1 transition-transform"
+          >
+            全てのエリアを表示 <ChevronRight size={16} className="ml-1" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {CITIES.map((city) => (
+            <div
+              key={city.name}
+              onClick={() => onNavigate('search', undefined, { query: city.name })}
+              className="group relative h-48 rounded-2xl overflow-hidden cursor-pointer shadow-lg"
+            >
+              <img
+                src={city.image}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt={city.name}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-6">
+                <h3 className="text-white font-bold text-xl">{city.name}</h3>
+              </div>
             </div>
-            <h2 className="font-serif text-4xl font-bold text-slate-900 mb-4">
+          ))}
+        </div>
+      </section>
+
+      {/* Value Proposition */}
+      <section className="py-20 bg-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-slate-500 uppercase tracking-widest text-sm font-bold">Why Executive Dining</span>
+            <h2 className="text-4xl font-serif font-bold text-slate-900 mt-2 mb-4">
               接待に特化した、唯一の評価軸
             </h2>
-            <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+            <div className="w-16 h-1 bg-slate-900 mx-auto"></div>
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto mt-6">
               一般的なグルメサイトでは分からない、ビジネスシーンで本当に重要な情報を提供します。
             </p>
           </div>
@@ -162,10 +131,10 @@ export default function Home({ onNavigate }: HomeProps) {
             ].map((item) => (
               <div
                 key={item.title}
-                className="bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 transition-all"
+                className="bg-white rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all cursor-default"
               >
                 <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-serif text-xl font-semibold text-slate-900 mb-3">{item.title}</h3>
+                <h3 className="font-serif text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
                 <p className="text-slate-500 leading-relaxed text-sm">{item.desc}</p>
               </div>
             ))}
@@ -174,28 +143,15 @@ export default function Home({ onNavigate }: HomeProps) {
       </section>
 
       {/* Featured Restaurants */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Clock size={14} className="text-indigo-500" />
-                <span className="text-indigo-600 text-sm font-medium">編集部 厳選</span>
-              </div>
-              <h2 className="font-serif text-3xl font-bold text-slate-900">
-                今週のエグゼクティブ推薦店
-              </h2>
-            </div>
-            <button
-              onClick={() => onNavigate('search')}
-              className="hidden sm:flex items-center gap-1.5 text-indigo-600 hover:text-indigo-500 font-medium text-sm transition-colors cursor-pointer"
-            >
-              すべて見る
-              <ChevronRight size={16} />
-            </button>
+          <div className="text-center mb-16">
+            <span className="text-slate-500 uppercase tracking-widest text-sm font-bold">Selection</span>
+            <h2 className="text-4xl font-serif font-bold text-slate-900 mt-2">全国の厳選店</h2>
+            <div className="w-16 h-1 bg-slate-900 mx-auto mt-6"></div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredRestaurants.map((restaurant) => (
               <RestaurantCard
                 key={restaurant.id}
@@ -206,53 +162,73 @@ export default function Home({ onNavigate }: HomeProps) {
             ))}
           </div>
 
-          <div className="text-center mt-8 sm:hidden">
+          <div className="text-center mt-12">
             <button
               onClick={() => onNavigate('search')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full font-medium hover:bg-slate-700 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-full font-semibold hover:bg-slate-800 transition-all shadow-md"
             >
-              すべての店舗を見る
-              <ChevronRight size={16} />
+              すべての店舗を見る <ChevronRight size={16} />
             </button>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
+      <section className="py-24 bg-slate-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="font-serif text-4xl font-bold text-white mb-4">
             次の会食、失敗できますか？
           </h2>
-          <p className="text-slate-300 text-lg mb-8">
+          <p className="text-slate-300 text-lg mb-10">
             重要な商談、役員接待、海外VIPのおもてなし。<br />
             店選びのリスクを、AIの力でゼロに近づけましょう。
           </p>
           <button
             onClick={() => onNavigate('search')}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-2xl transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 cursor-pointer text-lg"
+            className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-slate-100 transition-all shadow-lg text-lg"
           >
-            今すぐ店を探す
-            <ChevronRight size={20} />
+            今すぐ店を探す <ChevronRight size={20} />
           </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-white/10 py-10">
+      <footer className="bg-slate-900 text-slate-300 py-16 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="font-serif text-white font-semibold">Executive Dining</span>
-              <span className="text-slate-500 text-xs">© 2026 All rights reserved.</span>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="bg-white text-slate-900 w-8 h-8 flex items-center justify-center rounded">
+                  <span className="font-serif text-lg">E</span>
+                </div>
+                <span className="text-xl font-serif font-bold tracking-tight text-white">
+                  EXECUTIVE <span className="text-slate-500">DINING</span>
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed max-w-sm">
+                「成功するビジネスは、食卓から始まる」<br />
+                会食特化型口コミサイトとして、ビジネスの質を高めます。
+              </p>
             </div>
-            <p className="text-slate-500 text-xs text-center">
-              AI による分析は参考情報です。最終的な判断はご自身でお願いします。
-            </p>
+            <div>
+              <h4 className="text-white font-bold mb-6">サービス</h4>
+              <ul className="space-y-4 text-sm">
+                <li><button onClick={() => onNavigate('search')} className="hover:text-white transition-colors">お店を探す</button></li>
+                <li><button onClick={() => onNavigate('search')} className="hover:text-white transition-colors">口コミを投稿する</button></li>
+                <li><button onClick={() => onNavigate('admin')} className="hover:text-white transition-colors">掲載希望の飲食店様へ</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-6">エリア別</h4>
+              <ul className="space-y-4 text-sm">
+                <li><button onClick={() => onNavigate('search', undefined, { query: '東京' })} className="hover:text-white transition-colors">東京の会食</button></li>
+                <li><button onClick={() => onNavigate('search', undefined, { query: '大阪' })} className="hover:text-white transition-colors">大阪の会食</button></li>
+                <li><button onClick={() => onNavigate('search', undefined, { query: '福岡' })} className="hover:text-white transition-colors">福岡の会食</button></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 mt-16 pt-8 text-sm text-center">
+            &copy; 2026 Executive Dining Inc. All rights reserved.
           </div>
         </div>
       </footer>
