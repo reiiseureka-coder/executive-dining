@@ -68,10 +68,10 @@ function Field({ label, required, children }: { label: string; required?: boolea
 const inputCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors";
 
 const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElement>, msg = 'この項目は必須です') => {
-  e.target.setCustomValidity(msg);
+  e.currentTarget.setCustomValidity(msg);
 };
 const clearValidity = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-  (e.target as HTMLInputElement).setCustomValidity('');
+  e.currentTarget.setCustomValidity('');
 };
 const selectCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
 
