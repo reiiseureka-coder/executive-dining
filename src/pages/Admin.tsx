@@ -39,7 +39,9 @@ const INITIAL: FormData = {
   parkingAvailable: false,
   taxiEase: 3,
   dressCode: 'スマートカジュアル',
-  reservationRequired: true,
+  reservationStatus: '要予約',
+  reservationUrl: '',
+  smokingPolicy: '禁煙',
 };
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
@@ -153,7 +155,9 @@ export default function Admin() {
       parking_available: form.parkingAvailable,
       taxi_ease: form.taxiEase,
       dress_code: form.dressCode,
-      reservation_required: form.reservationRequired,
+      reservation_status: form.reservationStatus,
+      reservation_url: form.reservationUrl,
+      smoking_policy: form.smokingPolicy,
     };
 
     const { error } = await supabase.from('restaurants').insert(record);
@@ -302,8 +306,12 @@ export default function Admin() {
             </div>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="reservation" checked={form.reservationRequired} onChange={(e) => update('reservationRequired', e.target.checked)} className="w-4 h-4 rounded accent-indigo-500 cursor-pointer" />
-                <label htmlFor="reservation" className="text-sm text-slate-700 cursor-pointer">完全予約制</label>
+                <select value={form.reservationStatus} onChange={(e) => update('reservationStatus', e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-400">
+                  <option value="要予約">要予約</option>
+                  <option value="可能">予約可能</option>
+                  <option value="不可能">予約不可</option>
+                </select>
+                <label className="text-sm text-slate-700">予約</label>
               </div>
               <div className="flex items-center gap-3">
                 <input type="checkbox" id="drink" checked={form.drinkAllInclusive} onChange={(e) => update('drinkAllInclusive', e.target.checked)} className="w-4 h-4 rounded accent-indigo-500 cursor-pointer" />

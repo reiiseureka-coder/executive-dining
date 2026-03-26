@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft, Star, MapPin, Lock, Phone, Users, Car, Train,
   Sparkles, CheckCircle, AlertCircle, ChevronRight, ThumbsUp, Send,
@@ -120,6 +120,31 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
   const restaurant = restaurants.find((r) => r.id === restaurantId);
   const reviews = allReviews.filter((r) => r.restaurantId === restaurantId);
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [restaurantId]);
+
+  // Swipe back gesture (swipe right from left edge)
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isEdgeSwipe = useRef(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isEdgeSwipe.current = touchStartX.current < 40;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isEdgeSwipe.current) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (dx > 80 && dy < 60) {
+      onNavigate('search');
+    }
+  };
+
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [aiAccess, setAiAccess] = useState<AIAccessGuide | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
@@ -194,7 +219,11 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
     : null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div
+      className="min-h-screen bg-slate-50"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Hero Image */}
       <div className="relative h-72 sm:h-96 bg-slate-800 overflow-hidden">
         <img
@@ -213,7 +242,7 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
           className="absolute top-4 left-4 flex items-center gap-2 glass text-white px-3 py-2 rounded-xl text-sm hover:bg-white/15 transition-colors cursor-pointer"
         >
           <ArrowLeft size={16} />
-          <span className="hidden sm:inline">一覧に戻る</span>
+          <span>一覧に戻る</span>
         </button>
 
         {/* Business Score */}
@@ -631,7 +660,6 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
                   { dt: '定休日', dd: restaurant.closedDays },
                   { dt: 'コース', dd: restaurant.courseType },
                   { dt: '個室詳細', dd: restaurant.privateRoomDetail },
-                  { dt: '要予約', dd: restaurant.reservationRequired ? 'はい' : 'いいえ' },
                   { dt: '飲み放題', dd: restaurant.drinkAllInclusive ? 'あり' : 'なし' },
                   { dt: '支払い方法', dd: restaurant.paymentMethods?.join('、') ?? '情報なし' },
                 ].map((item) => (
@@ -640,7 +668,55 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
                     <dd className="text-slate-700">{item.dd}</dd>
                   </div>
                 ))}
+
+                {/* 予約 */}
+                <div className="flex gap-4 items-center">
+                  <dt className="w-24 shrink-0 text-slate-400 font-medium">予約</dt>
+                  <dd>
+                    <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      restaurant.reservationStatus === '要予約'
+                        ? 'bg-amber-100 text-amber-800'
+                        : restaurant.reservationStatus === '可能'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {restaurant.reservationStatus}
+                    </span>
+                  </dd>
+                </div>
+
+                {/* 喫煙 */}
+                <div className="flex gap-4 items-center">
+                  <dt className="w-24 shrink-0 text-slate-400 font-medium">喫煙</dt>
+                  <dd>
+                    <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      restaurant.smokingPolicy === '禁煙'
+                        ? 'bg-slate-100 text-slate-700'
+                        : restaurant.smokingPolicy === '喫煙室あり'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-orange-100 text-orange-800'
+                    }`}>
+                      {restaurant.smokingPolicy}
+                    </span>
+                  </dd>
+                </div>
               </dl>
+
+              {/* 外部予約リンク */}
+              {restaurant.reservationUrl && (
+                <div className="mt-5 pt-5 border-t border-slate-100">
+                  <a
+                    href={restaurant.reservationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-500 transition-colors"
+                  >
+                    <Navigation size={14} />
+                    外部サイトで予約する
+                  </a>
+                  <p className="text-xs text-slate-400 mt-2">食べログ等の外部サイトへ移動します</p>
+                </div>
+              )}
             </div>
           </div>
         )}

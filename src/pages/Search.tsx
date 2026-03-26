@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search as SearchIcon, SlidersHorizontal, X, MapPin, Lock, TrendingUp, ChevronDown } from 'lucide-react';
 import type { Page } from '../types';
 import { restaurants } from '../data/mockData';
@@ -7,6 +7,8 @@ import RestaurantCard from '../components/RestaurantCard';
 interface SearchProps {
   onNavigate: (page: Page, restaurantId?: string, searchParams?: { query?: string }) => void;
   initialQuery?: string;
+  initialRegion?: string;
+  initialPrivateRoom?: string;
 }
 
 const REGIONS = ['すべて', '関東', '関西', '東海', '九州', '北海道・東北', '中国・四国'];
@@ -27,14 +29,18 @@ const SORT_OPTIONS = [
   { value: 'price_desc', label: '価格: 高い順' },
 ];
 
-export default function Search({ onNavigate, initialQuery = '' }: SearchProps) {
+export default function Search({ onNavigate, initialQuery = '', initialRegion, initialPrivateRoom }: SearchProps) {
   const [query, setQuery] = useState(initialQuery);
-  const [selectedRegion, setSelectedRegion] = useState('すべて');
+  const [selectedRegion, setSelectedRegion] = useState(initialRegion ?? 'すべて');
   const [selectedArea, setSelectedArea] = useState('すべて');
   const [selectedGenre, setSelectedGenre] = useState('すべて');
-  const [selectedPrivateRoom, setSelectedPrivateRoom] = useState('すべて');
+  const [selectedPrivateRoom, setSelectedPrivateRoom] = useState(initialPrivateRoom ?? 'すべて');
   const [sortBy, setSortBy] = useState('score');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!(initialRegion || initialPrivateRoom));
+
+  useEffect(() => {
+    if (initialRegion || initialPrivateRoom) setShowFilters(true);
+  }, [initialRegion, initialPrivateRoom]);
 
   const currentAreas = selectedRegion !== 'すべて' ? AREAS[selectedRegion as keyof typeof AREAS] || ['すべて'] : ['すべて'];
 

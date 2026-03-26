@@ -1,12 +1,22 @@
 import { useState } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
 import type { Page } from '../types';
+import type { SearchParams } from '../App';
 import { restaurants } from '../data/mockData';
 import RestaurantCard from '../components/RestaurantCard';
 
 interface HomeProps {
-  onNavigate: (page: Page, restaurantId?: string, searchParams?: { query?: string }) => void;
+  onNavigate: (page: Page, restaurantId?: string, searchParams?: SearchParams) => void;
 }
+
+const FILTER_CHIPS: { label: string; params: SearchParams }[] = [
+  { label: '東京', params: { region: '関東' } },
+  { label: '大阪', params: { query: '大阪' } },
+  { label: '京都', params: { query: '京都' } },
+  { label: '個室あり', params: { privateRoom: '完全個室' } },
+  { label: 'ランチ', params: { query: 'ランチ' } },
+  { label: 'ディナー', params: { query: 'ディナー' } },
+];
 
 const CITIES = [
   { name: '東京', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&q=80&w=800' },
@@ -34,30 +44,43 @@ export default function Home({ onNavigate }: HomeProps) {
             alt="Hero background"
           />
         </div>
-        <div className="relative z-10 text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-serif text-white mb-6 tracking-tight">
+        <div className="relative z-10 text-center px-4 w-full max-w-3xl mx-auto">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-serif text-white mb-4 md:mb-6 tracking-tight leading-tight">
             会食の成否は、<br className="md:hidden" />店選びで決まる。
           </h1>
-          <p className="text-slate-300 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-slate-300 text-sm sm:text-base md:text-xl mb-8 md:mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
             ビジネスエグゼクティブのための、会食特化型口コミサイト。<br className="hidden md:block" />
             リアルな声に基づいた、失敗しない接待体験を。
           </p>
 
-          <div className="bg-white p-2 rounded-full shadow-2xl flex max-w-2xl mx-auto">
+          <div className="bg-white p-1.5 md:p-2 rounded-full shadow-2xl flex max-w-2xl mx-auto">
             <input
               type="text"
               placeholder="エリア、ジャンル、キーワードで検索..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-grow px-6 py-3 rounded-full focus:outline-none text-slate-800"
+              className="flex-grow px-4 md:px-6 py-2.5 md:py-3 rounded-full focus:outline-none text-slate-800 text-sm md:text-base"
             />
             <button
               onClick={handleSearch}
-              className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition-all flex items-center gap-2"
+              className="bg-slate-900 text-white px-5 md:px-8 py-2.5 md:py-3 rounded-full font-bold hover:bg-slate-800 transition-all flex items-center gap-1.5 md:gap-2 text-sm md:text-base"
             >
-              <Search size={16} /> 検索
+              <Search size={15} /> 検索
             </button>
+          </div>
+
+          {/* Filter chips */}
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
+            {FILTER_CHIPS.map((chip) => (
+              <button
+                key={chip.label}
+                onClick={() => onNavigate('search', undefined, chip.params)}
+                className="bg-white/20 border border-white/30 text-white text-xs sm:text-sm px-3 py-1.5 rounded-full hover:bg-white/30 transition-all backdrop-blur-sm"
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -66,7 +89,7 @@ export default function Home({ onNavigate }: HomeProps) {
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">主要エリアから探す</h2>
+            <h2 className="text-xl sm:text-3xl font-serif font-bold text-slate-900 mb-2">主要エリアから探す</h2>
             <p className="text-slate-500">全国のビジネス拠点から最適な一軒を。</p>
           </div>
           <button
@@ -97,48 +120,23 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-      {/* Value Proposition */}
-      <section className="py-20 bg-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-slate-500 uppercase tracking-widest text-sm font-bold">Why Executive Dining</span>
-            <h2 className="text-4xl font-serif font-bold text-slate-900 mt-2 mb-4">
-              接待に特化した、唯一の評価軸
-            </h2>
-            <div className="w-16 h-1 bg-slate-900 mx-auto"></div>
-            <p className="text-slate-500 text-lg max-w-2xl mx-auto mt-6">
-              一般的なグルメサイトでは分からない、ビジネスシーンで本当に重要な情報を提供します。
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: '🔒',
-                title: '機密性・個室評価',
-                desc: '防音性能、視線の遮蔽、会話の漏れやすさなど、重要な商談に必要な環境を詳細に評価。完全個室かどうかだけでなく、実際の使用感を口コミで確認。',
-              },
-              {
-                icon: '🤖',
-                title: 'AI ビジネス診断',
-                desc: 'Gemini AI が複数の口コミを統合分析。「役員接待に最適か」「機密性は保たれるか」「どんな会食シーンに向くか」を総合スコアで可視化。',
-              },
-              {
-                icon: '🚖',
-                title: 'アクセス・帰宅動線',
-                desc: '会食後のタクシーの捕まえやすさ、ハイヤー駐車スペース、最寄り駅の具体的な出口まで。スムーズな帰宅を実現する実践的な情報を提供。',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="bg-white rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all cursor-default"
-              >
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-serif text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                <p className="text-slate-500 leading-relaxed text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
+      {/* Service Teaser */}
+      <section className="py-14 md:py-20 bg-slate-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="text-slate-500 uppercase tracking-widest text-xs sm:text-sm font-bold">Why Executive Dining</span>
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mt-2 mb-4">
+            接待に特化した、唯一の評価軸
+          </h2>
+          <div className="w-12 h-1 bg-slate-900 mx-auto mb-4"></div>
+          <p className="text-slate-500 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
+            一般的なグルメサイトでは分からない、ビジネスシーンで本当に重要な情報を提供します。
+          </p>
+          <button
+            onClick={() => onNavigate('about')}
+            className="inline-flex items-center gap-2 text-slate-900 font-semibold border border-slate-300 px-6 py-3 rounded-full hover:bg-slate-200 transition-all text-sm md:text-base"
+          >
+            詳しく見る <ChevronRight size={16} />
+          </button>
         </div>
       </section>
 
@@ -147,7 +145,7 @@ export default function Home({ onNavigate }: HomeProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-slate-500 uppercase tracking-widest text-sm font-bold">Selection</span>
-            <h2 className="text-4xl font-serif font-bold text-slate-900 mt-2">全国の厳選店</h2>
+            <h2 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 mt-2">全国の厳選店</h2>
             <div className="w-16 h-1 bg-slate-900 mx-auto mt-6"></div>
           </div>
 
@@ -176,7 +174,7 @@ export default function Home({ onNavigate }: HomeProps) {
       {/* CTA Section */}
       <section className="py-24 bg-slate-900">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="font-serif text-4xl font-bold text-white mb-4">
+          <h2 className="font-serif text-2xl md:text-4xl font-bold text-white mb-4">
             次の会食、失敗できますか？
           </h2>
           <p className="text-slate-300 text-lg mb-10">

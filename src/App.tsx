@@ -6,17 +6,24 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import Detail from './pages/Detail';
 import Admin from './pages/Admin';
+import About from './pages/About';
+
+export interface SearchParams {
+  query?: string;
+  region?: string;
+  privateRoom?: string;
+}
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [searchKey, setSearchKey] = useState(0);
-  const [searchInitialQuery, setSearchInitialQuery] = useState('');
+  const [searchInitialParams, setSearchInitialParams] = useState<SearchParams>({});
 
-  const handleNavigate = (page: Page, restaurantId?: string, searchParams?: { query?: string }) => {
+  const handleNavigate = (page: Page, restaurantId?: string, searchParams?: SearchParams) => {
     if (restaurantId) setSelectedRestaurantId(restaurantId);
     if (page === 'search') {
-      setSearchInitialQuery(searchParams?.query ?? '');
+      setSearchInitialParams(searchParams ?? {});
       setSearchKey((k) => k + 1);
     }
     setCurrentPage(page);
@@ -29,11 +36,20 @@ export default function App() {
         <Header currentPage={currentPage} onNavigate={handleNavigate} />
 
         {currentPage === 'home' && <Home onNavigate={handleNavigate} />}
-        {currentPage === 'search' && <Search key={searchKey} initialQuery={searchInitialQuery} onNavigate={handleNavigate} />}
+        {currentPage === 'search' && (
+          <Search
+            key={searchKey}
+            initialQuery={searchInitialParams.query ?? ''}
+            initialRegion={searchInitialParams.region}
+            initialPrivateRoom={searchInitialParams.privateRoom}
+            onNavigate={handleNavigate}
+          />
+        )}
         {currentPage === 'detail' && selectedRestaurantId && (
           <Detail restaurantId={selectedRestaurantId} onNavigate={handleNavigate} />
         )}
         {currentPage === 'admin' && <Admin />}
+        {currentPage === 'about' && <About onNavigate={handleNavigate} />}
       </div>
     </AuthProvider>
   );

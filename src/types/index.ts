@@ -39,7 +39,9 @@ export interface Restaurant {
   parkingAvailable: boolean;
   taxiEase: number; // タクシーの捕まえやすさ (1-5)
   dressCode: string;
-  reservationRequired: boolean;
+  reservationStatus: '可能' | '不可能' | '要予約';
+  reservationUrl?: string;
+  smokingPolicy: '喫煙可' | '喫煙室あり' | '禁煙';
   createdAt: string;
 }
 
@@ -92,4 +94,4 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export type Page = 'home' | 'search' | 'detail' | 'admin';
+export type Page = 'home' | 'search' | 'detail' | 'admin' | 'about';
