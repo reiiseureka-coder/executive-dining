@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# Executive Dining
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 / TypeScript / Vite 7 / Tailwind CSS 4 による会食店検索のプレビュー版です。
 
-Currently, two official plugins are available:
+## 開発・検証
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Node.js 22.18+（テストで TypeScript の型除去を利用）を使用します。
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm ci
+npm run test
+npm run lint
+npm run build
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 現在利用できる機能
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- 6件の既存サンプルを対象に、店名・英語名・住所・エリア・料理などを複数語で検索
+- 個室・予算上限・営業時間に基づくランチ／ディナーの絞り込みと並び替え
+- 検索条件と店舗詳細をハッシュURLに保持。再読み込み・ブラウザの戻る／進むに対応
+- 候補のブラウザ内保存、保存した候補のみの表示
+- 口コミ・掲載情報のブラウザ内下書き保存。外部への送信や公開はしません
+- 設定済みの場合のみ既存のSupabase Googleログイン。未設定でも検索画面は利用可能
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+掲載情報・写真・評価・口コミはすべてサンプルです。実在店舗の最新情報・公式掲載・実際の来店記録を示しません。電話・予約への直接リンクは設置せず、公式情報を検索する導線にしています。
+
+## 本番データ接続の前に必要な確認
+
+1. 店舗情報の取得・掲載権限・正確性と写真の利用条件を確認し、モックとの区別を設計する。
+2. 実際のSupabaseスキーマを確認する。既存 `supabase_setup.sql` にはフロントエンドの `reservation_status`、`reservation_url`、`smoking_policy` がないため、そのまま掲載登録できない。
+3. 口コミの作者IDの検証、承認・編集・削除フロー、店舗掲載の権限を設計し、RLSを確認する。既存SQLのプロフィール公開範囲・ランク変更権限も見直す必要がある。この変更ではSQL／RLSを実行・変更していない。
+4. 公開前に実際の利用規約・プライバシーポリシーと運営主体を用意する。存在しない規約への同意リンクは表示しない。
+5. AIは現在準備中。プロバイダーキーを `VITE_*` 環境変数に入れるとブラウザに公開されるため、旧クライアント直接呼び出しは無効化した。再公開にはサーバー側の認証・レート制限・データ検証と費用管理が必要。既に公開済みのキーがある場合は管理者が利用状況を確認しローテーションする。
+
+任意の認証設定：`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`。秘密鍵・service-roleキーはフロントエンドへ渡さないでください。
+
+## 保存について
+
+候補と下書きはlocalStorageを利用し、このブラウザの同じオリジン内だけに保存されます。端末間・アカウント間の同期はありません。保存領域が使えないときはエラーを表示し、成功したと誤表示しません。共有端末では個人情報を入力しないでください。
+
+GitHubのmain更新後に接続済みVercelが自動デプロイする想定です。設定や環境変数はこの更新では変更していません。

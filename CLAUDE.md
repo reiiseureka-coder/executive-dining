@@ -1,131 +1,30 @@
-# Executive Dining — プロジェクト概要
+# Executive Dining — 開発ガイド
 
-ビジネスエグゼクティブ向けの**会食・接待特化型口コミサイト**。
-「成功するビジネスは、食卓から始まる」をコンセプトに、接待・商談に適した飲食店を探せるプラットフォーム。
+React 19 / TypeScript / Vite 7 / Tailwind CSS 4 の会食店検索プレビューです。詳細と本番化の未解決事項は README.md を参照してください。
 
----
+## 検証
 
-## 技術スタック
+Node.js 22.18+。`npm ci`、`npm run test`、`npm run lint`、`npm run build`。
+UI変更はスマホ・デスクトップ、検索から詳細への移動、ブラウザの戻る／進む、再読み込み、ダイアログの閉じる／Escapeを確認してください。
 
-| 項目 | 内容 |
-|------|------|
-| フレームワーク | React 19 + TypeScript |
-| ビルドツール | Vite 6 |
-| スタイリング | Tailwind CSS v4 + カスタム CSS（src/index.css）|
-| フォント | Playfair Display（serif）、Noto Sans JP、Inter |
-| アイコン | lucide-react |
-| AI | Google Gemini API（`@google/genai`）|
-| 認証 | Supabase Auth（Google OAuth）|
-| ルーティング | 外部ライブラリなし（App.tsx の state ベース独自実装）|
-| バックエンド | Supabase（DBスキーマ: supabase_setup.sql）/ 現在はモックデータ |
+## 構成
 
----
+- `src/lib/routing.ts`: ハッシュルーティング。検索条件は詳細URLにも保持
+- `src/lib/search.ts`: 正規化・複数語検索・地域／個室／予算／時間帯の絞り込み
+- `src/hooks/useSavedRestaurants.ts`: ブラウザ内の候補保存
+- `src/lib/drafts.ts`: ブラウザ内の下書きの安全な読み込み
+- `src/data/mockData.ts`: 既存サンプル6店と架空の口コミ。実データとして表示しない
+- `src/components/SampleNotice.tsx`: サンプル情報の明示
+- `src/contexts/AuthContext.tsx`: 任意のSupabase認証。未設定でも閲覧できる
 
-## ディレクトリ構成
+## 重要な制約
 
-```
-executive-dining/
-├── index.html
-├── CLAUDE.md
-├── supabase_setup.sql          # Supabase テーブル定義
-├── src/
-│   ├── main.tsx                # エントリーポイント
-│   ├── App.tsx                 # ルーティング・グローバル state 管理
-│   ├── index.css               # グローバルスタイル（font-serif 定義・glass-morphism 等）
-│   ├── components/
-│   │   ├── Header.tsx          # ヘッダー（ナビゲーション・ログインモーダル）
-│   │   ├── RestaurantCard.tsx  # 店舗カードコンポーネント
-│   │   ├── RankBadge.tsx       # ユーザーランクバッジ
-│   │   └── StarRating.tsx      # 星評価 UI
-│   ├── contexts/
-│   │   └── AuthContext.tsx     # Supabase 認証コンテキスト
-│   ├── pages/
-│   │   ├── Home.tsx            # ホーム（ヒーロー・エリアカード・厳選店・フッター）
-│   │   ├── Search.tsx          # 検索・絞り込み結果ページ
-│   │   ├── Detail.tsx          # 店舗詳細ページ
-│   │   └── Admin.tsx           # 店舗登録ページ
-│   ├── services/
-│   │   └── gemini.ts           # Gemini API（ビジネス適性分析・アクセスガイド）
-│   ├── data/
-│   │   └── mockData.ts         # モック店舗・口コミデータ
-│   ├── types/
-│   │   └── index.ts            # 型定義（Restaurant, Review, Page 等）
-│   └── lib/
-│       └── supabase.ts         # Supabase クライアント
-```
+- 投稿・掲載はローカル下書きのみ。成功表示は実際に保存できた場合に限る
+- 本番DBのスキーマ・RLS変更は別途承認が必要。SQLを勝手に適用しない
+- AIは準備中。Gemini等の秘密鍵を `VITE_*` に置かない。ブラウザ直接呼び出しを復活させない
+- 利用規約・プライバシーポリシーは未提供。架空リンクや同意文を作らない
+- サンプル写真を実店舗の写真として扱わない。未確認の店舗設備や予約可否を保証しない
 
----
+## デザイン
 
-## ルーティング
-
-`App.tsx` の `currentPage` state で制御するスイッチ方式。外部ルーターは使用しない。
-
-| page | コンポーネント | 主な params |
-|------|--------------|------------|
-| `home` | `Home` | — |
-| `search` | `Search` | `initialQuery?: string`（キーワード・エリア名）|
-| `detail` | `Detail` | `restaurantId: string` |
-| `admin` | `Admin` | — |
-
-ページ間の遷移はすべて `handleNavigate(page, restaurantId?, searchParams?)` 経由。
-Search への遷移時は `searchKey` をインクリメントしてコンポーネントをリセットする。
-
----
-
-## 主要な型（src/types/index.ts）
-
-- **Restaurant**: `businessSpecs`（接客/静かさ/アクセス/機密性/雰囲気）、`overallBusinessScore`（0-100）、`privateRoomType`、`tags` 等を含む詳細な店舗情報
-- **Review**: 接客・静かさ・アクセス・機密性・雰囲気の個別評価 + コメント
-- **AIAnalysis**: Gemini が生成するビジネス適性スコア・推奨シーン・懸念点
-- **AIAccessGuide**: 最寄り駅・タクシー案内・ドライバー指示文
-- **UserProfile / UserRank**: ブロンズ / シルバー / ゴールド / ルビー
-- **Page**: `'home' | 'search' | 'detail' | 'admin'`
-
----
-
-## AI 機能（src/services/gemini.ts）
-
-### ビジネス適性分析 `analyzeRestaurantForBusiness()`
-- モデル: `gemini-2.0-flash`
-- 店舗情報 + 口コミを元に `AIAnalysis` を JSON で返す
-
-### アクセスガイド `getAccessGuide()`
-- モデル: `gemini-2.0-flash`
-- 住所・最寄り駅情報から `AIAccessGuide` を JSON で返す
-
-環境変数 `VITE_GEMINI_API_KEY`（`.env.local`）が未設定の場合は AI 機能が無効化される。
-
----
-
-## 認証（Supabase）
-
-- Google OAuth でサインイン
-- サインイン時に `user_profiles` テーブルへ自動でプロフィールを作成
-- ランクは `ブロンズ` からスタート
-
----
-
-## デザイン方針
-
-- **ベース**: 白・スレートの落ち着いたカラーパレット
-- **見出し**: `font-serif`（Playfair Display）を使用
-- **カード**: 白背景・ライトボーダーのクリーンなスタイル
-- **ヘッダー**: glass-morphism（`glass-morphism` クラス、`src/index.css` 定義）
-
----
-
-## 開発コマンド
-
-```bash
-npm run dev      # 開発サーバー起動（http://localhost:5173）
-npm run build    # プロダクションビルド
-npm run preview  # ビルド結果のプレビュー
-```
-
-## 環境変数（.env.local）
-
-```
-VITE_GEMINI_API_KEY=...          # Google Gemini API キー
-VITE_SUPABASE_URL=...            # Supabase プロジェクト URL
-VITE_SUPABASE_ANON_KEY=...       # Supabase 匿名キー
-```
+温かいアイボリー、濃い文字色、落ち着いたグリーン。日本語の明朝見出しと読みやすい本文。大きなグラデーション・過剰なピル／影・AIを強調する装飾は避け、条件・写真・余白で整理します。

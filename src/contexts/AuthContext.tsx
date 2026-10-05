@@ -1,108 +1,87 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
-import type { UserProfile, UserRank } from '../types';
-
-interface AuthContextValue {
-  session: Session | null;
-  user: User | null;
-  profile: UserProfile | null;
-  loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
+import { useEffect, useState, type ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
+import { AuthContext } from "./auth";
+import type { UserProfile, UserRank } from "../types";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(Boolean(supabase));
   useEffect(() => {
-    // 初期セッション取得
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchOrCreateProfile(session.user);
-      else setLoading(false);
-    });
-
-    // セッション変更の監視
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchOrCreateProfile(session.user);
-      else {
-        setProfile(null);
-        setLoading(false);
+    const client = supabase;
+    if (!client) return;
+    let alive = true;
+    let generation = 0;
+    const updateSession = async (next: Session | null) => {
+      const request = ++generation;
+      if (!alive) return;
+      setSession(next);
+      setProfile(null);
+      try {
+        if (next?.user) {
+          const { data } = await client
+            .from("user_profiles")
+            .select("*")
+            .eq("id", next.user.id)
+            .maybeSingle();
+          if (alive && request === generation && data)
+            setProfile({
+              id: data.id,
+              email: data.email,
+              displayName: data.display_name,
+              avatarUrl: data.avatar_url,
+              rank: data.rank as UserRank,
+              createdAt: data.created_at,
+            });
+        }
+      } finally {
+        if (alive && request === generation) setLoading(false);
       }
+    };
+    client.auth
+      .getSession()
+      .then(({ data }) => updateSession(data.session))
+      .catch(() => {
+        if (alive) setLoading(false);
+      });
+    const {
+      data: { subscription },
+    } = client.auth.onAuthStateChange((_event, next) => {
+      setTimeout(() => {
+        if (alive) void updateSession(next).catch(() => {});
+      }, 0);
     });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      alive = false;
+      subscription.unsubscribe();
+    };
   }, []);
-
-  const fetchOrCreateProfile = async (user: User) => {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
-    if (error || !data) {
-      // プロフィールが存在しない場合は作成
-      const newProfile = {
-        id: user.id,
-        email: user.email ?? '',
-        display_name: user.user_metadata?.full_name ?? user.email ?? '',
-        avatar_url: user.user_metadata?.avatar_url ?? null,
-        rank: 'ブロンズ' as UserRank,
-      };
-      const { data: created } = await supabase
-        .from('user_profiles')
-        .insert(newProfile)
-        .select()
-        .single();
-      if (created) setProfile(toUserProfile(created));
-    } else {
-      setProfile(toUserProfile(data));
-    }
-    setLoading(false);
-  };
-
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
+    if (!supabase) throw new Error("ログイン機能は準備中です。");
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
       options: { redirectTo: window.location.origin },
     });
+    if (error) throw error;
   };
-
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (supabase) {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    }
   };
-
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user: session?.user ?? null,
+        profile,
+        loading,
+        signInWithGoogle,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
-
-// DBの snake_case → camelCase 変換
-function toUserProfile(data: Record<string, unknown>): UserProfile {
-  return {
-    id: data.id as string,
-    email: data.email as string,
-    displayName: data.display_name as string,
-    avatarUrl: data.avatar_url as string | undefined,
-    rank: data.rank as UserRank,
-    createdAt: data.created_at as string,
-  };
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Save, Plus, CheckCircle, Building2, MapPin, Utensils, Lock, Clock, Phone, Users, Star, CreditCard } from 'lucide-react';
 import type { Restaurant } from '../types';
-import { supabase } from '../lib/supabase';
+import { readDraft } from '../lib/drafts';
 
 type FormData = Omit<Restaurant, 'id' | 'avgRating' | 'reviewCount' | 'overallBusinessScore' | 'createdAt'>;
 
@@ -78,7 +78,7 @@ const clearValidity = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement
 const selectCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
 
 export default function Admin() {
-  const [form, setForm] = useState<FormData>(INITIAL);
+  const [form, setForm] = useState<FormData>(() => readDraft('executive-dining:listing-draft:v1', INITIAL));
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -118,56 +118,15 @@ export default function Admin() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setSaveError('');
-
-    const record = {
-      name: form.name,
-      name_en: form.nameEn,
-      genre: form.genre,
-      region: form.region,
-      area: form.area,
-      address: form.address,
-      nearest_station: form.nearestStation,
-      private_room_type: form.privateRoomType,
-      private_room_detail: form.privateRoomDetail,
-      course_type: form.courseType,
-      price_range: form.priceRange,
-      avg_price_per_person: form.avgPricePerPerson,
-      avg_rating: 0,
-      review_count: 0,
-      business_specs: form.businessSpecs,
-      overall_business_score: 0,
-      service_level: form.serviceLevel,
-      drink_all_inclusive: form.drinkAllInclusive,
-      payment_methods: form.paymentMethods,
-      tags: form.tags,
-      image_url: form.imageUrl,
-      description: form.description,
-      recommended_for: form.recommendedFor,
-      tel: form.tel,
-      open_hours: form.openHours,
-      closed_days: form.closedDays,
-      capacity: form.capacity,
-      private_room_capacity: form.privateRoomCapacity,
-      parking_available: form.parkingAvailable,
-      taxi_ease: form.taxiEase,
-      dress_code: form.dressCode,
-      reservation_status: form.reservationStatus,
-      reservation_url: form.reservationUrl,
-      smoking_policy: form.smokingPolicy,
-    };
-
-    const { error } = await supabase.from('restaurants').insert(record);
-    setSaving(false);
-
-    if (error) {
-      setSaveError(`保存に失敗しました: ${error.message}`);
-    } else {
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true); setSaveError('');
+    try {
+      localStorage.setItem('executive-dining:listing-draft:v1', JSON.stringify(form));
       setSubmitted(true);
-    }
+    } catch {
+      setSaveError('下書きを保存できませんでした。ブラウザの保存設定や空き容量をご確認ください。');
+    } finally { setSaving(false); }
   };
 
   if (submitted) {
@@ -177,16 +136,16 @@ export default function Admin() {
           <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5">
             <CheckCircle size={32} className="text-emerald-500" />
           </div>
-          <h2 className="font-serif text-2xl font-bold text-slate-900 mb-2">登録が完了しました</h2>
+          <h2 className="font-serif text-2xl font-bold text-slate-900 mb-2">下書きを保存しました</h2>
           <p className="text-slate-500 text-sm mb-6">
-            「{form.name}」を登録しました。
+            「{form.name}」をこのブラウザに保存しました。送信・公開はされていません。
           </p>
           <button
             onClick={() => { setForm(INITIAL); setSubmitted(false); }}
             className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl hover:bg-indigo-400 transition-colors cursor-pointer"
           >
             <Plus size={16} />
-            次の店舗を登録する
+            別の店舗の下書きを作る
           </button>
         </div>
       </div>
@@ -202,8 +161,8 @@ export default function Admin() {
               <Building2 size={20} className="text-indigo-400" />
             </div>
             <div>
-              <h1 className="font-serif text-2xl font-bold text-white">新規店舗登録</h1>
-              <p className="text-slate-400 text-sm">Executive Dining プラットフォームへの掲載申請</p>
+              <h1 className="font-serif text-2xl font-bold text-white">掲載情報の下書き</h1>
+              <p className="text-slate-400 text-sm">掲載申請は準備中です。現在はこのブラウザ内に下書きだけを保存できます。</p>
             </div>
           </div>
         </div>
@@ -211,6 +170,7 @@ export default function Admin() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <p className="sample-notice">保存した情報は検索結果には反映されません。送信・公開には、運営側でのデータベース接続と内容確認が必要です。</p>
           {/* Basic Info */}
           <Section title="基本情報" icon={Building2}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -498,7 +458,7 @@ export default function Admin() {
               className="flex items-center gap-2 px-8 py-3 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
             >
               <Save size={16} />
-              {saving ? '保存中...' : '店舗を登録する'}
+              {saving ? '保存中...' : '下書きを保存する'}
             </button>
           </div>
         </form>

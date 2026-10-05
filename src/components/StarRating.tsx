@@ -17,6 +17,8 @@ export default function StarRating({ value, onChange, size = 20, readonly = fals
           onClick={() => !readonly && onChange?.(star)}
           className={`transition-transform ${readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'}`}
           disabled={readonly}
+          aria-label={`${star}つ星`}
+          aria-pressed={!readonly ? star === value : undefined}
         >
           <Star
             size={size}
