@@ -4,7 +4,7 @@ export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn';
 export type FactField = 'name' | 'address' | 'website' | 'genre' | 'private_room' | 'price' | 'hours' | 'access' | 'coordinates' | 'notice';
 export const FACT_LABELS: Record<FactField, string> = {
   name: '店舗名', address: '所在地', website: '公式サイト', genre: '料理',
-  private_room: '個室', price: '料金', hours: '営業時間', access: 'アクセス', coordinates: '地図位置', notice: '営業のお知らせ',
+  private_room: '個室', price: '掲載コース・料金', hours: '営業時間', access: 'アクセス', coordinates: '地図位置', notice: '営業のお知らせ',
 };
 export interface Provenance {
   provider: string;

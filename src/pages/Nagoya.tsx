@@ -1,46 +1,55 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, MapPin, Search } from 'lucide-react';
-import { diningRepository } from '../data/diningClient';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
+import { ArrowUpRight, Bookmark, MapPin, Search } from 'lucide-react';
+import type { Page } from '../types';
+import type { SearchParams } from '../lib/search';
+import { catalogGenres, filterCatalog } from '../lib/catalogSearch';
 import { configuredMapProvider } from '../components/map/mapProvider';
-import { FACT_LABELS, factValue, safeExternalUrl, searchVerifiedRestaurants, type VerifiedRestaurant } from '../domain/dining';
+import { factValue, safeExternalUrl, verifiedCoordinates } from '../domain/dining';
+import { usePublicCatalog } from '../hooks/usePublicCatalog';
+import { useSavedCatalog } from '../hooks/useSavedCatalog';
+import { VerifiedEvidence, VerifiedFactList, VerifiedReviews } from '../components/VerifiedFacts';
 const RestaurantMap = lazy(() => import('../components/map/RestaurantMap'));
 const date = (value: string) => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(value));
-export default function Nagoya() {
-  const [rows, setRows] = useState<VerifiedRestaurant[]>([]);
-  const [query, setQuery] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(Boolean(diningRepository));
-  const [showMap, setShowMap] = useState(false);
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    if (!diningRepository) return;
-    const controller = new AbortController();
-    diningRepository.listPublished(controller.signal).then(data => { if (!controller.signal.aborted) setRows(data); }).catch(() => {
-      if (!controller.signal.aborted) setError('掲載情報を読み込めませんでした。時間をおいて再度お試しください。');
-    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
-  }, [retry]);
-  const filtered = useMemo(() => searchVerifiedRestaurants(rows, query), [rows, query]);
+interface Props { params: SearchParams; onChange: (params: SearchParams) => void; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
+export default function Nagoya({ params, onChange, onNavigate }: Props) {
+  const { rows, loading, error, reload } = usePublicCatalog();
+  const { savedIds, toggleSaved, storageWarning } = useSavedCatalog();
+  const [selected, setSelected] = useState('');
+  const genres = useMemo(() => catalogGenres(rows), [rows]);
+  const filtered = useMemo(() => filterCatalog(rows, params, savedIds), [rows, params, savedIds]);
+  const showMap = params.view === 'map';
+  const update = (key: keyof SearchParams, value: string) => onChange({ ...params, [key]: value });
   const select = useCallback((id: string) => {
+    setSelected(id);
     const element = document.getElementById(`verified-${id}`);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    element?.focus({ preventScroll: true });
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' }); element?.focus({ preventScroll: true });
   }, []);
   return <div className="page-width catalog-page">
     <div className="catalog-heading"><div><p className="eyebrow">NAGOYA / VERIFIED FACTS</p><h1>名古屋の会食、<br />確かめた情報から。</h1></div><p>公式情報を項目ごとに確認して掲載します。<br />個室・料金・営業状況の最終確認は、予約前にお店へ。</p></div>
-    <div className="catalog-explainer"><MapPin size={19} aria-hidden="true" /><p>取得候補は審査後に掲載します。写真や星の評価を補って表示することはありません。口コミは、本人の投稿を審査する仕組みを準備中です。</p></div>
-    <div className="catalog-toolbar"><label className="catalog-search"><Search size={18} aria-hidden="true" /><input aria-label="名古屋の確認済み店舗を検索" placeholder="店名・エリア・個室など" value={query} onChange={event => setQuery(event.target.value)} /></label><button className="button-secondary" onClick={() => setShowMap(value => !value)} aria-pressed={showMap}>{showMap ? '地図を閉じる' : '地図を表示'}</button></div>
-    <p className="catalog-count" aria-live="polite">{loading ? '掲載情報を確認しています…' : `確認済み掲載 ${filtered.length}件`}</p>
+    <div className="catalog-explainer"><MapPin size={19} aria-hidden="true" /><p>公式のコース価格と条件をそのまま掲載します。平均予算・空席・防音性は推測しません。口コミは、本人の投稿を審査する仕組みを準備中です。</p></div>
+    <div className="catalog-toolbar"><label className="catalog-search"><Search size={18} aria-hidden="true" /><input aria-label="名古屋の確認済み店舗を検索" placeholder="店名・エリア・個室など（複数語）" value={params.query ?? ''} onChange={event => update('query', event.target.value)} /></label><button className="button-secondary" onClick={() => update('view', showMap ? '' : 'map')} aria-pressed={showMap}>{showMap ? '地図を閉じる' : '地図を表示'}</button></div>
+    <div className="catalog-filters">
+      <label>料理<select value={params.genre ?? ''} onChange={event => update('genre', event.target.value)}><option value="">すべての料理</option>{genres.map(genre => <option key={genre}>{genre}</option>)}</select></label>
+      <label>確認できる情報<select value={params.information ?? ''} onChange={event => update('information', event.target.value)}><option value="">指定しない</option><option value="private_room">個室情報あり</option><option value="price">料金情報あり</option><option value="hours">営業時間情報あり</option><option value="notice">営業のお知らせあり</option><option value="coordinates">地図位置確認済み</option></select></label>
+      <label>並び順<select value={params.sort ?? 'name'} onChange={event => update('sort', event.target.value)}><option value="name">店名順</option><option value="recent">確認日が新しい順</option></select></label>
+      <label className="catalog-saved-filter"><input type="checkbox" checked={params.saved === '1'} onChange={event => update('saved', event.target.checked ? '1' : '')} />保存した候補のみ</label>
+      <button className="catalog-reset" onClick={() => onChange({})}>条件をリセット</button>
+    </div>
+    <p className="catalog-filter-note">「情報あり」は確認記録の有無です。個室の有無・利用条件は本文でご確認ください。</p>
+    <div className="catalog-result-heading"><p className="catalog-count" aria-live="polite">{loading ? '掲載情報を確認しています…' : `確認済み掲載 ${filtered.length}件`}</p><button className="catalog-reset" disabled={loading} onClick={() => void reload()}>最新情報を取得</button></div>
+    {params.saved === '1' && <p className="catalog-filter-note">保存した候補のうち、公開中の情報を表示します。保存はこのブラウザ内のみです。</p>}
+    {storageWarning && <p className="sample-notice" role="status">{storageWarning}</p>}
     {showMap && <><p className="map-privacy">地図表示時は、背景地図の取得のため{configuredMapProvider(import.meta.env.VITE_MAP_STYLE_URL).name}へ接続します。端末の現在地は取得しません。</p><Suspense fallback={<p role="status">地図を準備しています…</p>}><RestaurantMap restaurants={filtered} onSelect={select} /></Suspense></>}
-    {error && <div className="catalog-empty" role="alert"><h2>掲載情報を取得できません</h2><p>{error}</p><button className="button-secondary" onClick={() => { setLoading(true); setError(''); setRetry(value => value + 1); }}>再読み込み</button></div>}
-    {!loading && !error && !filtered.length && <div className="catalog-empty"><p className="eyebrow">{rows.length ? 'NO RESULTS' : 'UNDER REVIEW'}</p><h2>{rows.length ? '条件に合うお店がありません' : '名古屋の掲載情報を準備しています'}</h2><p>{rows.length ? '別の店名やエリアで検索してください。' : '候補の収集と公式情報の確認を進めています。掲載承認が終わったお店から、ここに表示します。'}</p><a href="#/search">サンプルで検索画面を見る <ArrowUpRight size={15} /></a></div>}
+    {error && <div className="catalog-empty" role="alert"><h2>掲載情報を取得できません</h2><p>{error}</p><button className="button-secondary" onClick={() => void reload()}>再読み込み</button></div>}
+    {!loading && !error && !filtered.length && <div className="catalog-empty"><p className="eyebrow">{rows.length ? 'NO RESULTS' : 'UNDER REVIEW'}</p><h2>{rows.length ? '条件に合うお店がありません' : '名古屋の掲載情報を準備しています'}</h2><p>{rows.length ? '別の店名や条件で検索してください。保存した候補も、公開が取り下げられた場合は表示されません。' : '候補を公式情報で確認しています。掲載承認と公開設定が完了したお店から、ここに表示します。'}</p>{rows.length ? <button className="button-secondary" onClick={() => onChange({})}>条件をリセット</button> : <a href="#/search">サンプルで検索画面を見る <ArrowUpRight size={15} /></a>}</div>}
     <div className="verified-list">{filtered.map(restaurant => {
       const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
-      return <article className="verified-card" key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
-        <div className="verified-card-heading"><div><p className="eyebrow">公式情報確認 · {date(restaurant.verifiedAt)}</p><h2>{restaurant.name}</h2><p>{restaurant.address}</p></div>{website && <a className="button-secondary" href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}</div>
-        <dl className="verified-facts">{(['genre', 'private_room', 'price', 'hours', 'access', 'notice'] as const).map(field => <div key={field}><dt>{FACT_LABELS[field]}</dt><dd>{factValue(restaurant, field) ?? '未確認'}</dd></div>)}</dl>
-        <details className="fact-evidence"><summary>出典・確認日を見る</summary><ul>{restaurant.facts.filter(fact => safeExternalUrl(fact.sourceUrl)).map(fact => <li key={fact.field}><a href={safeExternalUrl(fact.sourceUrl)!} target="_blank" rel="noreferrer">{FACT_LABELS[fact.field]}の出典</a><span>取得 {date(fact.fetchedAt)} / 確認 {date(fact.verifiedAt)}{fact.licenses.length > 0 ? ` · ${fact.licenses.join(', ')}` : ''}</span>{fact.attributions.length > 0 && <small>{fact.attributions.join(' / ')}</small>}</li>)}</ul></details>
-        <div className="verified-reviews"><h3>このサービスの口コミ</h3>{restaurant.reviews.length === 0 ? <p>公開された口コミはまだありません。</p> : restaurant.reviews.map(review => <div key={review.id}><p>{review.displayName} · {review.rating}/5 · {review.visitedMonth}来店</p><p>{review.comment}</p></div>)}</div>
+      const saved = savedIds.includes(restaurant.id);
+      return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
+        <div className="verified-card-heading"><div><p className="eyebrow">公式情報確認 · {date(restaurant.verifiedAt)}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
+        <VerifiedFactList restaurant={restaurant} compact />
+        <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>詳細と確認情報を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<span>{verifiedCoordinates(restaurant) ? '地図位置確認済み' : '地図位置は確認中'}</span></div>
+        <VerifiedEvidence restaurant={restaurant} /><VerifiedReviews restaurant={restaurant} />
       </article>;
     })}</div>
   </div>;

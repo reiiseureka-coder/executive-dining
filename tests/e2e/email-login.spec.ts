@@ -41,19 +41,62 @@ test('email rate-limit error stays signed out and does not retry automatically',
   await expect(page.getByRole('heading', { name: '運営者のログインが必要です' })).toBeVisible();
   expect(requests).toBe(1);
 });
-test('synthetic email callback establishes a session and removes callback credentials from URL', async ({ page }) => {
-  const user = { id: 'cccccccc-cccc-4ccc-cccc-cccccccccccc', aud: 'authenticated', role: 'authenticated', email: 'fixture@example.test', created_at: '2026-10-05T00:00:00Z', app_metadata: {}, user_metadata: {} };
+const callbackUser = { id: 'cccccccc-cccc-4ccc-cccc-cccccccccccc', aud: 'authenticated', role: 'authenticated', email: 'fixture@example.test', created_at: '2026-10-05T00:00:00Z', app_metadata: {}, user_metadata: { admin: true } };
+const queue = Array.from({ length: 10 }, (_, i) => ({ id: `candidate-${i}`, name: `検証用候補${i + 1}`, address: '名古屋市中区', status: 'candidate', version: 1, verifiedAt: null, sources: [], facts: [] }));
+function callbackUrl(type = 'magiclink') {
+  const part = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const token = `${part({ alg: 'HS256', typ: 'JWT' })}.${part({ sub: callbackUser.id, exp: Math.floor(Date.now() / 1000) + 3600 })}.synthetic-signature`;
+  return `${base}/#${new URLSearchParams({ access_token: token, refresh_token: 'synthetic-refresh', expires_in: '3600', token_type: 'bearer', type })}`;
+}
+test('authorized callback lands on all ten editorial rows with safe history, reload and normal homepage persistence', async ({ page }) => {
+  let roleChecks = 0;
   await page.route('https://test-project.supabase.co/**', async route => {
     const url = route.request().url();
-    await route.fulfill({ json: url.includes('/auth/v1/user') ? user : url.endsWith('/rpc/dining_editor_access') ? true : [] });
+    if (url.endsWith('/rpc/dining_editor_access')) roleChecks++;
+    await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : url.endsWith('/rpc/dining_editor_access') ? true : url.endsWith('/rpc/dining_editor_queue') ? queue : [] });
   });
-  const part = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url');
-  const token = `${part({ alg: 'HS256', typ: 'JWT' })}.${part({ sub: user.id, exp: Math.floor(Date.now() / 1000) + 3600 })}.synthetic-signature`;
-  const params = new URLSearchParams({ access_token: token, refresh_token: 'synthetic-refresh', expires_in: '3600', token_type: 'bearer', type: 'magiclink' });
-  await page.goto(`${base}/#${params}`);
+  await page.goto(`${base}/#/about`);
+  await page.goto(callbackUrl('invite'));
+  await expect(page).toHaveURL(/#\/curation$/);
+  await expect(page.locator('.curation-card')).toHaveCount(10);
+  await expect(page.getByText('最新 10件（最大200件） / 口コミ受付は別途準備中')).toBeVisible();
+  await page.goBack(); await expect(page).toHaveURL(/#\/about$/);
   await expect(page).not.toHaveURL(/access_token|refresh_token/);
-  await page.getByRole('link', { name: '運営者向け審査', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '確認待ちの候補はありません' })).toBeVisible();
+  await page.goForward(); await expect(page).toHaveURL(/#\/curation$/);
+  await page.reload(); await expect(page.locator('.curation-card')).toHaveCount(10);
+  const beforeHome = roleChecks;
+  await page.getByRole('button', { name: 'Executive Dining ホーム', exact: true }).click();
+  await page.reload();
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(page.getByRole('heading', { name: /名古屋の会食/ })).toBeVisible();
+  expect(roleChecks).toBe(beforeHome);
+});
+test('callback intent and metadata never redirect an account denied by the server', async ({ page }) => {
+  let checks = 0, queues = 0;
+  await page.route('https://test-project.supabase.co/**', async route => {
+    const url = route.request().url(); if (url.endsWith('/rpc/dining_editor_access')) checks++; if (url.endsWith('/rpc/dining_editor_queue')) queues++;
+    await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : url.endsWith('/rpc/dining_editor_access') ? false : [] });
+  });
+  await page.goto(callbackUrl());
+  await expect.poll(() => checks).toBeGreaterThan(0);
+  await expect(page).not.toHaveURL(/curation|access_token|refresh_token/);
+  expect(queues).toBe(0);
+});
+test('new navigation during the callback permission check is never pulled back to curation', async ({ page }) => {
+  let checks = 0;
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await page.route('https://test-project.supabase.co/**', async route => {
+    const url = route.request().url();
+    if (url.endsWith('/rpc/dining_editor_access')) { checks++; await gate; await route.fulfill({ json: true }).catch(() => {}); }
+    else await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : [] });
+  });
+  await page.goto(callbackUrl());
+  await expect.poll(() => checks).toBeGreaterThan(0);
+  await page.getByRole('link', { name: '掲載情報について', exact: true }).click();
+  release();
+  await expect(page).toHaveURL(/#\/about$/);
+  await page.reload(); await expect(page).toHaveURL(/#\/about$/);
 });
 test('expired callback reports a generic error and never sends mail without a click', async ({ page, isMobile }) => {
   const requests: string[] = [];

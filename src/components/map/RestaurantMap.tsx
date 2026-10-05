@@ -10,12 +10,13 @@ setWorkerUrl(workerUrl);
 const provider = configuredMapProvider(import.meta.env.VITE_MAP_STYLE_URL);
 export default function RestaurantMap({ restaurants, onSelect }: { restaurants: VerifiedRestaurant[]; onSelect: (id: string) => void }) {
   const container = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markersRef = useRef<Marker[]>([]);
   const [failure, setFailure] = useState<MapFailure | null>(null);
   const [ready, setReady] = useState(false);
   useEffect(() => {
     if (!container.current) return;
     let map: Map | undefined;
-    const markers: Marker[] = [];
     let hadError = false;
     let active = true;
     let loaded = false;
@@ -27,18 +28,25 @@ export default function RestaurantMap({ restaurants, onSelect }: { restaurants: 
       map.scrollZoom.disable();
       map.on('error', event => { hadError = true; if (active) setFailure(classifyMapFailure(event.error)); });
       map.on('load', () => { loaded = true; if (active && !hadError) setReady(true); });
-      for (const restaurant of restaurants) {
-        const coordinates = verifiedCoordinates(restaurant);
-        if (!coordinates) continue;
-        const button = document.createElement('button');
-        button.className = 'restaurant-map-pin';
-        button.textContent = '●';
-        button.setAttribute('aria-label', `${restaurant.name}の掲載情報を表示`);
-        button.addEventListener('click', () => onSelect(restaurant.id));
-        markers.push(new Marker({ element: button }).setLngLat(coordinates).addTo(map));
-      }
+      mapRef.current = map;
     } catch (error) { queueMicrotask(() => { if (active) setFailure(classifyMapFailure(error)); }); }
-    return () => { active = false; window.clearTimeout(timeout); markers.forEach(marker => marker.remove()); map?.remove(); };
+    return () => { active = false; window.clearTimeout(timeout); markersRef.current.forEach(marker => marker.remove()); markersRef.current = []; mapRef.current = null; map?.remove(); };
+  }, []);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const markers: Marker[] = [];
+    for (const restaurant of restaurants) {
+      const coordinates = verifiedCoordinates(restaurant);
+      if (!coordinates) continue;
+      const button = document.createElement('button');
+      button.className = 'restaurant-map-pin'; button.textContent = '●';
+      button.setAttribute('aria-label', `${restaurant.name}の掲載情報を表示`);
+      button.addEventListener('click', () => onSelect(restaurant.id));
+      markers.push(new Marker({ element: button }).setLngLat(coordinates).addTo(map));
+    }
+    markersRef.current = markers;
+    return () => { markers.forEach(marker => marker.remove()); if (markersRef.current === markers) markersRef.current = []; };
   }, [restaurants, onSelect]);
   const pinCount = restaurants.filter(restaurant => verifiedCoordinates(restaurant)).length;
   return <section className="catalog-map" aria-label="名古屋エリアの地図" data-map-status={failure ?? (ready ? 'ready' : 'loading')}>

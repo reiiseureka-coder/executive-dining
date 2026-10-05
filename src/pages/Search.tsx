@@ -92,8 +92,8 @@ export default function Search({ params, onChange, onNavigate }: SearchProps) {
     <div className="page-width search-page">
       <div className="page-heading">
         <p className="eyebrow">FIND YOUR TABLE</p>
-        <h1>会食の条件から探す。</h1>
-        <p>候補を保存して、一席ずつ確かめる。</p>
+        <h1>サンプルで検索を試す。</h1>
+        <p>この画面は動作確認用の6件のサンプルです。<a href="#/nagoya">名古屋の実データ掲載はこちら</a></p>
       </div>
       <SampleNotice compact />
       <section className="search-panel" aria-label="検索条件">

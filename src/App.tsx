@@ -4,12 +4,14 @@ import type { SearchParams } from "./lib/search";
 import { parseRoute, routeHash } from "./lib/routing";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
-import Home from "./pages/Home";
+import AdminCallbackLanding from "./components/AdminCallbackLanding";
+import DemoHome from "./pages/Home";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Nagoya from "./pages/Nagoya";
+import NagoyaDetail from "./pages/NagoyaDetail";
 import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
@@ -34,11 +36,11 @@ export default function App() {
   ) => {
     const search =
       params ??
-      (route.page === "search" || route.page === "detail" ? route.params : {});
+      (["search", "detail", "nagoya", "nagoya-detail", "home"].includes(route.page) ? route.params : {});
     window.location.hash = routeHash(
       page,
       restaurantId,
-      page === "search" || page === "detail" ? search : {},
+      ["search", "detail", "nagoya", "nagoya-detail"].includes(page) ? search : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -46,13 +48,15 @@ export default function App() {
     window.history.replaceState(
       null,
       "",
-      routeHash("search", undefined, params),
+      routeHash(route.page === "search" ? "search" : "nagoya", undefined, params),
     );
     window.dispatchEvent(new HashChangeEvent("hashchange"));
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "会食の店選びを、丁寧に。",
+      home: "名古屋の会食店を探す",
+      demo: "サンプル・デモ",
+      "nagoya-detail": "名古屋の店舗情報",
       search: "お店を探す",
       detail: "店舗情報",
       about: "このサービスについて",
@@ -64,6 +68,7 @@ export default function App() {
   }, [route.page]);
   return (
     <AuthProvider>
+      <AdminCallbackLanding />
       <a
         className="skip-link"
         href="#main-content"
@@ -80,7 +85,7 @@ export default function App() {
         onNavigate={handleNavigate}
       />
       <main id="main-content" tabIndex={-1}>
-        {route.page === "home" && <Home onNavigate={handleNavigate} />}
+        {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
         {route.page === "search" && (
           <Search
             params={route.params}
@@ -95,7 +100,8 @@ export default function App() {
             onNavigate={handleNavigate}
           />
         )}
-        {route.page === "nagoya" && <Nagoya />}
+        {(route.page === "home" || route.page === "nagoya") && <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />}
+        {route.page === "nagoya-detail" && <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} />}
         {route.page === "curation" && <Curation />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
@@ -107,6 +113,7 @@ export default function App() {
           <a href="#/about">掲載情報について</a>
           <a href="#/admin">掲載情報の下書き</a>
           <a href="#/curation">運営者向け審査</a>
+          <a href="#/demo">サンプル・デモ</a>
           <span>© {new Date().getFullYear()} Executive Dining</span>
         </div>
       </footer>

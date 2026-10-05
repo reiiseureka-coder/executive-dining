@@ -154,3 +154,17 @@ npm run test:e2e
 - https://supabase.com/docs/guides/auth/auth-email-passwordless
 - https://supabase.com/docs/guides/auth/auth-smtp
 - https://supabase.com/docs/guides/auth/redirect-urls
+
+## コア画面の改善（Draft Previewのみ）
+
+- `/`と主検索導線は実データ用名古屋画面。旧6件サンプルは明示した`#/demo`/`#/search`へ分離。公開gate OFFの場合、実画面は0件のまま表示する。
+- 複数語のAND検索、公式ジャンル、確認済み情報の有無、保存候補、店名/確認日順。数値予算や個室の有無を自由記述から推測しない。
+- 実店舗UUIDのローカル保存、専用詳細URL、検索条件/地図モードを含むURL、戻る/進む/再読み込み。投稿や予約は追加しない。
+- 価格の税/サービス/席料条件、休業notice、出典/確認日を一覧・詳細へ保持する。位置未確認の店舗には推測ピンを付けない。
+- 公開RPCの同時要求をまとめ、成功結果を60秒だけメモリ内再利用。時間経過だけでは要求せず、自動pollingなし。読取失敗時は古い結果を除外してエラー/再試行を表示。
+- 地図の一覧絞り込みではmarkerだけを更新し、背景styleを再読込しない。WebGL2非対応時の代替表示は維持。
+- 招待/メールcallback時だけ、認証後のDB編集権限がtrueなら審査へ置換遷移する。通常のホーム閲覧・session復元・権限なし・別画面への途中移動には介入しない。権限をmetadataやcallback typeから判断しない。
+- pinned auth-js 2.99.3のdetectSessionInUrl hookで、SDKが既に解析したcallback URLの履歴entryを置換し、戻る操作にcredential fragmentを残さない。SDKの検証/保存/refreshは変更しない。対応はcallback/back-forward/reloadのテストで固定する。
+- SDK既定のpersistSession/autoRefreshを維持。同じ安定したoriginとブラウザではsessionを再利用する。新しいVercel一時URL、別ブラウザ、ストレージ削除では共有されない。Google OAuthは低優先の別工程。
+
+この作業ではDB/security/Auth設定/公開gate/main/Productionを変更しない。fixtureはtests内のみで、実Previewの掲載情報として同梱しない。

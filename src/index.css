@@ -1508,3 +1508,30 @@ figure {
 .email-login-form label { font-size: 13px; }
 .email-login-form input { min-width: 0; width: 100%; border: 1px solid #c5cbbc; background: #fffefb; padding: 12px; }
 .email-login-form .primary-button { margin-top: 4px; }
+.catalog-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; margin-top: 18px; }
+.catalog-filters label { display: grid; gap: 6px; font-size: 11px; color: #5d6156; }
+.catalog-filters select { max-width: 240px; min-height: 42px; border: 1px solid #d8dace; background: #fffefb; padding: 8px 10px; color: #28352b; }
+.catalog-filters .catalog-saved-filter { display: flex; align-items: center; gap: 7px; min-height: 42px; font-size: 12px; }
+.catalog-reset { color: #48603d; font-size: 12px; background: none; border: 0; padding: 10px 0; text-decoration: underline; text-underline-offset: 4px; }
+.catalog-filter-note { font-size: 11px; color: #74766b; line-height: 1.9; margin-block: 12px; }
+.catalog-result-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.verified-title { text-align: left; font: inherit; color: inherit; padding: 0; border: 0; background: none; }
+.verified-title:hover { color: #58714b; }
+.verified-card.is-selected { border-color: #58714b; outline: 1px solid #58714b; }
+.operating-notice { margin-top: 20px; border-left: 3px solid #9b8547; background: #f6f1e5; padding: 13px 16px; font-size: 12px; line-height: 1.9; }
+.operating-notice strong { font-weight: 500; }
+.operating-notice p { white-space: pre-wrap; }
+.verified-card-actions { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; font-size: 12px; }
+.verified-card-actions a { display: inline-flex; align-items: center; gap: 5px; color: #48603d; }
+.verified-card-actions span { margin-left: auto; color: #74766b; font-size: 10px; }
+.catalog-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px; font-size: 13px; color: #48603d; background: none; border: 0; padding: 0; }
+.catalog-detail .verified-card { margin-bottom: 24px; }
+.catalog-detail h1 { font: 500 clamp(26px, 4vw, 36px)/1.6 'Noto Serif JP', serif; margin-block: 10px; }
+.detail-official { margin-block: 10px 24px; }
+@media (max-width: 720px) {
+  .catalog-filters { gap: 12px; }
+  .catalog-filters > label:not(.catalog-saved-filter) { width: calc(50% - 6px); }
+  .catalog-filters select { max-width: 100%; width: 100%; }
+  .verified-card-actions span { width: 100%; margin-left: 0; }
+  .verified-card-heading > button { margin-top: 16px; }
+}

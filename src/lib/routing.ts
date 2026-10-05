@@ -2,6 +2,8 @@ import type { Page } from "../types/index.ts";
 import type { SearchParams } from "./search.ts";
 const keys: (keyof SearchParams)[] = [
   "query",
+  "information",
+  "view",
   "region",
   "area",
   "genre",
@@ -26,9 +28,13 @@ export function parseRoute(hash: string): {
       restaurantId: path.slice("/restaurant/".length),
       params,
     };
+  if (path.startsWith('/nagoya/')) {
+    try { return { page: 'nagoya-detail', restaurantId: decodeURIComponent(path.slice('/nagoya/'.length)), params }; }
+    catch { return { page: 'nagoya', params }; }
+  }
   const page = path.slice(1);
   return {
-    page: ["search", "about", "admin", "nagoya", "curation"].includes(page) ? (page as Page) : "home",
+    page: ["search", "about", "admin", "nagoya", "curation", "demo"].includes(page) ? (page as Page) : "home",
     params,
   };
 }
@@ -40,6 +46,8 @@ export function routeHash(
   const path =
     page === "home"
       ? "/"
+      : page === "nagoya-detail"
+        ? `/nagoya/${encodeURIComponent(restaurantId ?? "")}`
       : page === "detail"
         ? `/restaurant/${encodeURIComponent(restaurantId ?? "")}`
         : `/${page}`;

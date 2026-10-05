@@ -3,7 +3,7 @@ import { Bookmark, Menu, X } from "lucide-react";
 import type { Page } from "../types";
 import type { SearchParams } from "../lib/search";
 import { useAuth } from "../contexts/auth";
-import { useSavedRestaurants } from "../hooks/useSavedRestaurants";
+import { useSavedCatalog } from "../hooks/useSavedCatalog";
 import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
 import EmailLoginForm from "./EmailLoginForm";
 interface HeaderProps {
@@ -11,8 +11,7 @@ interface HeaderProps {
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
 }
 const items: { label: string; page: Page }[] = [
-  { label: "お店を探す", page: "search" },
-  { label: "名古屋の掲載情報", page: "nagoya" },
+  { label: "お店を探す", page: "nagoya" },
   { label: "このサービスについて", page: "about" },
 ];
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -21,7 +20,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const [busy, setBusy] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const { user, loading, signInWithGoogle, signOut } = useAuth();
-  const { savedIds } = useSavedRestaurants();
+  const { savedIds } = useSavedCatalog();
   useEffect(() => {
     if (modal) {
       dialog.current?.showModal();
@@ -83,7 +82,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <div className="header-actions">
             <button
               className="header-saved"
-              onClick={() => navigate("search", { saved: "1" })}
+              onClick={() => navigate("nagoya", { saved: "1" })}
               aria-label={`保存した候補 ${savedIds.length}件`}
             >
               <Bookmark size={17} />
@@ -176,7 +175,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   </button>
                   <p className="quiet-label">
                     {user ? user.email : "Googleの認証画面へ移動します。"}
-                  </p></>}
+                  </p>{user && <button className="button-secondary" onClick={() => navigate("curation")}>審査画面を開く</button>}</>}
                 </>
               )}
               {error && (
