@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Nagoya from "./pages/Nagoya";
 import NagoyaDetail from "./pages/NagoyaDetail";
+import Compare from "./pages/Compare";
 import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
@@ -47,11 +48,11 @@ export default function App() {
   ) => {
     const search =
       params ??
-      (["search", "detail", "nagoya", "nagoya-detail", "home"].includes(route.page) ? route.params : {});
+      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare"].includes(route.page) ? route.params : {});
     window.location.hash = routeHash(
       page,
       restaurantId,
-      ["search", "detail", "nagoya", "nagoya-detail"].includes(page) ? search : {},
+      ["search", "detail", "nagoya", "nagoya-detail", "compare"].includes(page) ? search : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -68,6 +69,7 @@ export default function App() {
       home: "名古屋の会食店を探す",
       demo: "サンプル・デモ",
       "nagoya-detail": "名古屋の店舗情報",
+      compare: "会食候補を比較",
       search: "お店を探す",
       detail: "店舗情報",
       about: "このサービスについて",
@@ -114,6 +116,7 @@ export default function App() {
         {(route.page === "home" || route.page === "nagoya") && <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />}
         {route.page === "nagoya-detail" && <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} />}
         {route.page === "curation" && <Curation />}
+        {route.page === "compare" && <Compare params={route.params} onNavigate={handleNavigate} />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
       </main>

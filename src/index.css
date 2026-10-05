@@ -1538,3 +1538,20 @@ figure {
 .section-heading .quiet-label.demo-sample-count { display: inline; }
 .verified-card { overflow-wrap: anywhere; }
 .verified-card-heading > div { min-width: 0; }
+.comparison-tray { position: sticky; bottom: 18px; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 26px; padding: 18px 22px; border: 1px solid #bcc8b3; background: #f2f5eef5; box-shadow: 0 4px 15px #28352b12; }
+.comparison-tray > div { flex: 1; min-width: 160px; }
+.comparison-tray strong { font-size: 14px; font-weight: 500; }
+.comparison-tray p { font-size: 10px; color: #64715c; line-height: 1.8; }
+.comparison-tray .primary-button { margin: 0; }
+.comparison-scroll-note { margin-block: 18px 10px; color: #74766b; font-size: 11px; }
+.comparison-table-scroll { overflow-x: auto; border: 1px solid #dedfd4; background: #fffefb; }
+.comparison-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.comparison-table th, .comparison-table td { padding: 18px; text-align: left; vertical-align: top; border-bottom: 1px solid #e5e5dc; border-right: 1px solid #e5e5dc; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 12px; line-height: 1.9; width: 240px; }
+.comparison-table th:first-child { width: 130px; font-weight: 500; color: #5d6156; background: #f4f4ed; }
+.comparison-table h2 { font: 500 21px/1.7 'Noto Serif JP', serif; }
+.comparison-table thead p { margin-top: 8px; font-size: 11px; font-weight: 400; color: #74766b; }
+.comparison-table small { display: block; color: #74766b; margin-top: 12px; font-size: 10px; }
+.comparison-table a { text-decoration: underline; text-underline-offset: 3px; }
+.comparison-share { margin-top: 22px; font-size: 12px; }
+.comparison-share input { width: 100%; margin-top: 10px; padding: 12px; border: 1px solid #c5cbbc; background: #fffefb; }
+@media (max-width: 720px) { .comparison-tray { bottom: 8px; padding: 14px; gap: 10px; } .comparison-tray > div { width: 100%; flex: auto; } .comparison-table th, .comparison-table td { padding: 14px; } }

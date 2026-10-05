@@ -4,6 +4,8 @@ const keys: (keyof SearchParams)[] = [
   "query",
   "information",
   "view",
+  "ids",
+  "returnTo",
   "region",
   "area",
   "genre",
@@ -34,7 +36,7 @@ export function parseRoute(hash: string): {
   }
   const page = path.slice(1);
   return {
-    page: ["search", "about", "admin", "nagoya", "curation", "demo"].includes(page) ? (page as Page) : "home",
+    page: ["search", "about", "admin", "nagoya", "curation", "demo", "compare"].includes(page) ? (page as Page) : "home",
     params,
   };
 }

@@ -96,7 +96,7 @@ npm run test:e2e
 ```
 
 既存Chromiumを使う場合: `PLAYWRIGHT_CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e`。
-`tests/database.test.mjs`はPGliteの隔離されたPostgresで、auth関数/ロールをテスト用に構成する。本番への接続・migration適用はしない。E2Eは2つのlocalhostサーバーとmocked Supabase応答だけを使い、本番認証を操作しない。
+`tests/database.test.mjs`はPGliteの隔離されたPostgresで、auth関数/ロールをテスト用に構成する。本番への接続・migration適用はしない。E2Eは3つのlocalhostサーバーとmocked Supabase応答だけを使い、本番認証を操作しない。
 
 参照した一次資料:
 - https://api.openpoiapi.com/openapi.json
@@ -138,7 +138,7 @@ npm run test:e2e
 - `emailRedirectTo` は現在のアプリoriginに固定。queryや外部入力のredirect先を使わない。callbackは既存SDKが処理し、URL内のtokenを除去する。
 - 送信中と送信試行後60秒は再送を抑制。SPA内の画面移動/ダイアログ再表示でも同じcooldownを保持する。これはUXの抑制で、サーバーのrate limitを置き換えない。
 - 送信受付、設定/上限エラー、期限切れcallbackを表示し、メール/OTPを自動再送しない。provider error textやURLのcredentialをそのままUIへ表示しない。
-- 管理者メールアドレスは未確認のためハードコード/保存しない。メール送信・初回招待の前に宛先と目的を確認する。
+- 管理者メールアドレスをコードへハードコード/保存しない。メール送信・初回招待の前に宛先と目的を確認する。
 
 最小セットアップの確認順:
 
@@ -165,6 +165,8 @@ npm run test:e2e
 - 地図の一覧絞り込みではmarkerだけを更新し、背景styleを再読込しない。WebGL2非対応時の代替表示は維持。
 - 招待/メールcallback時だけ、認証後のDB編集権限がtrueなら審査へ置換遷移する。通常のホーム閲覧・session復元・権限なし・別画面への途中移動には介入しない。権限をmetadataやcallback typeから判断しない。
 - pinned auth-js 2.99.3のdetectSessionInUrl hookで、SDKが既に解析したcallback URLの履歴entryを置換し、戻る操作にcredential fragmentを残さない。SDKの検証/保存/refreshは変更しない。対応はcallback/back-forward/reloadのテストで固定する。
+- 最大3店を公式情報で比較し、未確認・価格条件・休業情報・項目の出典/確認日を保持する。共有リンクは公開UUIDだけで構成し、元URLのquery/fragmentは引き継がない。送信・共有サービス・analyticsは追加しない。
+- 比較選択はブラウザ内のみ。保存失敗を表示し、clipboard失敗時は手動コピーへ切り替える。受信側に保存状態がなくても利用でき、現在の公開RPCから消えた店舗は表示しない。
 - SDK既定のpersistSession/autoRefreshを維持。同じ安定したoriginとブラウザではsessionを再利用する。新しいVercel一時URL、別ブラウザ、ストレージ削除では共有されない。Google OAuthは低優先の別工程。
 
 この作業ではDB/security/Auth設定/公開gate/main/Productionを変更しない。fixtureはtests内のみで、実Previewの掲載情報として同梱しない。

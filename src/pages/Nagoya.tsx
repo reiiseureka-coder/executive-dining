@@ -6,6 +6,8 @@ import { catalogGenres, filterCatalog } from '../lib/catalogSearch';
 import { configuredMapProvider } from '../components/map/mapProvider';
 import { factValue, safeExternalUrl, verifiedCoordinates } from '../domain/dining';
 import { usePublicCatalog } from '../hooks/usePublicCatalog';
+import { useComparison } from '../hooks/useComparison';
+import ComparisonTray from '../components/ComparisonTray';
 import { useSavedCatalog } from '../hooks/useSavedCatalog';
 import { VerifiedEvidence, VerifiedFactList, VerifiedReviews } from '../components/VerifiedFacts';
 const RestaurantMap = lazy(() => import('../components/map/RestaurantMap'));
@@ -14,6 +16,7 @@ interface Props { params: SearchParams; onChange: (params: SearchParams) => void
 export default function Nagoya({ params, onChange, onNavigate }: Props) {
   const { rows, loading, error, reload } = usePublicCatalog();
   const { savedIds, toggleSaved, storageWarning } = useSavedCatalog();
+  const comparison = useComparison();
   const [selected, setSelected] = useState('');
   const genres = useMemo(() => catalogGenres(rows), [rows]);
   const filtered = useMemo(() => filterCatalog(rows, params, savedIds), [rows, params, savedIds]);
@@ -48,9 +51,10 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
       return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
         <div className="verified-card-heading"><div><p className="eyebrow">公式情報確認 · {date(restaurant.verifiedAt)}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
         <VerifiedFactList restaurant={restaurant} compact />
-        <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>詳細と確認情報を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<span>{verifiedCoordinates(restaurant) ? '地図位置確認済み' : '地図位置は確認中'}</span></div>
+        <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>詳細と確認情報を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button><span>{verifiedCoordinates(restaurant) ? '地図位置確認済み' : '地図位置は確認中'}</span></div>
         <VerifiedEvidence restaurant={restaurant} /><VerifiedReviews restaurant={restaurant} />
       </article>;
     })}</div>
+    <ComparisonTray onNavigate={onNavigate} />
   </div>;
 }
