@@ -11,6 +11,7 @@ interface HeaderProps {
 }
 const items: { label: string; page: Page }[] = [
   { label: "お店を探す", page: "search" },
+  { label: "名古屋の掲載情報", page: "nagoya" },
   { label: "このサービスについて", page: "about" },
 ];
 export default function Header({ currentPage, onNavigate }: HeaderProps) {

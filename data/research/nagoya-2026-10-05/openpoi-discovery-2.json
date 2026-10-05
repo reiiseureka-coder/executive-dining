@@ -1,0 +1,182 @@
+{
+  "request_url": "https://api.openpoiapi.com/v1/search?q=Kawabun+Asada+Genji+Dynasty+Ryujo+Kuretake+Kitcho+%E3%83%92%E3%83%AB%E3%83%88%E3%83%B3+%E8%A6%B3%E5%85%89%E3%83%9B%E3%83%86%E3%83%AB+%E6%9D%B1%E6%80%A5%E3%83%9B%E3%83%86%E3%83%AB&center=136.900%2C35.170&radius=3500&limit=100",
+  "fetched_at": "2026-10-05T05:49:38.790627+00:00",
+  "response": {
+    "count": 9,
+    "results": [
+      {
+        "name": "GOKITCHO",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.16983017,
+        "lng": 136.90367187,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "ウルフギャングステーキハウス名古屋店",
+        "name_kana": "ウルフギャングステーキハウスナゴヤテン",
+        "prefecture": "愛知県",
+        "city": "名古屋市",
+        "address": "愛知県名古屋市中区錦1丁目19-30 名古屋観光ホテル1階",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.168776,
+        "lng": 136.895448,
+        "level": "",
+        "source": "jff",
+        "licenses": [
+          "公共データ利用規約（第1.0版, PDL1.0）"
+        ],
+        "attributions": [
+          "厚生労働省 食品衛生申請等システム（オープンデータ）"
+        ]
+      },
+      {
+        "name": "Florist Tsuboikaen ヒルトン名古屋店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "retail_other",
+        "business_type": "retail_other",
+        "lat": 35.16753158,
+        "lng": 136.89474685,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "GENJI",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.16758896,
+        "lng": 136.8946919,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "エステティック ミスパリ ヒルトン名古屋店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "service_other",
+        "business_type": "service_other",
+        "lat": 35.16751826,
+        "lng": 136.89451978,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "名古屋ヒルトンプラザ 事務局",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "retail_other",
+        "business_type": "retail_other",
+        "lat": 35.16712532,
+        "lng": 136.89406724,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "株式会社名古屋東急ホテル",
+        "name_kana": "カブシキガイシャナゴヤトウキュウホテル",
+        "prefecture": "愛知県",
+        "city": "名古屋市",
+        "address": "愛知県名古屋市中区栄四丁目6番8号",
+        "category": "unknown",
+        "business_type": "unknown",
+        "lat": 35.1686,
+        "lng": 136.913601,
+        "level": "",
+        "source": "jff",
+        "licenses": [
+          "CDLA-Permissive-2.0",
+          "公共データ利用規約（第1.0版, PDL1.0）"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org",
+          "厚生労働省 食品衛生申請等システム（オープンデータ）"
+        ]
+      },
+      {
+        "name": "名古屋ヒルトンホテル",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市千種区",
+        "address": "",
+        "category": "lodging",
+        "business_type": "lodging",
+        "lat": 35.1711952268,
+        "lng": 136.924046259,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "Fine Art Salon ASADA",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市昭和区",
+        "address": "",
+        "category": "service_other",
+        "business_type": "service_other",
+        "lat": 35.142980631852,
+        "lng": 136.92531384959,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      }
+    ]
+  }
+}

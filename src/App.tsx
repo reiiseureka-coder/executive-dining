@@ -9,6 +9,8 @@ import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import Nagoya from "./pages/Nagoya";
+import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
   window.addEventListener("hashchange", callback);
@@ -55,6 +57,8 @@ export default function App() {
       detail: "店舗情報",
       about: "このサービスについて",
       admin: "掲載店登録",
+      nagoya: "名古屋の掲載情報",
+      curation: "店舗情報の確認・審査",
     };
     document.title = `${labels[route.page]} | Executive Dining`;
   }, [route.page]);
@@ -91,6 +95,8 @@ export default function App() {
             onNavigate={handleNavigate}
           />
         )}
+        {route.page === "nagoya" && <Nagoya />}
+        {route.page === "curation" && <Curation />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
       </main>
@@ -100,6 +106,7 @@ export default function App() {
           <p>会食の店選びを、丁寧に。</p>
           <a href="#/about">掲載情報について</a>
           <a href="#/admin">掲載情報の下書き</a>
+          <a href="#/curation">運営者向け審査</a>
           <span>© {new Date().getFullYear()} Executive Dining</span>
         </div>
       </footer>

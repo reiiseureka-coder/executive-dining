@@ -28,7 +28,7 @@ export function parseRoute(hash: string): {
     };
   const page = path.slice(1);
   return {
-    page: ["search", "about", "admin"].includes(page) ? (page as Page) : "home",
+    page: ["search", "about", "admin", "nagoya", "curation"].includes(page) ? (page as Page) : "home",
     params,
   };
 }
