@@ -6,3 +6,6 @@ export const supabase = url && key ? createClient(url, key) : null;
 
 // New dedicated projects must verify the provider and redirect allowlist before offering Google sign-in.
 export const googleSignInEnabled = import.meta.env.VITE_SUPABASE_GOOGLE_LOGIN_ENABLED === 'true';
+
+// Email links are opt-in after SMTP, recipients and redirects have been verified.
+export const emailSignInEnabled = import.meta.env.VITE_SUPABASE_EMAIL_LOGIN_ENABLED === 'true';

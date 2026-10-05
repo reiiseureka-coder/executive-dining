@@ -1,16 +1,17 @@
 # 名古屋の実データ基盤：導入前チェック
 
-このブランチは公開前の基盤準備です。既存デモは維持しています。2026-10-05、承認済みの基盤migrationと候補取り込みが専用DBへ適用されましたが、公開・口コミ受付はOFFです。アプリのキー入力・Vercel接続・認証設定は別工程です。安全な本番公開を意味しません。
+このブランチは公開前の基盤準備です。既存デモは維持しています。2026-10-05、承認済みの基盤migrationと候補取り込みが専用DBへ適用されましたが、公開・口コミ受付はOFFです。ユーザー入力のpublishable keyでPreview接続を確認済みです。認証と編集者権限は別工程です。安全な本番公開を意味しません。
 
 ## 確認済みの専用DB状態（2026-10-05）
 
 - 対象project: `gpwcleaohnywnnhlcvtm`。新規専用DBを使用し、旧`public.user_profiles`等のschemaは導入しない。
-- 適用済みserver history: `20261005102621 nagoya_foundation`。
+- 適用済みserver history: `20261005102621 nagoya_foundation`、`20261005104017 catalog_source_eligibility`。
 - 対応repo file: `supabase/migrations/202610050001_nagoya_foundation.sql`。
 - 適用内容のSHA-256: `84d5e91be8a42eb778514c483ce17735624395601aba7de947179b394df2724e`。適用後もこのファイルは変更していない。
 - repo filenameのversionとserver historyのversionが異なる。CLIで自動pushする前に、承認済みの履歴照合・同期が必要。同じ基盤を再実行したり、過去ファイルを無断で改名/上書きしたりしない。
-- 10候補、15 private source（official-research 10＋OpenPOI 5）。全候補candidate、全source未審査、公開fact・編集者・口コミ0件。
+- 10:40時点の監査：10候補、15 private source（official-research 10＋OpenPOI 5）。全候補candidate、全source未審査、公開fact・編集者・口コミ0件。
 - 公開/口コミgate OFF。publicの新規table/function自動公開設定もOFFを保存・再確認済み。
+- 12:27時点のPreview確認：ユーザーがpublishable keyを入力し、commit `04c012a298299bb6d1d8407e5788c7950658f377`で再構築済み。catalogは読み込み後0件、curationは未ログインで操作不可。キーの値はrepo/文書に保存しない。
 - テーブル本体約304 kB、DB全体約11 MBという時点確認。継続監視や大量取得ジョブは設定していない。
 
 
@@ -25,10 +26,10 @@
 
 ## 明示的に残る制限
 
-- 新専用Supabaseの基盤schema/RLSとOFF gateは確認済み。実際のGoogle provider、redirect、利用者session、アプリからのREST接続は別途確認が必要。旧SQLコメントのproject refはこの専用projectとは異なる。
+- 新専用Supabaseの基盤schema/RLSとOFF gateは確認済み。実際のGoogle provider、redirect、利用者session、アプリからの匿名catalog接続は確認済み。認証sessionと編集操作は別途確認が必要。旧SQLコメントのproject refはこの専用projectとは異なる。
 - 新しいprivate schemaは旧publicテーブルの弱い権限を修正しない。旧店舗insert、他人名義口コミinsert、プロフィール全公開/ランク自己変更は、実際のpolicyを確認して別途是正が必要。旧テーブルのデータ移行や削除も行わない。
 - 審査画面は最新200件の初期キュー。大規模運用向けページング・担当者管理・候補のマージUIは次段階。OpenPOI上の名前/座標を永続IDにせず、重複を自動統合しない。
-- 公開カタログの本番通信、実際のOAuth、Supabase RESTでのロール境界は未検証。ローカルPostgres実行とmocked RPC UIだけではこれらを保証できない。
+- 接続済みPreviewの匿名catalog応答は確認済み。実際のメールログイン/OAuthと、利用者sessionによるSupabase RESTのロール境界は未検証。ローカルPostgres実行とmocked RPC UIだけではこれらを保証できない。
 - 口コミの利用規約・プライバシーポリシー・運営者名・保持期間・アカウント削除/開示対応・通報窓口・スパム対策・審査UI・本人編集フローを決めるまで受付不可。DBの5件/日制限だけでは十分な濫用対策ではない。
 - MapLibreは地図表示時に約1MB（gzip約286KB）の別chunkを読む。通常検索の初期bundleには含まれない。OpenFreeMapにSLA/将来の料金条件を保証しない。別providerへ変更する場合はstyleとattribution/プライバシーを再確認する。
 - 現在の10店舗資料は実座標未確認のためピン0件。会食適性、空席、遮音性やサービス品質の評価ではない。
@@ -117,14 +118,39 @@ npm run test:e2e
 4. DBの`public_enabled`と`reviews_enabled`はOFFのまま、1回の匿名catalog RPCが空配列を返すこと、一般アクセスがprivate table/編集RPCを拒否されることを少数回確認する。定期pollingやseed再取得を始めない。
 5. Googleログインを使う場合は、Google providerと許可redirect URLを別途確認する。クライアントID/secretやOAuthの永続アクセス設定が必要な部分はユーザーへ引き継ぐ。確認後に限り `VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=true`。
 6. 編集者への付与は確認済みのauth UUIDだけを別途承認して登録する。プロフィールrankやuser_metadataで権限を与えない。
-7. source eligibilityの追加proposal、店舗ごとの公式確認、公開対象と公開スイッチを承認してから公開へ進む。mainへのmerge/Productionデプロイは別の承認対象。
+7. source eligibilityの追加対策は適用済み。店舗ごとの公式確認、公開対象と公開スイッチを承認してから公開へ進む。mainへのmerge/Productionデプロイは別の承認対象。
 
-## Source eligibilityの追加proposal（未適用）
+## Source eligibilityの追加対策（承認・適用済み）
 
-`supabase/proposals/202610050002_catalog_source_eligibility.sql` は適用対象のmigrationsディレクトリ外に置いたレビュー案。現状の承認RPCは公式3項目を検証するが、後からsourceを失効した際、公開RPCのtop-level name/address joinsが再チェックしない余地がある。
+`supabase/proposals/202610050002_catalog_source_eligibility.sql` はレビュー時のファイルをそのまま保存している。承認後、専用projectへserver version `20261005104017 catalog_source_eligibility`として適用・検証済み。SHA-256は `715d6d13e0f8eda8d43ed1e916458515a9a85d0b0992640f9ad5a10e03abcf2a`。historicalなproposal-onlyコメントを含め、SQL本文/ファイル名は変更しない。元の承認RPCは公式3項目を検証するが、後からsourceを失効した際のtop-level joins再確認をこの対策で補った。
 
-提案は公開RPCの読み取り時にもname/address/websiteの3公式sourceを毎回確認する。core sourceが失効・未確認・非公式へ変更された場合は店舗全体を非公開にし、任意項目のみ失効した場合は既存fact_jsonがその項目を除外する。データ・役割・gate・関数署名/実行grantは変更しない。ローカルPGliteで正例、core失効、任意項目失効、OFF gate、grant維持を検証する。ライブへの適用は未承認・未実施。
+適用済みの対策は公開RPCの読み取り時にもname/address/websiteの3公式sourceを毎回確認する。core sourceが失効・未確認・非公式へ変更された場合は店舗全体を非公開にし、任意項目のみ失効した場合は既存fact_jsonがその項目を除外する。データ・役割・gate・関数署名/実行grantは変更しない。ローカルPGliteで正例、core失効、任意項目失効、OFF gate、grant維持を検証する。専用project上でも関数定義・ACL維持・OFF gate・匿名catalog空配列を確認済み。今後のCLI履歴同期ではこのserver versionとの対応も照合する。
 
 フロントのdecodeも公式core項目と表示名/住所の一致、重複、最低限のライセンス情報を検証するが、これは画面の防御でありRPC自体のアクセス制御の代わりではない。
 
 認証状態の同期はauth sessionだけを読む。旧profile tableは一切問い合わせず、初回session取得が遅れて返っても新しいログイン/ログアウト状態を上書きしない。Supabase SDKは既存利用版`2.99.3`へexact pinし、依存更新による予期しない挙動変更を避ける。
+
+## 管理者のメールリンクログイン（コードのみ・初期OFF）
+
+メールリンクは `VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false` が初期値。Googleは引き続きOFF。画面の小さなメールフォームだけを用意し、招待・メール送信・auth user作成・editor付与・SMTP/redirect/signup設定の変更はこのコード準備では行わない。
+
+- `signInWithOtp` の `shouldCreateUser:false` で、このフォームからの自動登録を防ぐ。これはAuth API全体のsignup禁止ではないため、既存のsignup許可状態を別途確認する。
+- `emailRedirectTo` は現在のアプリoriginに固定。queryや外部入力のredirect先を使わない。callbackは既存SDKが処理し、URL内のtokenを除去する。
+- 送信中と送信試行後60秒は再送を抑制。SPA内の画面移動/ダイアログ再表示でも同じcooldownを保持する。これはUXの抑制で、サーバーのrate limitを置き換えない。
+- 送信受付、設定/上限エラー、期限切れcallbackを表示し、メール/OTPを自動再送しない。provider error textやURLのcredentialをそのままUIへ表示しない。
+- 管理者メールアドレスは未確認のためハードコード/保存しない。メール送信・初回招待の前に宛先と目的を確認する。
+
+最小セットアップの確認順:
+
+1. 対象メールが本人の指定したアドレスであり、Supabase organizationの既存team member宛かを確認する。標準SMTPはteam memberにしか配信せず、現行Docsでは2通/時・本番SLAなし。配信のためだけにorganizationへの権限を追加しない。
+2. Dashboardの非秘密項目だけでEmail provider、custom SMTP有無、送信上限、Site URL/redirect allowlist、signup許可状態を確認する。SMTP password/API keysは取得・表示しない。
+3. 必要なAuth設定変更は正確なPreview originと変更内容を示して承認を得る。redirectはbranchの既知URLだけに限定し、広いwildcardを追加しない。
+4. 初回auth userがなければ指定メール1件への招待を別途承認。リンクはユーザーが自分のブラウザで開く。招待token/セッションをチャットへ貼らない。
+5. 所有確認済みauth UUIDへのeditor membershipを別途承認して付与。ログイン成功だけで編集者に昇格させない。
+6. 既知のbranch alias `https://executive-dining-git-feat-nag-96fdff-reiiseureka-6623s-projects.vercel.app` を使う。Vercel保護付きのため、受信リンクを開くブラウザで先にPreview本体を表示できることを確認する。保護を外したりbypass credentialを追加したりしない。Previewだけでメールflagを有効にする場合もその設定変更を確認し、1通の制御したログイン検証から始める。既定SMTPの2通/時に注意し、招待＋再ログイン以外の繰返しテストをしない。
+7. 本運用/複数管理者には配信品質を含む別設計が必要。custom SMTPの契約・DNS・資格情報、Google OAuthのclient/secretは選択された場合に限り別途承認・ユーザー入力へ引き継ぐ。
+
+一次資料（2026-10-05確認）:
+- https://supabase.com/docs/guides/auth/auth-email-passwordless
+- https://supabase.com/docs/guides/auth/auth-smtp
+- https://supabase.com/docs/guides/auth/redirect-urls

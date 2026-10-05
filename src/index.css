@@ -1504,3 +1504,7 @@ figure {
   .verified-facts > div { grid-template-columns: 68px 1fr; }
 }
 .source-snapshot { font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow-y: auto; background: #f8f7f3; padding: 12px; }
+.email-login-form { display: grid; gap: 12px; margin-top: 18px; }
+.email-login-form label { font-size: 13px; }
+.email-login-form input { min-width: 0; width: 100%; border: 1px solid #c5cbbc; background: #fffefb; padding: 12px; }
+.email-login-form .primary-button { margin-top: 4px; }

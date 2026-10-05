@@ -4,6 +4,9 @@ interface AuthContextValue {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  emailRetryAt: number;
+  emailSending: boolean;
+  signInWithEmail: (email: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }

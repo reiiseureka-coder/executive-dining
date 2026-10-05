@@ -7,7 +7,8 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' } },
   ],
   webServer: [
-    { command: 'VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= npm run dev -- --host 127.0.0.1 --port 4180', url: 'http://127.0.0.1:4180', reuseExistingServer: false },
-    { command: 'VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false VITE_DINING_DATABASE_ENABLED=true VITE_SUPABASE_URL=https://test-project.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key VITE_SUPABASE_ANON_KEY= npm run dev -- --host 127.0.0.1 --port 4181', url: 'http://127.0.0.1:4181', reuseExistingServer: false },
+    { command: 'VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= npm run dev -- --host 127.0.0.1 --port 4180', url: 'http://127.0.0.1:4180', reuseExistingServer: false },
+    { command: 'VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false VITE_DINING_DATABASE_ENABLED=true VITE_SUPABASE_URL=https://test-project.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key VITE_SUPABASE_ANON_KEY= npm run dev -- --host 127.0.0.1 --port 4181', url: 'http://127.0.0.1:4181', reuseExistingServer: false },
+    { command: 'VITE_SUPABASE_EMAIL_LOGIN_ENABLED=true VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false VITE_DINING_DATABASE_ENABLED=true VITE_SUPABASE_URL=https://test-project.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key VITE_SUPABASE_ANON_KEY= npm run dev -- --host 127.0.0.1 --port 4182', url: 'http://127.0.0.1:4182', reuseExistingServer: false },
   ],
 });

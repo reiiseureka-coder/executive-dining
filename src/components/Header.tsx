@@ -4,7 +4,8 @@ import type { Page } from "../types";
 import type { SearchParams } from "../lib/search";
 import { useAuth } from "../contexts/auth";
 import { useSavedRestaurants } from "../hooks/useSavedRestaurants";
-import { googleSignInEnabled, supabase } from "../lib/supabase";
+import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
+import EmailLoginForm from "./EmailLoginForm";
 interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
@@ -157,11 +158,12 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               <p>
                 検索と候補保存はログインせずに使えます。候補・下書きはこのブラウザ内に保存されます。
               </p>
-              {!supabase || (!user && !googleSignInEnabled) ? (
+              {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>
               ) : (
                 <>
-                  <button
+                  {!user && emailSignInEnabled && <EmailLoginForm />}
+                  {(user || googleSignInEnabled) && <><button
                     className="primary-button"
                     disabled={busy}
                     onClick={authenticate}
@@ -174,7 +176,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   </button>
                   <p className="quiet-label">
                     {user ? user.email : "Googleの認証画面へ移動します。"}
-                  </p>
+                  </p></>}
                 </>
               )}
               {error && (
