@@ -20,6 +20,7 @@ test('signed-in account never reads legacy profile table and cannot gain editor 
   await expect(page.getByRole('heading', { name: '編集権限が必要です' })).toBeVisible();
   expect(requests.some(url => url.includes('user_profiles'))).toBe(false);
   expect(requests.some(url => url.includes('dining_editor_queue'))).toBe(false);
+  await expect(page.locator('.review-readiness')).toHaveCount(0);
 });
 test('authorized editor can read the queue and sign out without a legacy profile table', async ({ page, isMobile }) => {
   const requests: string[] = [];
@@ -31,6 +32,9 @@ test('authorized editor can read the queue and sign out without a legacy profile
   await signedInFixture(page);
   await page.goto('http://127.0.0.1:4181/#/curation');
   await expect(page.getByRole('heading', { name: '確認待ちの候補はありません' })).toBeVisible();
+  await page.locator('.review-readiness summary').click();
+  await expect(page.getByText('現在、口コミの送信・審査・通報の操作は接続していません。店舗の掲載承認とは別工程です。')).toBeVisible();
+  expect(requests.some(url => url.includes('dining_review_queue'))).toBe(false);
   expect(requests.some(url => url.includes('dining_editor_queue'))).toBe(true);
   expect(requests.some(url => url.includes('user_profiles'))).toBe(false);
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
@@ -38,6 +42,7 @@ test('authorized editor can read the queue and sign out without a legacy profile
   await page.getByRole('button', { name: 'ログアウト', exact: true }).click();
   await expect(page.getByRole('heading', { name: '運営者のログインが必要です' })).toBeVisible();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.locator('.review-readiness')).toHaveCount(0);
 });
 test('unconfigured Google provider is not offered just because a database key is configured', async ({ page, isMobile }) => {
   await page.route('https://test-project.supabase.co/**', route => route.fulfill({ json: [] }));

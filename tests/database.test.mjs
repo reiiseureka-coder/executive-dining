@@ -109,6 +109,50 @@ test('review model binds author, holds pending, blocks self-moderation, supports
   assert.equal((await rpc('select public.dining_public_catalog() as result'))[0].result[0].reviews.length, 0);
 });
 
+test('review safeguards reject duplicates, future/exact-day dates and stale or withdrawn moderation', async () => {
+  await identity(visitor);
+  await assert.rejects(rpc("select public.dining_submit_review($1,'Member',4,'A sufficiently long comment','2099-01-01')", [restaurant]), /Invalid visit month/);
+  await assert.rejects(rpc("select public.dining_submit_review($1,'Member',4,'A sufficiently long comment','2026-09-01')", [restaurant]), /unique constraint/);
+  await db.exec('reset role');
+  const withdrawn = (await rpc("select id,version from dining_private.reviews where author_id=$1", [visitor]))[0];
+  const pending = (await rpc("select id,version from dining_private.reviews where author_id=$1", [editor]))[0];
+  await identity(editor);
+  await assert.rejects(rpc("select public.dining_moderate_review($1,999,'approved','Stale')", [withdrawn.id]), /Stale review/);
+  await assert.rejects(rpc("select public.dining_moderate_review($1,$2,'approved','Cannot restore withdrawal')", [withdrawn.id, withdrawn.version]), /cannot be moderated/);
+  await identity(visitor);
+  await assert.rejects(rpc("select public.dining_moderate_review($1,$2,'approved','Not an editor')", [pending.id, pending.version]), /Editor access/);
+});
+test('closed reception still permits own withdrawal, never access to another author', async () => {
+  await db.exec('update dining_private.settings set reviews_enabled=false');
+  const own = (await rpc("select id from dining_private.reviews where author_id=$1", [editor]))[0].id;
+  await identity(visitor);
+  await assert.rejects(rpc('select public.dining_withdraw_review($1)', [own]), /access denied/);
+  await identity(editor);
+  await assert.rejects(rpc("select public.dining_submit_review($1,'Member',4,'A sufficiently long comment','2026-09-01')", [restaurant]), /Reviews are not open/);
+  await rpc('select public.dining_withdraw_review($1)', [own]);
+  await db.exec('reset role');
+  assert.equal((await rpc('select status from dining_private.reviews where id=$1', [own]))[0].status, 'withdrawn');
+  await db.exec('update dining_private.settings set reviews_enabled=true');
+});
+test('deleted author disappears from public reviews but private retention still needs an explicit policy', async () => {
+  const deleted = '55555555-5555-4555-8555-555555555555';
+  await db.query('insert into auth.users values ($1)', [deleted]);
+  await identity(deleted);
+  await assert.rejects(rpc("select public.dining_submit_review($1,'Visitor',4,'A sufficiently long comment','2026-09-02')", [restaurant]), /check constraint/);
+  const id = (await rpc("select public.dining_submit_review($1,'Visitor',4,'A sufficiently long comment','2026-09-01') as id", [restaurant]))[0].id;
+  await identity(editor);
+  await assert.rejects(rpc("select public.dining_moderate_review($1,1,'approved','')", [id]), /check constraint/);
+  await rpc("select public.dining_moderate_review($1,1,'approved','Checked')", [id]);
+  await identity(null, 'anon');
+  assert.equal((await rpc('select public.dining_public_catalog() as result'))[0].result[0].reviews.length, 1);
+  await db.exec('reset role'); await db.query('delete from auth.users where id=$1', [deleted]);
+  await identity(null, 'anon');
+  assert.equal((await rpc('select public.dining_public_catalog() as result'))[0].result[0].reviews.length, 0);
+  await db.exec('reset role');
+  const retained = (await rpc('select author_id,comment from dining_private.reviews where id=$1', [id]))[0];
+  assert.equal(retained.author_id, null); assert.ok(retained.comment.length > 0);
+});
+
 test('seed import is candidate-only and idempotent, preserving full private evidence', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'ed-seed-test-'));
   try {

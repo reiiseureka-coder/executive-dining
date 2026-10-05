@@ -1555,3 +1555,18 @@ figure {
 .comparison-share { margin-top: 22px; font-size: 12px; }
 .comparison-share input { width: 100%; margin-top: 10px; padding: 12px; border: 1px solid #c5cbbc; background: #fffefb; }
 @media (max-width: 720px) { .comparison-tray { bottom: 8px; padding: 14px; gap: 10px; } .comparison-tray > div { width: 100%; flex: auto; } .comparison-table th, .comparison-table td { padding: 14px; } }
+
+.visit-draft, .feedback-draft, .review-readiness { margin-top: 24px; padding: 20px; border: 1px solid #d6dccf; background: #f8f9f3; font-size: 12px; line-height: 1.9; }
+.visit-draft summary, .feedback-draft summary, .review-readiness summary { cursor: pointer; font-size: 14px; font-weight: 500; }
+.visit-draft form, .feedback-draft form { display: grid; gap: 14px; margin-top: 20px; }
+.visit-draft label, .feedback-draft label { display: grid; gap: 6px; }
+.visit-draft input:not([type=checkbox]), .visit-draft select, .visit-draft textarea, .feedback-draft input, .feedback-draft select, .feedback-draft textarea { width: 100%; min-width: 0; border: 1px solid #cbd1c2; padding: 10px 12px; background: #fffefb; border-radius: 0; }
+.review-draft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.visit-draft .draft-check { display: flex; align-items: flex-start; gap: 9px; }
+.draft-check input { margin-top: 5px; }
+.draft-privacy-note { font-size: 11px; color: #626957; margin-block: 10px; }
+.review-draft-preview { border: 1px solid #b8c3ab; padding: 18px; margin-top: 18px; background: #fffefb; }
+.draft-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-draft-preview button { margin-top: 14px; }
+.review-readiness ul { padding-left: 20px; list-style: disc; }
+@media (max-width: 720px) { .review-draft-grid { grid-template-columns: 1fr; } .visit-draft, .feedback-draft, .review-readiness { padding: 14px; } }

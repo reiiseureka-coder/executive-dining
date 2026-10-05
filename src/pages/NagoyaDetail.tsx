@@ -6,6 +6,8 @@ import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { useComparison } from '../hooks/useComparison';
 import { parseComparisonIds } from '../lib/comparison';
 import ComparisonTray from '../components/ComparisonTray';
+import ReviewDraftPanel from '../components/ReviewDraftPanel';
+import FeedbackDraftPanel from '../components/FeedbackDraftPanel';
 import { useSavedCatalog } from '../hooks/useSavedCatalog';
 import { factValue, safeExternalUrl, verifiedCoordinates } from '../domain/dining';
 import { VerifiedEvidence, VerifiedFactList, VerifiedReviews } from '../components/VerifiedFacts';
@@ -36,7 +38,7 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
       <p className="catalog-filter-note">料金は掲載コースとその条件です。平均利用額・空席・防音性を保証するものではありません。予約前に最新情報をお店へご確認ください。</p>
       {website && <a className="button-secondary detail-official" href={website} target="_blank" rel="noreferrer">公式サイトで最新情報を確認 <ArrowUpRight size={15} /></a>}
       <button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button>
-      <VerifiedEvidence restaurant={restaurant} /><VerifiedReviews restaurant={restaurant} />
+      <VerifiedEvidence restaurant={restaurant} /><FeedbackDraftPanel key={`correction:${restaurant.id}`} restaurantId={restaurant.id} /><VerifiedReviews restaurant={restaurant} allowReportDraft /><ReviewDraftPanel key={`review:${restaurant.id}`} restaurantId={restaurant.id} />
     </article>
     {verifiedCoordinates(restaurant) ? <><p className="map-privacy">背景地図を外部の地図配信元から読み込みます。端末の現在地は取得しません。</p><Suspense fallback={<p role="status">地図を準備しています…</p>}><RestaurantMap restaurants={mapRows} onSelect={select} /></Suspense></> : <div className="catalog-explainer">正確な地図位置は確認中です。住所から推測したピンは表示していません。</div>}
     <ComparisonTray onNavigate={onNavigate} />
