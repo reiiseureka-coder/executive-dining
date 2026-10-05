@@ -174,7 +174,7 @@ test('visit drafts stay local, recover during navigation and restore saved month
   await draft.getByLabel('体験の総合評価', { exact: true }).selectOption('4');
   await draft.getByLabel('本人の体験本文', { exact: true }).fill('自分で訪問して食事をした、確認用の体験メモです。');
   await page.getByRole('button', { name: '検索条件を保って一覧へ', exact: true }).click();
-  await page.getByRole('button', { name: '詳細と確認情報を見る', exact: true }).first().click();
+  await page.locator(`#verified-${rows[0].id}`).getByRole('button', { name: '詳細と確認情報を見る', exact: true }).click();
   await draft.locator('summary').click();
   await expect(draft.getByLabel('公開用ニックネーム', { exact: true })).toHaveValue('会食メモ');
   await draft.getByLabel('本人が実際に訪問した体験です', { exact: true }).check();
