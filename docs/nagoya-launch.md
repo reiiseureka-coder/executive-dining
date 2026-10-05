@@ -8,7 +8,7 @@
 - `#/curation`：DBが有効な場合にログインを確認し、DBに保存された編集者membershipをRPCで検証。候補の出典・元資料を確認し、公式ページで確認した短い事実を項目別に記録。掲載承認・差し戻し・対象外変更は再確認画面と楽観ロック付き。
 - 編集者による事実の変更は店舗を確認待ちに戻し、再承認まで非公開。全体の公開スイッチはDB側で初期OFF。
 - OpenPOI adapter：限定された名古屋のbbox＋市名チェック、最大50件/呼び出し、2秒以上の間隔、同時実行拒否、15秒timeout。429を自動再試行しない。生レコードとライセンス・帰属表示の全配列を保持する。
-- MapLibre GL JS + OpenFreeMap：ユーザーが「地図を表示」を押したときだけ読み込み。標準attributionを維持。WebGL/通信障害でも一覧を利用可能。正確な位置を公式確認した店舗だけピンを表示する。
+- MapLibre GL JS + OpenFreeMap：ユーザーが「地図を表示」を押したときだけ読み込み。標準attributionを維持。WebGL2未対応・worker起動不可・配信元通信障害を区別して表示し、障害時でも一覧を利用可能。20秒で読込状態を打ち切る。正確な位置を公式確認した店舗だけピンを表示する。
 - 本人口コミのDBモデル：サーバー側のauth.uid()に作者を固定、pending開始、承認を経て公開、自己承認禁止、本人の取り下げ。現段階では全口コミRPCのクライアント実行権限なし、DB受付スイッチOFF、投稿/審査UI未公開。
 
 ## 明示的に残る制限
@@ -92,3 +92,7 @@ npm run test:e2e
 - https://maplibre.org/maplibre-gl-js/docs/
 - https://supabase.com/docs/guides/database/functions
 - https://supabase.com/docs/guides/database/postgres/row-level-security
+
+### 2026-10-05 地図検証の区分
+
+既存CIでの地図ケースは意図的な通信障害時のfallback確認。追加ケースでは制御したMapLibre styleでWebGL描画のload完了を検証する。OpenFreeMap本番styleのHTTP 200/CORSレスポンス確認と、実ブラウザでのタイル描画成功は別の結果として扱う。環境がWebGL2を無効にしている場合は理由を表示し、迂回しない。

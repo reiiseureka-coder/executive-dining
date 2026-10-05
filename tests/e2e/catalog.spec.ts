@@ -72,3 +72,14 @@ test('signed-out curation never requests the editorial queue', async ({ page }) 
   await expect(page.getByRole('heading', { name: '運営者のログインが必要です' })).toBeVisible();
   expect(calls.some(url => url.includes('dining_editor_queue'))).toBe(false);
 });
+
+test('MapLibre initializes WebGL and finishes rendering with a controlled base style', async ({ page }) => {
+  await page.route('https://tiles.openfreemap.org/**', route => route.fulfill({ json: {
+    version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e9eddf' } }],
+  } }));
+  await page.goto('/#/nagoya');
+  await page.getByRole('button', { name: '地図を表示' }).click();
+  await expect(page.locator('.catalog-map')).toHaveAttribute('data-map-status', 'ready');
+  await expect(page.locator('.maplibregl-canvas')).toBeVisible();
+  await expect(page.getByText('地図を読み込めませんでした。店舗情報は一覧から確認できます。')).toHaveCount(0);
+});

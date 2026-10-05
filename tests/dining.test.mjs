@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { parseOpenPoiResponse, buildOpenPoiUrl, OpenPoiProvider } from '../src/data/providers/openPoi.ts';
 import { searchVerifiedRestaurants, verifiedCoordinates, safeExternalUrl, decodePublishedCatalog } from '../src/domain/dining.ts';
 import { configuredMapProvider } from '../src/components/map/mapProvider.ts';
+import { classifyMapFailure } from '../src/components/map/mapDiagnostics.ts';
 import { parseRoute, routeHash } from '../src/lib/routing.ts';
 const timestamp = '2026-10-05T00:00:00Z';
 const facility = { name: 'テスト食堂', address: '名古屋市中区1', city: '名古屋市中区', category: 'restaurant', lat: '35.17', lng: '136.90', level: '8', source: 'overture', licenses: ['CDLA-Permissive-2.0', 'Apache-2.0'], attributions: ['A', 'B'] };
@@ -74,4 +75,10 @@ test('malformed public RPC contract fails closed instead of crashing during rend
   assert.throws(() => decodePublishedCatalog([{ ...restaurant, facts: null }]), /形式/);
   assert.throws(() => decodePublishedCatalog([{ ...restaurant, verifiedAt: 'not-a-date' }]), /形式/);
   assert.deepEqual(decodePublishedCatalog([{ status: 'candidate' }]), []);
+});
+
+test('map diagnostics distinguish unsupported WebGL from provider/network errors', () => {
+  assert.equal(classifyMapFailure(new Error('WebGL2 is required')), 'webgl');
+  assert.equal(classifyMapFailure(new Error('Failed to fetch (https://tiles.example.com)')), 'network');
+  assert.equal(classifyMapFailure(new Error('Unable to create Worker')), 'worker');
 });
