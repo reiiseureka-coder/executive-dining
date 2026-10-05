@@ -131,3 +131,8 @@ test("draft storage unavailable is safe", () => {
   };
   assert.deepEqual(readDraft("draft", { author: "" }), { author: "" });
 });
+
+test("Kyoto does not match the suffix of Tokyo prefecture", () => {
+  assert.equal(filterRestaurants(list, { query: "京都" }).length, 0);
+  assert.equal(filterRestaurants(list, { query: "東京都" }).length, 1);
+});

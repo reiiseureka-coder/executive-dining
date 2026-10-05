@@ -12,7 +12,12 @@ export interface SearchParams {
   saved?: string;
 }
 export const normalize = (value: string) =>
-  value.normalize("NFKC").toLocaleLowerCase("ja").trim();
+  value
+    .normalize("NFKC")
+    .replaceAll("東京都", "東京 ")
+    .replaceAll("京都府", "京都 ")
+    .toLocaleLowerCase("ja")
+    .trim();
 
 // Meal filters use listed sample opening hours, not an unrelated keyword match.
 export function servesMeal(restaurant: Restaurant, meal?: string): boolean {
