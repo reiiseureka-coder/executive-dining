@@ -2,6 +2,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Page } from "./types";
 import type { SearchParams } from "./lib/search";
 import { parseRoute, routeHash } from "./lib/routing";
+import { isAdminEmailCallback } from "./lib/authLanding";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import AdminCallbackLanding from "./components/AdminCallbackLanding";
@@ -15,11 +16,21 @@ import NagoyaDetail from "./pages/NagoyaDetail";
 import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
-  window.addEventListener("hashchange", callback);
-  window.addEventListener("popstate", callback);
+  let restartingForCallback = false;
+  const changed = () => {
+    // Opening a fresh auth fragment in an already-loaded SPA is a same-document navigation.
+    // Reload once so the standard SDK validates it; the SDK detection hook then clears it.
+    if (isAdminEmailCallback(window.location.hash)) {
+      if (!restartingForCallback) { restartingForCallback = true; window.location.reload(); }
+      return;
+    }
+    callback();
+  };
+  window.addEventListener("hashchange", changed);
+  window.addEventListener("popstate", changed);
   return () => {
-    window.removeEventListener("hashchange", callback);
-    window.removeEventListener("popstate", callback);
+    window.removeEventListener("hashchange", changed);
+    window.removeEventListener("popstate", changed);
   };
 }
 export default function App() {

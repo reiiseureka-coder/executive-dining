@@ -1535,3 +1535,6 @@ figure {
   .verified-card-actions span { width: 100%; margin-left: 0; }
   .verified-card-heading > button { margin-top: 16px; }
 }
+.section-heading .quiet-label.demo-sample-count { display: inline; }
+.verified-card { overflow-wrap: anywhere; }
+.verified-card-heading > div { min-width: 0; }

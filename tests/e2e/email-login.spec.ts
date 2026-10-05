@@ -100,10 +100,10 @@ test('new navigation during the callback permission check is never pulled back t
 });
 test('expired callback reports a generic error and never sends mail without a click', async ({ page, isMobile }) => {
   const requests: string[] = [];
-  await page.route('https://test-project.supabase.co/**', async route => { requests.push(route.request().url()); await route.fulfill({ json: {} }); });
+  await page.route('https://test-project.supabase.co/**', async route => { requests.push(route.request().url()); await route.fulfill({ json: route.request().url().includes('/rpc/dining_public_catalog') ? [] : {} }); });
   await page.goto(`${base}/#error=access_denied&error_code=otp_expired&error_description=private-provider-detail`);
   await openLogin(page, isMobile);
-  await expect(page.getByRole('alert')).toContainText('ログインリンクを確認できませんでした');
+  await expect(page.getByRole('dialog').getByRole('alert')).toContainText('ログインリンクを確認できませんでした');
   await expect(page.getByText('private-provider-detail', { exact: true })).toHaveCount(0);
   expect(requests.some(url => url.includes('/auth/v1/otp'))).toBe(false);
 });

@@ -18,7 +18,7 @@ export default function Home({ onNavigate }: HomeProps) {
     <>
       <section className="home-hero page-width">
         <div className="hero-copy">
-          <p className="eyebrow">A PLACE FOR GOOD CONVERSATION</p>
+          <p className="eyebrow">SAMPLE / DESIGN DEMO</p>
           <h1>
             <span>大切な話を、</span>
             <span>心地よい一席で。</span>
@@ -132,7 +132,7 @@ export default function Home({ onNavigate }: HomeProps) {
             <h2>一席を選ぶ、手がかり。</h2>
             <p>気になるお店を保存して、条件を見比べる。</p>
           </div>
-          <span className="quiet-label">
+          <span className="quiet-label demo-sample-count">
             掲載サンプル {restaurants.length} 店
           </span>
         </div>
