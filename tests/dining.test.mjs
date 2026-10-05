@@ -82,3 +82,20 @@ test('map diagnostics distinguish unsupported WebGL from provider/network errors
   assert.equal(classifyMapFailure(new Error('Failed to fetch (https://tiles.example.com)')), 'network');
   assert.equal(classifyMapFailure(new Error('Unable to create Worker')), 'worker');
 });
+const eligibleFacts = ['name', 'address', 'website'].map(field => ({
+  field, value: field === 'website' ? 'https://example.com' : restaurant[field], sourceUrl: 'https://example.com/source',
+  provider: 'official', licenses: [], attributions: [], fetchedAt: timestamp, verifiedAt: timestamp,
+}));
+const eligibleRestaurant = { ...restaurant, facts: eligibleFacts };
+test('catalog accepts complete, source-matched official basic facts', () => {
+  assert.equal(decodePublishedCatalog([eligibleRestaurant])[0].name, restaurant.name);
+});
+test('verified label does not bypass missing or nonofficial core source evidence', () => {
+  assert.throws(() => decodePublishedCatalog([{ ...eligibleRestaurant, facts: eligibleFacts.slice(1) }]), /公式/);
+  assert.throws(() => decodePublishedCatalog([{ ...eligibleRestaurant, facts: eligibleFacts.map(fact => ({ ...fact, provider: 'openpoi:overture', licenses: ['CDLA-Permissive-2.0'] })) }]), /公式/);
+});
+test('catalog rejects duplicate, mismatched or unlicensed nonofficial evidence', () => {
+  assert.throws(() => decodePublishedCatalog([{ ...eligibleRestaurant, name: 'Different' }]), /一致/);
+  assert.throws(() => decodePublishedCatalog([{ ...eligibleRestaurant, facts: [...eligibleFacts, eligibleFacts[0]] }]), /重複/);
+  assert.throws(() => decodePublishedCatalog([{ ...eligibleRestaurant, facts: [...eligibleFacts, { ...eligibleFacts[0], field: 'genre', provider: 'unknown' }] }]), /掲載根拠/);
+});

@@ -3,6 +3,8 @@ const date = '2026-10-05T00:00:00Z';
 const fixture = {
   id: 'test-restaurant', status: 'verified', name: '検証用名古屋レストラン', address: '名古屋市中区（テスト）', verifiedAt: date,
   facts: [
+    { field: 'name', value: '検証用名古屋レストラン', sourceUrl: 'https://example.com', provider: 'official', licenses: [], attributions: [], fetchedAt: date, verifiedAt: date },
+    { field: 'address', value: '名古屋市中区（テスト）', sourceUrl: 'https://example.com', provider: 'official', licenses: [], attributions: [], fetchedAt: date, verifiedAt: date },
     { field: 'website', value: 'https://example.com', sourceUrl: 'https://example.com', provider: 'official', licenses: [], attributions: [], fetchedAt: date, verifiedAt: date },
     { field: 'private_room', value: '半個室 4〜6名', sourceUrl: 'https://example.com/rooms', provider: 'official', licenses: [], attributions: [], fetchedAt: date, verifiedAt: date },
   ], reviews: [],
@@ -82,4 +84,11 @@ test('MapLibre initializes WebGL and finishes rendering with a controlled base s
   await expect(page.locator('.catalog-map')).toHaveAttribute('data-map-status', 'ready');
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
   await expect(page.getByText('地図を読み込めませんでした。店舗情報は一覧から確認できます。')).toHaveCount(0);
+});
+
+test('a verified label cannot display a venue without eligible official core facts', async ({ page }) => {
+  await page.route('https://test-project.supabase.co/**', route => route.fulfill({ json: [{ ...fixture, facts: fixture.facts.filter(fact => fact.field !== 'name') }] }));
+  await page.goto('http://127.0.0.1:4181/#/nagoya');
+  await expect(page.getByRole('heading', { name: '掲載情報を取得できません' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: fixture.name })).toHaveCount(0);
 });

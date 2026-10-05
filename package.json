@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.44.0",
-    "@supabase/supabase-js": "^2.99.3",
+    "@supabase/supabase-js": "2.99.3",
     "@tailwindcss/vite": "^4.2.1",
     "framer-motion": "^12.35.1",
     "lucide-react": "^0.577.0",

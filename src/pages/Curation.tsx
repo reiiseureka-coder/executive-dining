@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/auth';
+import { googleSignInEnabled } from '../lib/supabase';
 import { diningRepository } from '../data/diningClient';
 import { FACT_LABELS, safeExternalUrl, type EditorialRestaurant, type FactField, type VerificationStatus } from '../domain/dining';
 const statusLabels: Record<VerificationStatus, string> = { candidate: '確認待ち', verified: '掲載承認済み', rejected: '掲載対象外' };
@@ -64,5 +65,5 @@ function EditorWorkspace() {
 }
 export default function Curation() {
   const { user, loading } = useAuth();
-  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">EDITORIAL WORKSPACE</p><h1>店舗情報の確認・審査</h1></div></div><p className="catalog-explainer">候補の取得と掲載承認は別の操作です。店名・所在地・公式サイトの確認記録が揃うまで、掲載は承認できません。</p><div style={{ marginTop: 24 }}>{!diningRepository ? <div className="catalog-empty"><h2>管理機能は接続準備中です</h2><p>店舗データベースと編集権限の確認が完了してから利用できます。</p><a href="#/admin">ブラウザ内で掲載情報の下書きを作る</a></div> : loading ? <p role="status">ログイン状態を確認しています…</p> : !user ? <div className="catalog-empty"><h2>運営者のログインが必要です</h2><p>上部のログインから、編集権限のあるアカウントでログインしてください。</p></div> : <EditorWorkspace key={user.id} />}</div></div>;
+  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">EDITORIAL WORKSPACE</p><h1>店舗情報の確認・審査</h1></div></div><p className="catalog-explainer">候補の取得と掲載承認は別の操作です。店名・所在地・公式サイトの確認記録が揃うまで、掲載は承認できません。</p><div style={{ marginTop: 24 }}>{!diningRepository ? <div className="catalog-empty"><h2>管理機能は接続準備中です</h2><p>店舗データベースと編集権限の確認が完了してから利用できます。</p><a href="#/admin">ブラウザ内で掲載情報の下書きを作る</a></div> : loading ? <p role="status">ログイン状態を確認しています…</p> : !user ? <div className="catalog-empty"><h2>運営者のログインが必要です</h2><p>{googleSignInEnabled ? '上部のログインから、編集権限のあるアカウントでログインしてください。' : 'ログイン設定の確認が完了してから利用できます。'}</p></div> : <EditorWorkspace key={user.id} />}</div></div>;
 }

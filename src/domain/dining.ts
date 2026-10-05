@@ -107,6 +107,19 @@ export function decodePublishedCatalog(payload: unknown): VerifiedRestaurant[] {
     for (const fact of row.facts) {
       if (!object(fact) || typeof fact.field !== 'string' || !Object.hasOwn(FACT_LABELS, fact.field) || typeof fact.value !== 'string' || typeof fact.sourceUrl !== 'string' || !safeExternalUrl(fact.sourceUrl) || typeof fact.provider !== 'string' || !strings(fact.licenses) || !strings(fact.attributions) || !date(fact.fetchedAt) || !date(fact.verifiedAt)) throw new Error('出典データの形式を確認できませんでした。');
     }
+    const facts = row.facts as PublishedFact[];
+    if (new Set(facts.map(fact => fact.field)).size !== facts.length) throw new Error('確認項目が重複しています。');
+    for (const fact of facts) {
+      if (!fact.value.trim() || !fact.provider.trim() || (fact.provider !== 'official' && !fact.licenses.length)) throw new Error('掲載根拠を確認できませんでした。');
+    }
+    // This protects rendering, not the RPC itself. Server eligibility must also be checked at publication time.
+    const core = ['name', 'address', 'website'] as const;
+    for (const field of core) {
+      const fact = facts.find(item => item.field === field);
+      if (!fact || fact.provider !== 'official' || !safeExternalUrl(fact.sourceUrl)?.startsWith('https:')) throw new Error('公式の基本情報を確認できませんでした。');
+      if (field !== 'website' && fact.value !== row[field]) throw new Error('掲載情報と出典の内容が一致しません。');
+      if (field === 'website' && !safeExternalUrl(fact.value)) throw new Error('公式サイトを確認できませんでした。');
+    }
     for (const review of row.reviews) {
       if (!object(review) || typeof review.id !== 'string' || typeof review.displayName !== 'string' || typeof review.comment !== 'string' || typeof review.rating !== 'number' || !Number.isInteger(review.rating) || review.rating < 1 || review.rating > 5 || typeof review.visitedMonth !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(review.visitedMonth) || !date(review.publishedAt)) throw new Error('口コミデータの形式を確認できませんでした。');
     }

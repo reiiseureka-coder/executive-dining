@@ -1,6 +1,18 @@
 # 名古屋の実データ基盤：導入前チェック
 
-このブランチは公開前の基盤準備です。既存デモを維持し、DB・認証・Vercel環境変数を変更しません。SQLファイルが存在することは、適用済み・安全な本番公開を意味しません。
+このブランチは公開前の基盤準備です。既存デモは維持しています。2026-10-05、承認済みの基盤migrationと候補取り込みが専用DBへ適用されましたが、公開・口コミ受付はOFFです。アプリのキー入力・Vercel接続・認証設定は別工程です。安全な本番公開を意味しません。
+
+## 確認済みの専用DB状態（2026-10-05）
+
+- 対象project: `gpwcleaohnywnnhlcvtm`。新規専用DBを使用し、旧`public.user_profiles`等のschemaは導入しない。
+- 適用済みserver history: `20261005102621 nagoya_foundation`。
+- 対応repo file: `supabase/migrations/202610050001_nagoya_foundation.sql`。
+- 適用内容のSHA-256: `84d5e91be8a42eb778514c483ce17735624395601aba7de947179b394df2724e`。適用後もこのファイルは変更していない。
+- repo filenameのversionとserver historyのversionが異なる。CLIで自動pushする前に、承認済みの履歴照合・同期が必要。同じ基盤を再実行したり、過去ファイルを無断で改名/上書きしたりしない。
+- 10候補、15 private source（official-research 10＋OpenPOI 5）。全候補candidate、全source未審査、公開fact・編集者・口コミ0件。
+- 公開/口コミgate OFF。publicの新規table/function自動公開設定もOFFを保存・再確認済み。
+- テーブル本体約304 kB、DB全体約11 MBという時点確認。継続監視や大量取得ジョブは設定していない。
+
 
 ## 今回できること
 
@@ -13,7 +25,7 @@
 
 ## 明示的に残る制限
 
-- 本番Supabaseの現行schema・RLS・ユーザー・プロバイダー設定は未検証。旧SQLコメントにproject refはあるが、対象projectと決めつけない。
+- 新専用Supabaseの基盤schema/RLSとOFF gateは確認済み。実際のGoogle provider、redirect、利用者session、アプリからのREST接続は別途確認が必要。旧SQLコメントのproject refはこの専用projectとは異なる。
 - 新しいprivate schemaは旧publicテーブルの弱い権限を修正しない。旧店舗insert、他人名義口コミinsert、プロフィール全公開/ランク自己変更は、実際のpolicyを確認して別途是正が必要。旧テーブルのデータ移行や削除も行わない。
 - 審査画面は最新200件の初期キュー。大規模運用向けページング・担当者管理・候補のマージUIは次段階。OpenPOI上の名前/座標を永続IDにせず、重複を自動統合しない。
 - 公開カタログの本番通信、実際のOAuth、Supabase RESTでのロール境界は未検証。ローカルPostgres実行とmocked RPC UIだけではこれらを保証できない。
@@ -40,10 +52,10 @@
 ## 必要なアクセスと承認
 
 1. 対象Supabase project ID・所有組織・現行migration/テーブル/policyの読み取り確認。秘密値のチャット貼り付けは不要。
-2. stagingまたは隔離したテストprojectでのmigration適用を承認。SQLは `supabase/migrations/202610050001_nagoya_foundation.sql`。既存名衝突なら停止し、`IF NOT EXISTS`で隠さない。ライブ環境に適用しない。
+2. stagingまたは隔離したテストprojectでのmigration適用を承認。SQLは `supabase/migrations/202610050001_nagoya_foundation.sql`。この基盤は上記の専用DBへ承認済みで適用済み。再適用しない。別環境への適用や追加SQLには別途承認が必要。既存名衝突を`IF NOT EXISTS`で隠さない。
 3. 最初の編集者のauth UUIDを安全な管理画面から確認し、その特定アカウントへの編集権限付与を承認。匿名ユーザー/通常ユーザー/編集者でRPCと直接テーブルアクセスを実環境テストする。
 4. 旧policyの是正とデータ公開範囲を承認。データを失う操作は別途確認。OAuth redirect先は https://executive-dining.vercel.app の実構成を確認する。
-5. 同じprojectの公開URLとpublishable/anon keyのみをVercelに設定。既存コードの変数名は `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`。service-role/token/秘密鍵をVITE変数やrepoに入れない。永続アクセスの新規作成/拡大は別途承認。
+5. 同じprojectの公開URLとpublishable keyのみを、ユーザー自身の操作でVercel Previewの対象branchに入力する。変数名は `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`（旧`VITE_SUPABASE_ANON_KEY`は互換用）。service-role/token/秘密鍵をVITE変数やrepoに入れない。永続アクセスの新規作成/拡大は別途承認。
 6. 確認済みcommitのpreviewで `VITE_DINING_DATABASE_ENABLED=true` を有効にしてQA。DBの `public_enabled` はまだfalse。
 7. 候補取り込みSQL、公式証拠、営業休止・料金条件、ライセンス/NOTICEの保持、公開する店舗を運営者がレビュー。承認後に限定公開スイッチをON。口コミは引き続きOFF。
 8. 対象commitをmainへmerge/本番デプロイする前に承認。Vercelがmainの更新で自動デプロイするため、mergeを単なるコード保存として扱わない。
@@ -96,3 +108,23 @@ npm run test:e2e
 ### 2026-10-05 地図検証の区分
 
 既存CIでの地図ケースは意図的な通信障害時のfallback確認。追加ケースでは制御したMapLibre styleでWebGL描画のload完了を検証する。OpenFreeMap本番styleのHTTP 200/CORSレスポンス確認と、実ブラウザでのタイル描画成功は別の結果として扱う。環境がWebGL2を無効にしている場合は理由を表示し、迂回しない。
+
+## 最小の安全なアプリ接続手順
+
+1. 対象projectのDashboardで公開URLとpublishable keyを確認。キーをチャットへ貼らない。キー取得/入力はユーザー操作へ引き継ぐ。
+2. Vercelの既存ExecutiveDining projectで、Preview・`feat/nagoya-foundation` branchのみに `VITE_SUPABASE_URL` と `VITE_SUPABASE_PUBLISHABLE_KEY` を設定する。Productionには設定しない。service-role/secret keyは使わない。
+3. 同じPreview scopeで `VITE_DINING_DATABASE_ENABLED=true`、`VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false` とする。変更・preview再構築は確認された範囲内で実施する。
+4. DBの`public_enabled`と`reviews_enabled`はOFFのまま、1回の匿名catalog RPCが空配列を返すこと、一般アクセスがprivate table/編集RPCを拒否されることを少数回確認する。定期pollingやseed再取得を始めない。
+5. Googleログインを使う場合は、Google providerと許可redirect URLを別途確認する。クライアントID/secretやOAuthの永続アクセス設定が必要な部分はユーザーへ引き継ぐ。確認後に限り `VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=true`。
+6. 編集者への付与は確認済みのauth UUIDだけを別途承認して登録する。プロフィールrankやuser_metadataで権限を与えない。
+7. source eligibilityの追加proposal、店舗ごとの公式確認、公開対象と公開スイッチを承認してから公開へ進む。mainへのmerge/Productionデプロイは別の承認対象。
+
+## Source eligibilityの追加proposal（未適用）
+
+`supabase/proposals/202610050002_catalog_source_eligibility.sql` は適用対象のmigrationsディレクトリ外に置いたレビュー案。現状の承認RPCは公式3項目を検証するが、後からsourceを失効した際、公開RPCのtop-level name/address joinsが再チェックしない余地がある。
+
+提案は公開RPCの読み取り時にもname/address/websiteの3公式sourceを毎回確認する。core sourceが失効・未確認・非公式へ変更された場合は店舗全体を非公開にし、任意項目のみ失効した場合は既存fact_jsonがその項目を除外する。データ・役割・gate・関数署名/実行grantは変更しない。ローカルPGliteで正例、core失効、任意項目失効、OFF gate、grant維持を検証する。ライブへの適用は未承認・未実施。
+
+フロントのdecodeも公式core項目と表示名/住所の一致、重複、最低限のライセンス情報を検証するが、これは画面の防御でありRPC自体のアクセス制御の代わりではない。
+
+認証状態の同期はauth sessionだけを読む。旧profile tableは一切問い合わせず、初回session取得が遅れて返っても新しいログイン/ログアウト状態を上書きしない。Supabase SDKは既存利用版`2.99.3`へexact pinし、依存更新による予期しない挙動変更を避ける。
