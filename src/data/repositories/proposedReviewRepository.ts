@@ -23,6 +23,7 @@ export interface PrivateProfileInput extends PublicProfileChoice { companyName: 
 export interface OwnReviewSummary { authorSnapshot: PublicAuthorSnapshot; operatorBadge: OperatorBadge; id: string; restaurantId: string; status: ModerationReview['status']; version: number; displayName: string; visitedMonth: string; relationship: ReviewDraft['relationship']; rating: number; comment: string }
 export interface FeedbackReceipt { id: string; status: 'received'; requestId: string }
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+const acknowledgedVersion = (result: Record<string, unknown>, expected: number) => (result.version === expected + 1 && (result.changed === undefined || result.changed === true)) || (result.version === expected && result.changed === false);
 export function decodeReviewCapabilities(value: unknown): ReviewCapabilities {
   if (!record(value) || value.contractVersion !== 2 || value.privatePilot !== true || !Number.isInteger(value.profileVersion) || Number(value.profileVersion) < 0 || !['acceptingProfiles','profileReady','signedIn','acceptingReviews','acceptingReports','acceptingCorrections','canManageOwn','canModerate'].every(key => typeof value[key] === 'boolean') || typeof value.policyVersion !== 'string' || !value.policyVersion.trim() || value.policyVersion.length > 100) throw new ReviewGatewayError('unavailable');
   const publicAuthor = value.publicAuthor === null ? null : decodeAuthorSnapshot(value.publicAuthor);
@@ -72,8 +73,8 @@ export class ProposedReviewRepository {
     if (!isUuid(requestId) || !Number.isInteger(expectedVersion) || expectedVersion < 1) throw new ReviewGatewayError('invalid');
     if (!(await this.capabilities()).signedIn) throw new ReviewGatewayError('denied');
     const result = await this.rpc('dining_revoke_profile_publication_v2', { expected_version: expectedVersion, request_id: requestId }, true);
-    if (!record(result) || result.version !== expectedVersion + 1 || result.status !== 'revoked' || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
-    return { status: 'revoked' as const, version: expectedVersion + 1, requestId };
+    if (!record(result) || !acknowledgedVersion(result, expectedVersion) || result.status !== 'revoked' || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
+    return { status: 'revoked' as const, version: result.version as number, changed: result.changed !== false, requestId };
   }
   async deleteProfile(expectedVersion: number, requestId: string) {
     if (!isUuid(requestId) || !Number.isInteger(expectedVersion) || expectedVersion < 1) throw new ReviewGatewayError('invalid');
@@ -87,6 +88,12 @@ export class ProposedReviewRepository {
     if (!capabilities.signedIn || !capabilities.canManageOwn) throw new ReviewGatewayError('denied');
     // No caller-selected author ID. Server must bind rows to auth.uid(), with bounded pagination before >200.
     return decodeOwnReviews(await this.rpc('dining_my_reviews_v2'));
+  }
+  async listApprovedPilotReviews(restaurantId: string) {
+    if (!isUuid(restaurantId)) throw new ReviewGatewayError('invalid');
+    const caps = await this.capabilities();
+    if (!caps.signedIn || !(caps.acceptingReviews || caps.canModerate)) throw new ReviewGatewayError('denied');
+    return decodeOwnReviews(await this.rpc('dining_approved_pilot_reviews_v2', { restaurant_id: restaurantId }));
   }
   async listModeration() {
     const capabilities = await this.capabilities();
@@ -143,15 +150,15 @@ export class ProposedReviewRepository {
     if (!capabilities.signedIn || !capabilities.canManageOwn) throw new ReviewGatewayError('denied');
     // Closing new submissions must not strand existing authors without withdrawal.
     const result = await this.rpc('dining_withdraw_review_v2', { review_id: reviewId, expected_version: expectedVersion, request_id: requestId }, true);
-    if (!record(result) || result.id !== reviewId || result.status !== 'withdrawn' || result.version !== expectedVersion + 1 || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
-    return { id: reviewId, status: 'withdrawn' as const, version: expectedVersion + 1, requestId };
+    if (!record(result) || result.id !== reviewId || result.status !== 'withdrawn' || !acknowledgedVersion(result, expectedVersion) || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
+    return { id: reviewId, status: 'withdrawn' as const, version: result.version as number, changed: result.changed !== false, requestId };
   }
   async moderate(review: ModerationReview, actorId: string, expectedVersion: number, nextStatus: 'approved' | 'rejected', reason: string, requestId: string) {
     const capabilities = await this.capabilities();
     if (!capabilities.signedIn || !capabilities.canModerate) throw new ReviewGatewayError('denied');
     if (!isUuid(review.id) || !isUuid(requestId) || moderationPreflight(review, actorId, capabilities.canModerate, expectedVersion, nextStatus, reason)) throw new ReviewGatewayError('invalid');
     const result = await this.rpc('dining_moderate_review_v2', { review_id: review.id, expected_version: expectedVersion, next_status: nextStatus, reason: reason.trim(), request_id: requestId }, true);
-    if (!record(result) || result.id !== review.id || result.status !== nextStatus || result.version !== expectedVersion + 1 || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
-    return { id: review.id, status: nextStatus, version: expectedVersion + 1, requestId };
+    if (!record(result) || result.id !== review.id || result.status !== nextStatus || !acknowledgedVersion(result, expectedVersion) || result.requestId !== requestId) throw new ReviewGatewayError('unconfirmed');
+    return { id: review.id, status: nextStatus, version: result.version as number, changed: result.changed !== false, requestId };
   }
 }

@@ -16,7 +16,7 @@ SQLファイル名はSupabase CLI 2.119.0の`migration new review_pilot_v2`で�
 
 ## このSQLを適用した場合に変わること
 
-9つのprivate tableと18のv2 RPC、private helpers/triggerを追加する。全新tableにRLSを有効化し、clientへのschema/table grantなし。すべての新RPCの`PUBLIC/anon/authenticated EXECUTE`を明示的に取り消した状態で終了する。
+10のprivate tableと19のv2 RPC、private helpers/triggerを追加する。全新tableにRLSを有効化し、clientへのschema/table grantなし。すべての新RPCの`PUBLIC/anon/authenticated EXECUTE`を明示的に取り消した状態で終了する。
 
 - profile: 実会社名、氏名、正式職名は本人だけのprivate RPC。編集者一覧にも返さない
 - snapshot: 業種・規模・広い役割区分・initials・自己申告の表記・投稿時の運営関係のみ。会社名/氏名/正式職名を含まない
@@ -25,9 +25,9 @@ SQLファイル名はSupabase CLI 2.119.0の`migration new review_pilot_v2`で�
 - pilot: 初期OFF、policy未承認、参加者/対象店舗は空。最大10人をDBでも制限。期間は最大30日
 - review: private専用table。既存public catalogへ一切joinしない。approvalはprivate pilot内の審査状態で、一般公開ではない
 - idempotency: actor/operation/request IDの一意性、payloadのSHA-256照合、actor単位transaction lock。同じIDの違う入力は拒否。raw payloadは保存しない
-- limits: 本人の投稿+訂正は5回/24h、通報+公式訂正は10回/24h、profile変更5回/24h。取り下げ/削除は受付OFFでも許可。pilot全体でレビュー100件/feedback200件まで
-- delete: profile削除で本人レビュー・feedback・関連eventをcascade削除し、過去payload fingerprintも削除。auth user削除でもcascade。JWTが残ってもauth.usersの存在確認でアクセスを拒否
-- retention: 30日超データのoperator専用purge関数を用意。scheduler/client grantは追加しない。実保管上限を守るには運用担当と実行設定が必要
+- limits: 操作別の24時間固定windowで、本人の投稿+訂正5回、通報+公式訂正10回、profile変更5回、運営者の審査50回、feedback解決50回。取り下げ/削除は受付OFFでも許可。pilot全体でレビュー100件/feedback200件まで
+- delete: profile削除でprivate会社/氏名/正式職名、本人レビュー・feedback・関連eventをcascade削除し、過去payload fingerprintも削除。ただし濫用防止の最小aggregate counter（actor UUID・操作区分・window開始・件数、最大5行/アカウント）はprofile削除でresetしない。本文/会社/氏名/hashは含まない。期限切れcounterはpurge対象。profile削除はAuthアカウントやpilot membership/Owner表示の削除とは別。auth userを別途削除した場合はcounter/所属行もcascadeし、JWTが残ってもauth.usersの存在確認でアクセスを拒否
+- retention: 30日超のprofile/口コミ等と、24時間windowが終了したaggregate counterのoperator専用purge関数を用意。scheduler/client grantは追加しない。実保管上限を守るには運用担当と実行設定が必要
 
 既存public/review gate、Auth provider/signup、ユーザー、editor、課金、Vercel Productionには触らない。
 
@@ -50,7 +50,7 @@ SQLファイル名はSupabase CLI 2.119.0の`migration new review_pilot_v2`で�
 7. **UI接続**: このadapterを初めて使うprivate pilot画面を用意し、profile/投稿の送信先・公開範囲・結果不明時の照合を表示。本人一覧/修正/取り下げ/削除・実審査/feedback処理をHTTP/UIでも試験
 8. **RPC grant**: 以下のexact signaturesの`authenticated` EXECUTEだけを必要範囲で明示付与。private table/schema/anon EXECUTEや旧v1を解放しない。capabilityの表示だけを権限判定にしない
 
-全18RPCはprofile4件、capability/対象店舗2件、本人review/審査queue2件、review操作5件（submit/revise/withdraw/moderate/delete）、feedback5件（report/correction/本人一覧/審査queue/resolve）。合計は18件。全一覧はSQL末尾のrevocation allowlistと関数signatureを照合する。
+全19RPCはprofile4件、capability/対象店舗2件、本人review/審査queue/承認済みpilotレビュー読取3件、review操作5件（submit/revise/withdraw/moderate/delete）、feedback5件（report/correction/本人一覧/審査queue/resolve）。合計は19件。全一覧はSQL末尾のrevocation allowlistと関数signatureを照合する。
 
 ### C. 一般公開/100人募集
 
@@ -60,8 +60,14 @@ SQLファイル名はSupabase CLI 2.119.0の`migration new review_pilot_v2`で�
 
 新規受付停止はpilot settingのenabled=false。現在の投稿者による本人一覧/取り下げ/削除を可能にしたままにし、すべてのRPCを一括revokeして利用者を閉じ込めない。編集者の権限剥奪は既存membershipを変えれば次のRPCで反映される。Owner表示を外しても過去投稿時の運営関係は隠れない。
 
-保存失敗/通信途絶は成功と表示せず、自動再送もしない。同じrequest IDの照合と本人一覧で確認する。clientで新しいrequest IDを勝手に再発行して二重処理しない。
+同状態へのwithdraw/revoke/moderate/resolveはchanged=falseのno-opで、fresh request IDを送られてもreceipt/eventを追加しない。no-opは新しい処理の受領ではなく、すでにその状態であるとの返答。保存失敗/通信途絶は成功と表示せず、自動再送もしない。同じrequest IDの照合と本人一覧で確認する。clientで新しいrequest IDを勝手に再発行して二重処理しない。
 
 ## 検証の限界
 
 PGliteは1つの隔離Postgresインスタンスで、実Supabase HTTPや複数接続の同時実行ではない。server transaction/制約/RLS/grant・実SQLへのadapter連携は検証するが、live OAuth/メール・PostgREST・ブラウザからの実情報送信は未検証。fake fixtureやモックの成功を本人確認/実際の口コミ受領とは表示しない。
+
+## 独立レビューへの対策
+
+NULLの公式URLをSQL constraintで明示拒否。新しいrequest IDで同状態操作を繰り返しても書込が増えない。profile削除後のquotaは内容を持たないaggregateで保持し、作り直しによるresetを拒否。登録と同意を済ませた参加者が承認済みprivateレビューを読める専用RPCを追加し、そのIDから通報できる。匿名・候補・取り下げ・未同意の経路は拒否し、一般public catalogは引き続き変更しない。
+
+承認済みpilotレビューを別の参加者へ返す際は、読み手だけでなく投稿者profileと当該reviewの両方が現在のpolicy versionへ同意していることを確認する。policy変更だけで旧同意を繰り越さない。投稿者がprofileを再確認しても旧reviewは自動再表示せず、本文/表示を再確認した版を再審査する。

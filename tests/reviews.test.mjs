@@ -127,3 +127,10 @@ test('editor queue remains inaccessible when backend role is false, including cl
   await assert.rejects(repo.listModeration(), error => error.code === 'denied');
   assert.equal(calls.length, 1);
 });
+test('no-op acknowledgment is explicit and inconsistent version/change pairs remain unconfirmed',async()=>{
+ const noop=repository(caps,{id:review,status:'withdrawn',version:2,requestId,changed:false});
+ assert.equal((await noop.repo.withdraw(review,2,requestId)).changed,false);
+ for(const receipt of [{id:review,status:'withdrawn',version:3,requestId,changed:false},{id:review,status:'withdrawn',version:2,requestId,changed:true}]) {
+   const {repo}=repository(caps,receipt); await assert.rejects(repo.withdraw(review,2,requestId),error=>error.code==='unconfirmed');
+ }
+});

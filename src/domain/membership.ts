@@ -1,4 +1,5 @@
-/** Public-only vocabulary. Actual company/name/title never enter these objects. */
+/** Public vocabulary. PublicAuthorSnapshot is the only publishable DTO.
+ * PublicProfileChoice includes transient confirmed romanization: never persist or publish that input object. */
 export const INDUSTRY_LABELS = { pharmaceutical: '製薬業界', healthcare: '医療・福祉', manufacturing: '製造業', technology: 'IT・情報通信', finance: '金融・保険', professional: '専門サービス', hospitality: '飲食・宿泊', public_sector: '公共・教育', other: 'その他の業種' } as const;
 export const COMPANY_SIZE_LABELS = { large: '大規模企業', medium: '中規模企業', small: '小規模企業', independent: '個人・フリーランス', undisclosed: '規模非公開' } as const;
 export const ROLE_LAYER_LABELS = { executive: '経営・事業統括', department: '部門マネジメント', team: 'チームマネジメント', professional: '専門職・実務担当', other: 'その他' } as const;

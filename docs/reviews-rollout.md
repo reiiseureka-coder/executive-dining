@@ -80,3 +80,5 @@ Adapterはcapabilityの版/型/許可が不足すればmutationを送らず、au
 - [Changelog](https://supabase.com/changelog.md) は2026-10-05に確認。関連するPostgres minor breaking changeはltree/legacy pgcrypto/btree_gist/custom operatorsが対象で、このパッチはそれらやserver versionを変更しない。
 
 最新版のprivate profile/公開snapshot/Owner表示と、適用・activation・ログイン・保管期限の承認事項は [private pilot承認用資料](review-pilot-approval.md) を正とする。旧v1の不足点はそのまま残し、新pilot tablesをpublic catalogへ流用しない。
+
+同状態操作のfresh-ID反復は書込なしのno-opにする。quotaはprofile消去と分離した最小aggregateで保持し、profile削除を全user-linked dataの消去と説明しない。Auth account削除は別の手続き。詳しくは承認用資料の保持/削除範囲を参照。

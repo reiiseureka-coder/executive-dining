@@ -45,7 +45,7 @@ before(async () => {
  await db.query('insert into dining_private.review_pilot_restaurants values($1)',[restaurant]);
 });
 beforeEach(async () => {
- await db.exec('reset role; truncate dining_private.pilot_profiles,dining_private.pilot_operator_badges,dining_private.pilot_requests,dining_private.pilot_reviews,dining_private.pilot_feedback,dining_private.pilot_events cascade; delete from dining_private.review_pilot_members; update dining_private.review_pilot_settings set enabled=false,policy_approved=false; update dining_private.settings set public_enabled=false,reviews_enabled=false;');
+ await db.exec('reset role; truncate dining_private.pilot_rate_limits,dining_private.pilot_profiles,dining_private.pilot_operator_badges,dining_private.pilot_requests,dining_private.pilot_reviews,dining_private.pilot_feedback,dining_private.pilot_events cascade; delete from dining_private.review_pilot_members; update dining_private.review_pilot_settings set enabled=false,policy_approved=false; update dining_private.settings set public_enabled=false,reviews_enabled=false;');
  for (const signature of signatures) await db.exec(`revoke all on function ${signature} from public,anon,authenticated`);
  await db.query('insert into auth.users values($1),($2),($3) on conflict do nothing',[author,editor,other]);
  await db.exec('delete from dining_private.editors'); await db.query('insert into dining_private.editors values($1,now())',[editor]);
@@ -53,9 +53,9 @@ beforeEach(async () => {
 });
 after(async()=>db.close());
 test('proposal has RLS, denied default grants and leaves existing publication/auth APIs untouched',async()=>{
- assert.equal(signatures.length,18);
+ assert.equal(signatures.length,19);
  const tables=(await db.query("select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='dining_private' and (c.relname like 'pilot_%' or c.relname like 'review_pilot_%') and c.relkind='r'")).rows;
- assert.equal(tables.length,9); assert.ok(tables.every(row=>row.relrowsecurity));
+ assert.equal(tables.length,10); assert.ok(tables.every(row=>row.relrowsecurity));
  await identity(author); await assert.rejects(rpc('dining_review_capabilities_v2'),/permission denied/);
  await assert.rejects(db.query('select * from dining_private.pilot_reviews'),/permission denied/);
  await assert.rejects(rpc('dining_submit_review',{restaurant_id:restaurant,display_name:'name',rating:4,comment:'long enough comment',visited_month:'2026-09-01'}),/permission denied/);
@@ -194,4 +194,64 @@ test('new public and private privileged functions have empty search paths and ex
  const rows=(await db.query("select p.proname,p.proconfig,has_function_privilege('authenticated',p.oid,'execute') as allowed from pg_proc p join pg_namespace n on n.oid=p.pronamespace where (n.nspname='public' and p.proname like 'dining_%_v2') or (n.nspname='dining_private' and (p.proname like 'pilot_%' or p.proname in ('limit_pilot_members','purge_review_pilot')))")).rows;
  assert.ok(rows.length>18); assert.ok(rows.every(row=>!row.allowed));
  assert.ok(rows.every(row=>row.proconfig.some(item=>item==='search_path=""')));
+});
+test('NULL correction source is rejected by SQL even when client validation is bypassed',async()=>{
+ await activate(); await identity(author);
+ await assert.rejects(rpc('dining_suggest_correction_v2',{restaurant_id:restaurant,request_id:randomUUID(),accepted_policy_version:policy,fact_field:'price',official_url:null,detail:'Sufficiently long correction detail'}),/check constraint/);
+ await db.exec('reset role'); assert.equal((await db.query('select count(*)::int as n from dining_private.pilot_feedback')).rows[0].n,0);
+});
+test('fresh-ID repeated withdrawal and profile revocation are no-ops without growing receipts/events',async()=>{
+ await activate(); const receipt=await submit(); let version=1;
+ for(let i=0;i<20;i++) version=(await repo.withdraw(receipt.id,version,randomUUID())).version;
+ assert.equal(version,2);
+ let profileVersion=1; for(let i=0;i<20;i++) profileVersion=(await repo.revokeProfile(profileVersion,randomUUID())).version;
+ assert.equal(profileVersion,2);
+ await db.exec('reset role');
+ assert.equal((await db.query("select count(*)::int as n from dining_private.pilot_requests where operation='withdraw'")).rows[0].n,1);
+ assert.equal((await db.query("select count(*)::int as n from dining_private.pilot_requests where operation='revoke_profile'")).rows[0].n,1);
+ assert.equal((await db.query("select count(*)::int as n from dining_private.pilot_events where action='withdraw'")).rows[0].n,1);
+});
+test('deleting and recreating a profile cannot reset aggregate budgets, while expired budgets permit a new window',async()=>{
+ await activate(); await submit(); await identity(author);
+ for(let version=1;version<=4;version++) await repo.saveProfile(profile(),version,randomUUID(),policy);
+ await assert.rejects(repo.saveProfile(profile(),5,randomUUID(),policy),error=>error.code==='limited');
+ await repo.deleteProfile(5,randomUUID());
+ await assert.rejects(repo.saveProfile(profile(),0,randomUUID(),policy),error=>error.code==='limited');
+ await db.exec('reset role');
+ const budget=(await db.query("select * from dining_private.pilot_rate_limits where actor_id=$1 and bucket='profile'",[author])).rows[0];
+ assert.equal(budget.count,5); assert.deepEqual(Object.keys(budget).sort(),['actor_id','bucket','count','window_started_at']);
+ await db.query("update dining_private.pilot_rate_limits set window_started_at=now()-interval '25 hours' where actor_id=$1",[author]);
+ await identity(author); assert.equal((await repo.saveProfile(profile(),0,randomUUID(),policy)).version,1);
+});
+test('registered participants can discover only approved private reviews for reporting, never identity or public exposure',async()=>{
+ await activate(); const receipt=await submit(); await identity(other); assert.deepEqual(await repo.listApprovedPilotReviews(restaurant),[]);
+ await approve(receipt); await identity(other); const reviews=await repo.listApprovedPilotReviews(restaurant); assert.equal(reviews[0].id,receipt.id);
+ const text=JSON.stringify(reviews); for(const privateText of ['架空会社','架空の人物','架空の正式職名',author]) assert.ok(!text.includes(privateText));
+ await repo.feedback(restaurant, reviews[0].id, {kind:'report',field:'',sourceUrl:'',reason:'other',detail:'承認済み投稿を確認した上での通報テストです。'}, context());
+ await identity(null,'anon'); await assert.rejects(rpc('dining_approved_pilot_reviews_v2',{restaurant_id:restaurant}),/permission denied/); assert.deepEqual(await rpc('dining_public_catalog'),[]);
+ await identity(author); await repo.withdraw(receipt.id,2,randomUUID()); await identity(other); assert.deepEqual(await repo.listApprovedPilotReviews(restaurant),[]);
+});
+test('same-state moderation and feedback resolution do not grow mutation receipts/events',async()=>{
+ await activate(); const receipt=await submit(); await approve(receipt); await identity(editor);
+ for(let i=0;i<20;i++) { const result=await rpc('dining_moderate_review_v2',{review_id:receipt.id,expected_version:2,next_status:'approved',reason:'already approved',request_id:randomUUID()}); assert.equal(result.changed,false); }
+ await identity(other); const correction=await repo.feedback(restaurant,null,{kind:'correction',field:'price',sourceUrl:'https://example.test/course',reason:'',detail:'公式価格の条件を確認するテストです。'},context());
+ await identity(editor); await rpc('dining_resolve_feedback_v2',{feedback_id:correction.id,expected_version:1,next_status:'resolved',reason:'checked',request_id:randomUUID()});
+ for(let i=0;i<20;i++) { const result=await rpc('dining_resolve_feedback_v2',{feedback_id:correction.id,expected_version:2,next_status:'resolved',reason:'already resolved',request_id:randomUUID()}); assert.equal(result.changed,false); }
+ await db.exec('reset role');
+ for(const operation of ['moderate','resolve']) assert.equal((await db.query('select count(*)::int as n from dining_private.pilot_requests where operation=$1',[operation])).rows[0].n,1);
+});
+test('alternating editor decisions are bounded without limiting author withdrawal',async()=>{
+ await activate(); const receipt=await submit(); await identity(editor);
+ for(let i=0;i<50;i++) await rpc('dining_moderate_review_v2',{review_id:receipt.id,expected_version:i+1,next_status:i%2===0?'approved':'rejected',reason:'bounded moderation test',request_id:randomUUID()});
+ await assert.rejects(rpc('dining_moderate_review_v2',{review_id:receipt.id,expected_version:51,next_status:'approved',reason:'over limit',request_id:randomUUID()}),/daily limit/);
+ await identity(author); assert.equal((await repo.withdraw(receipt.id,51,randomUUID())).status,'withdrawn');
+});
+test('approved peer visibility requires current-policy consent on both author profile and the review itself',async()=>{
+ await activate(); const receipt=await submit(); await approve(receipt);
+ const nextPolicy='test-approved-pilot-policy-v2'; await db.exec('reset role'); await db.query('update dining_private.review_pilot_settings set policy_version=$1',[nextPolicy]);
+ await identity(other); await repo.saveProfile(profile(),1,randomUUID(),nextPolicy); assert.deepEqual(await repo.listApprovedPilotReviews(restaurant),[]);
+ await identity(author); await repo.saveProfile(profile(),1,randomUUID(),nextPolicy);
+ await identity(other); assert.deepEqual(await repo.listApprovedPilotReviews(restaurant),[]);
+ await identity(author); const edited=await repo.revise(receipt.id,2,draft(),{requestId:randomUUID(),acceptedPolicyVersion:nextPolicy,profileVersion:2});
+ await approve(edited); await identity(other); assert.equal((await repo.listApprovedPilotReviews(restaurant))[0].id,receipt.id);
 });

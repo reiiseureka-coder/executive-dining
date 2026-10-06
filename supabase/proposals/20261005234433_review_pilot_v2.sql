@@ -62,7 +62,7 @@ create table dining_private.pilot_feedback (
   status text not null default 'received' check (status in ('received','resolved','dismissed')),
   version integer not null default 1 check (version > 0), created_at timestamptz not null default now(),
   check ((kind='report' and review_id is not null and category in ('privacy','non_visit','relationship','abuse','spam','other') and official_url is null)
-      or (kind='correction' and review_id is null and category in ('name','address','website','genre','private_room','price','hours','access','coordinates','notice') and official_url ~ '^https://[^[:space:]@]+$' and length(official_url)<=2000))
+      or (kind='correction' and review_id is null and category in ('name','address','website','genre','private_room','price','hours','access','coordinates','notice') and official_url is not null and official_url ~ '^https://[^[:space:]@]+$' and length(official_url)<=2000))
 );
 create index pilot_feedback_author_idx on dining_private.pilot_feedback(author_id,created_at);
 create table dining_private.pilot_requests (
@@ -70,6 +70,14 @@ create table dining_private.pilot_requests (
   input_hash text not null, receipt jsonb not null, created_at timestamptz not null default now(), primary key(actor_id,operation,request_id)
 );
 create index pilot_requests_rate_idx on dining_private.pilot_requests(actor_id,created_at);
+-- Bounded aggregate quotas survive profile deletion; no content, names, hashes or receipts.
+create table dining_private.pilot_rate_limits (
+ actor_id uuid not null references auth.users(id) on delete cascade,
+ bucket text not null check(bucket in ('profile','submit,revise','report,correction','moderate','resolve')),
+ window_started_at timestamptz not null default now(), count integer not null check(count>0), primary key(actor_id,bucket)
+);
+alter table dining_private.pilot_rate_limits enable row level security;
+revoke all on dining_private.pilot_rate_limits from public,anon,authenticated;
 create table dining_private.pilot_events (
   id bigint generated always as identity primary key, review_id uuid references dining_private.pilot_reviews(id) on delete cascade,
   feedback_id uuid references dining_private.pilot_feedback(id) on delete cascade, actor_id uuid references auth.users(id) on delete set null,
@@ -127,8 +135,17 @@ begin
 end;
 $$;
 create function dining_private.pilot_limit(ops text[], maximum integer) returns void language plpgsql set search_path='' as $$
+declare budget text:=array_to_string(ops,','); previous dining_private.pilot_rate_limits;
 begin
- if (select count(*) from dining_private.pilot_requests where actor_id=auth.uid() and operation=any(ops) and created_at>now()-interval '1 day')>=maximum then raise exception 'Pilot daily limit' using errcode='54000'; end if;
+ -- pilot_begin already holds the per-actor transaction lock.
+ select * into previous from dining_private.pilot_rate_limits where actor_id=auth.uid() and bucket=budget for update;
+ if found and previous.window_started_at>now()-interval '1 day' then
+   if previous.count>=maximum then raise exception 'Pilot daily limit' using errcode='54000'; end if;
+   update dining_private.pilot_rate_limits set count=count+1 where actor_id=auth.uid() and bucket=budget;
+ else
+   insert into dining_private.pilot_rate_limits(actor_id,bucket,window_started_at,count) values(auth.uid(),budget,now(),1)
+   on conflict(actor_id,bucket) do update set window_started_at=excluded.window_started_at,count=1;
+ end if;
 end;
 $$;
 create function dining_private.pilot_label(industry text, size text, layer text, family text, given text) returns text language sql immutable set search_path='' as $$
@@ -183,6 +200,7 @@ begin
  select * into p from dining_private.pilot_profiles where user_id=auth.uid() for update;
  if not found then raise exception 'Profile unavailable' using errcode='42501'; end if;
  if expected_version is null or p.version<>expected_version then raise exception 'Stale profile' using errcode='40001'; end if;
+ if not p.public_consented then return jsonb_build_object('version',p.version,'status','revoked','requestId',request_id,'changed',false); end if;
  update dining_private.pilot_profiles set public_consented=false,version=version+1,updated_at=now() where user_id=auth.uid();
  update dining_private.pilot_reviews set status='withdrawn',version=version+1,updated_at=now() where author_id=auth.uid();
  return dining_private.pilot_finish('revoke_profile',request_id,payload,jsonb_build_object('version',p.version+1,'status','revoked','requestId',request_id));
@@ -224,6 +242,16 @@ create function public.dining_review_queue_v2() returns jsonb language plpgsql s
 begin
  if not dining_private.pilot_editor() then raise exception 'Editor access required' using errcode='42501'; end if;
  return (select coalesce(jsonb_agg(dining_private.pilot_review_json(v)||jsonb_build_object('authorId',v.author_id) order by v.created_at),'[]'::jsonb) from dining_private.pilot_reviews v);
+end;
+$$;
+create function public.dining_approved_pilot_reviews_v2(restaurant_id uuid) returns jsonb language plpgsql stable security definer set search_path='' as $$
+begin
+ if not ((dining_private.pilot_open() and dining_private.pilot_profile_ready()) or dining_private.pilot_editor()) then raise exception 'Pilot access required' using errcode='42501'; end if;
+ if not dining_private.pilot_eligible(restaurant_id) then raise exception 'Eligible pilot restaurant required' using errcode='22023'; end if;
+ return (select coalesce(jsonb_agg(dining_private.pilot_review_json(v) order by v.created_at desc),'[]'::jsonb) from dining_private.pilot_reviews v
+ join dining_private.pilot_profiles p on p.user_id=v.author_id cross join dining_private.review_pilot_settings s
+ where v.restaurant_id=dining_approved_pilot_reviews_v2.restaurant_id and v.status='approved' and p.public_consented
+ and p.accepted_policy_version=s.policy_version and v.accepted_policy_version=s.policy_version);
 end;
 $$;
 create function public.dining_submit_review_v2(restaurant_id uuid, request_id uuid, accepted_policy_version text, profile_version integer, rating integer, comment text, visited_month date, relationship text, has_visited boolean, privacy_checked boolean) returns jsonb
@@ -271,6 +299,7 @@ begin
  select * into v from dining_private.pilot_reviews where id=review_id and author_id=auth.uid() for update;
  if not found then raise exception 'Review access denied' using errcode='42501'; end if;
  if expected_version is null or v.version<>expected_version then raise exception 'Stale review' using errcode='40001'; end if;
+ if v.status='withdrawn' then return jsonb_build_object('id',review_id,'status','withdrawn','version',v.version,'requestId',request_id,'changed',false); end if;
  update dining_private.pilot_reviews set status='withdrawn',version=version+1,updated_at=now() where id=review_id;
  insert into dining_private.pilot_events(review_id,actor_id,action,reason) values(review_id,auth.uid(),'withdraw','Author withdrawal');
  return dining_private.pilot_finish('withdraw',request_id,payload,jsonb_build_object('id',review_id,'status','withdrawn','version',v.version+1,'requestId',request_id));
@@ -286,6 +315,8 @@ begin
  if v.author_id=auth.uid() or v.status='withdrawn' then raise exception 'Self or withdrawn review' using errcode='42501'; end if;
  if next_status is null or next_status not in ('approved','rejected') or reason is null or length(btrim(reason)) not between 1 and 1000 then raise exception 'Decision and reason required' using errcode='22023'; end if;
  if next_status='approved' and (not dining_private.pilot_eligible(v.restaurant_id) or v.relationship<>'customer') then raise exception 'Pilot approval eligibility' using errcode='22023'; end if;
+ if v.status=next_status then return jsonb_build_object('id',review_id,'status',v.status,'version',v.version,'requestId',request_id,'changed',false); end if;
+ perform dining_private.pilot_limit(array['moderate'],50);
  update dining_private.pilot_reviews set status=next_status,version=version+1,updated_at=now() where id=review_id;
  insert into dining_private.pilot_events(review_id,actor_id,action,reason) values(review_id,auth.uid(),next_status,btrim(reason));
  return dining_private.pilot_finish('moderate',request_id,payload,jsonb_build_object('id',review_id,'status',next_status,'version',v.version+1,'requestId',request_id));
@@ -349,6 +380,8 @@ begin
  if not found or expected_version is null or f.version<>expected_version then raise exception 'Stale feedback' using errcode='40001'; end if;
  if f.author_id=auth.uid() then raise exception 'Self resolution prohibited' using errcode='42501'; end if;
  if next_status is null or next_status not in ('resolved','dismissed') or reason is null or length(btrim(reason)) not between 1 and 1000 then raise exception 'Decision and reason required' using errcode='22023'; end if;
+ if f.status=next_status then return jsonb_build_object('id',feedback_id,'status',f.status,'version',f.version,'requestId',request_id,'changed',false); end if;
+ perform dining_private.pilot_limit(array['resolve'],50);
  update dining_private.pilot_feedback set status=next_status,version=version+1 where id=feedback_id;
  insert into dining_private.pilot_events(feedback_id,actor_id,action,reason) values(feedback_id,auth.uid(),next_status,btrim(reason));
  -- Resolving feedback never changes a review or an official fact automatically.
@@ -363,6 +396,7 @@ begin
  delete from dining_private.pilot_reviews where created_at<now()-interval '30 days';
  delete from dining_private.pilot_feedback where created_at<now()-interval '30 days';
  delete from dining_private.pilot_requests where created_at<now()-interval '30 days';
+ delete from dining_private.pilot_rate_limits where window_started_at<=now()-interval '1 day';
 end;
 $$;
 do $$ declare f record; begin
@@ -374,7 +408,7 @@ end $$;
 -- Every new public RPC is unavailable until separately approved explicit activation grants.
 do $$ declare f record; begin
  for f in select p.oid::regprocedure as signature from pg_proc p join pg_namespace n on n.oid=p.pronamespace
- where n.nspname='public' and p.proname in ('dining_my_profile_v2','dining_save_profile_v2','dining_revoke_profile_publication_v2','dining_delete_my_profile_v2','dining_review_capabilities_v2','dining_review_pilot_catalog_v2','dining_my_reviews_v2','dining_review_queue_v2','dining_submit_review_v2','dining_revise_review_v2','dining_withdraw_review_v2','dining_moderate_review_v2','dining_delete_own_review_v2','dining_report_review_v2','dining_suggest_correction_v2','dining_my_feedback_v2','dining_feedback_queue_v2','dining_resolve_feedback_v2') loop
+ where n.nspname='public' and p.proname in ('dining_my_profile_v2','dining_save_profile_v2','dining_revoke_profile_publication_v2','dining_delete_my_profile_v2','dining_review_capabilities_v2','dining_review_pilot_catalog_v2','dining_my_reviews_v2','dining_review_queue_v2','dining_approved_pilot_reviews_v2','dining_submit_review_v2','dining_revise_review_v2','dining_withdraw_review_v2','dining_moderate_review_v2','dining_delete_own_review_v2','dining_report_review_v2','dining_suggest_correction_v2','dining_my_feedback_v2','dining_feedback_queue_v2','dining_resolve_feedback_v2') loop
  execute format('revoke all on function %s from public,anon,authenticated',f.signature);
  end loop;
 end $$;
