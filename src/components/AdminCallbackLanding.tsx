@@ -1,37 +1,22 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/auth';
+import { useAppAccess } from '../contexts/appAccess';
 import { adminEmailCallbackDetected } from '../lib/supabase';
-import { isUnclaimedLoginLanding } from '../lib/authLanding';
-import { diningRepository } from '../data/diningClient';
+import { consumeLoginDestination, isUnclaimedLoginLanding } from '../lib/authLanding';
 
 export default function AdminCallbackLanding() {
   const { user, loading } = useAuth();
+  const access = useAppAccess();
   const handled = useRef(false);
-  const userId = user?.id;
   useEffect(() => {
-    if (!adminEmailCallbackDetected || loading || !userId || !diningRepository || handled.current) return;
-    const startHash = window.location.hash;
-    if (!isUnclaimedLoginLanding(startHash)) { handled.current = true; return; }
-    const controller = new AbortController();
-    const interrupted = () => {
-      if (window.location.hash !== startHash) { handled.current = true; controller.abort(); }
-    };
-    const unlisten = () => {
-      window.removeEventListener('hashchange', interrupted);
-      window.removeEventListener('popstate', interrupted);
-    };
-    window.addEventListener('hashchange', interrupted);
-    window.addEventListener('popstate', interrupted);
-    void diningRepository.canEdit(controller.signal).then(allowed => {
-      if (controller.signal.aborted) return;
-      handled.current = true;
-      if (allowed !== true || window.location.hash !== startHash) return;
-      unlisten();
-      window.history.replaceState(window.history.state, '', '#/curation');
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }).catch(() => { if (!controller.signal.aborted) handled.current = true; });
-    return () => { controller.abort(); unlisten(); };
-  }, [userId, loading]);
+    if (!adminEmailCallbackDetected || loading || access.loading || !user || handled.current) return;
+    handled.current = true;
+    let target = consumeLoginDestination(window.localStorage);
+    // New navigation always wins. A callback must not pull a user away from their current page.
+    if (!isUnclaimedLoginLanding(window.location.hash)) return;
+    if ((target === '#/curation' && !access.editor) || (target === '#/pilot' && !access.ownerTrial)) target = '#/';
+    window.history.replaceState(window.history.state, '', target);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }, [user, loading, access.loading, access.editor, access.ownerTrial]);
   return null;
 }

@@ -9,18 +9,20 @@ const fixture = {
     { field: 'private_room', value: '半個室 4〜6名', sourceUrl: 'https://example.com/rooms', provider: 'official', licenses: [], attributions: [], fetchedAt: date, verifiedAt: date },
   ], reviews: [],
 };
-test('default preview preserves sample search, gated curation, and route history', async ({ page }) => {
+test('default preview has a closed public catalog, hidden management and legacy route compatibility', async ({ page }) => {
   await page.goto('/#/nagoya');
   await expect(page.getByRole('heading', { name: '名古屋の掲載情報を準備しています' })).toBeVisible();
   await expect(page.getByText('確認済み掲載 0件')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.getByRole('link', { name: '運営者向け審査' }).click();
+  await expect(page.getByRole('link', { name: '運営管理', exact:true })).toHaveCount(0);
+  await page.evaluate(() => { window.location.hash = '#/curation'; });
   await expect(page.getByRole('heading', { name: '管理機能は接続準備中です' })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('heading', { name: '名古屋の掲載情報を準備しています' })).toBeVisible();
   await page.reload();
   await expect(page.getByText('確認済み掲載 0件')).toBeVisible();
-  await page.getByRole('link', { name: /サンプルで検索画面/ }).click();
+  await expect(page.getByRole('link', { name: /サンプルで検索画面/ })).toHaveCount(0);
+  await page.goto('/#/search');
   await expect(page.getByText('サンプル', { exact: false }).first()).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(6);
 });

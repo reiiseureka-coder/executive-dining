@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bookmark, Menu, X } from "lucide-react";
 import type { Page } from "../types";
 import type { SearchParams } from "../lib/search";
+import { useAppAccess } from "../contexts/appAccess";
 import { useAuth } from "../contexts/auth";
 import { useSavedCatalog } from "../hooks/useSavedCatalog";
 import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
@@ -10,11 +11,13 @@ interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
 }
-const items: { label: string; page: Page }[] = [
-  { label: "お店を探す", page: "nagoya" },
-  { label: "このサービスについて", page: "about" },
-];
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
+  const access = useAppAccess();
+  const items: { label: string; page: Page }[] = [
+    { label: "お店を探す", page: "home" },
+    { label: "このサービスについて", page: "about" },
+    ...(access.editor ? [{ label: "運営管理", page: "curation" as Page }] : []),
+  ];
   const [modal, setModal] = useState<"menu" | "login" | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,7 +37,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   }, [modal]);
   const navigate = (page: Page, params?: SearchParams) => {
     setModal(null);
-    onNavigate(page, undefined, params ?? {});
+    onNavigate(page, undefined, params);
   };
   const authenticate = async () => {
     setError("");
@@ -82,12 +85,12 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <div className="header-actions">
             <button
               className="header-saved"
-              onClick={() => navigate("nagoya", { saved: "1" })}
-              aria-label={`保存した候補 ${savedIds.length}件`}
+              onClick={() => navigate(access.ownerTrial ? "compare" : "nagoya", access.ownerTrial ? undefined : { saved: "1" })}
+              aria-label={access.ownerTrial ? "候補の比較を開く" : `保存した候補 ${savedIds.length}件`}
             >
               <Bookmark size={17} />
               <span>候補</span>
-              <small>{savedIds.length}</small>
+              {!access.ownerTrial && <small>{savedIds.length}</small>}
             </button>
             <button
               className="desktop-login"
@@ -140,9 +143,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   {item.label}
                 </button>
               ))}
-              <button onClick={() => navigate("admin")}>
-                掲載情報の下書き
-              </button>
+
               <button
                 onClick={() => {
                   setError("");
@@ -155,7 +156,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           ) : (
             <>
               <p>
-                検索と候補保存はログインせずに使えます。候補・下書きはこのブラウザ内に保存されます。
+                {user ? "ログイン状態はこのブラウザで保持されます。共有端末では利用後にログアウトしてください。" : "招待済みのアカウントでログインすると、利用できる店舗情報と管理メニューがここに表示されます。"}
               </p>
               {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>
@@ -175,7 +176,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   </button>
                   <p className="quiet-label">
                     {user ? user.email : "Googleの認証画面へ移動します。"}
-                  </p>{user && <button className="button-secondary" onClick={() => navigate("curation")}>審査画面を開く</button>}</>}
+                  </p>{user && <button className="button-secondary" onClick={() => navigate("home")}>お店を探す</button>}{access.editor && <button className="button-secondary" onClick={() => navigate("curation")}>運営管理を開く</button>}</>}
                 </>
               )}
               {error && (

@@ -19,8 +19,9 @@ test('homepage and primary search use real catalog, while six-sample demo stays 
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
   await page.getByRole('button', { name: 'お店を探す', exact: true }).click();
-  await expect(page).toHaveURL(`${base}/#/nagoya`);
-  await page.getByRole('link', { name: 'サンプル・デモ', exact: true }).click();
+  await expect(page).toHaveURL(`${base}/#/`);
+  await expect(page.getByRole('link', { name: 'サンプル・デモ', exact: true })).toHaveCount(0);
+  await page.goto(`${base}/#/demo`);
   await expect(page.getByText('掲載サンプル 6 店')).toBeVisible();
   await page.getByRole('button', { name: 'すべてのお店', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'サンプルで検索を試す。' })).toBeVisible();

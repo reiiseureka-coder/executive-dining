@@ -1598,3 +1598,8 @@ figure {
 .pilot-profile summary { cursor:pointer; font-weight:500; }
 .owner-trial .catalog-toolbar select { width:100%; border:1px solid #cbd1c2; padding:11px; background:#fffefb; }
 .owner-trial .review-draft-preview { margin-top:26px; }
+
+.private-mode-banner { background: #e8eee5; color: #2c4836; border-bottom: 1px solid #ccd8c8; font-size: .8rem; }
+.private-mode-banner .page-width { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding-top: 9px; padding-bottom: 9px; }
+.private-mode-banner button { color: inherit; background: transparent; border: 0; text-decoration: underline; white-space: nowrap; cursor: pointer; }
+@media (max-width: 600px) { .private-mode-banner .page-width { align-items: flex-start; font-size: .72rem; } }

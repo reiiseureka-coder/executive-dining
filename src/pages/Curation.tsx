@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ReviewReadiness from '../components/ReviewReadiness';
+import { useAppAccess } from '../contexts/appAccess';
 import { useAuth } from '../contexts/auth';
 import { emailSignInEnabled, googleSignInEnabled } from '../lib/supabase';
 import { diningRepository } from '../data/diningClient';
@@ -62,9 +63,10 @@ function EditorWorkspace() {
   if (state === 'loading') return <p role="status">編集権限を確認しています…</p>;
   if (state === 'denied') return <div className="catalog-empty"><h2>編集権限が必要です</h2><p>このアカウントには運営者としての権限がありません。</p></div>;
   if (state === 'error') return <div className="catalog-empty" role="alert"><h2>審査データを読み込めません</h2><p>接続と権限を確認してください。</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>再読み込み</button></div>;
-  return <><a className="button-secondary" href="#/pilot">実店舗の非公開テストへ</a><ReviewReadiness /><p className="catalog-count">最新 {rows.length}件（最大200件） / 口コミ受付は別途準備中</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>一覧を再読み込み</button><div className="curation-list">{rows.map(row => <CandidateEditor key={`${row.id}:${row.version}`} row={row} reload={reload} />)}</div>{!rows.length && <div className="catalog-empty"><h2>確認待ちの候補はありません</h2><p>取得候補は、重複・出典を確認してから管理者が取り込みます。</p></div>}</>;
+  return <><ReviewReadiness /><p className="catalog-count">最新 {rows.length}件（最大200件） / 口コミ受付は別途準備中</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>一覧を再読み込み</button><div className="curation-list">{rows.map(row => <CandidateEditor key={`${row.id}:${row.version}`} row={row} reload={reload} />)}</div>{!rows.length && <div className="catalog-empty"><h2>確認待ちの候補はありません</h2><p>取得候補は、重複・出典を確認してから管理者が取り込みます。</p></div>}</>;
 }
 export default function Curation() {
   const { user, loading } = useAuth();
-  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">EDITORIAL WORKSPACE</p><h1>店舗情報の確認・審査</h1></div></div><p className="catalog-explainer">候補の取得と掲載承認は別の操作です。店名・所在地・公式サイトの確認記録が揃うまで、掲載は承認できません。</p><div style={{ marginTop: 24 }}>{!diningRepository ? <div className="catalog-empty"><h2>管理機能は接続準備中です</h2><p>店舗データベースと編集権限の確認が完了してから利用できます。</p><a href="#/admin">ブラウザ内で掲載情報の下書きを作る</a></div> : loading ? <p role="status">ログイン状態を確認しています…</p> : !user ? <div className="catalog-empty"><h2>運営者のログインが必要です</h2><p>{(googleSignInEnabled || emailSignInEnabled) ? '上部のログインから、編集権限のあるアカウントでログインしてください。' : 'ログイン設定の確認が完了してから利用できます。'}</p></div> : <EditorWorkspace key={user.id} />}</div></div>;
+  const access = useAppAccess();
+  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">EDITORIAL WORKSPACE</p><h1>店舗情報の確認・審査</h1>{access.ownerTrial && access.editor && <a className="button-secondary" href="#/?view=queue">テスト投稿を確認</a>}</div></div><p className="catalog-explainer">候補の取得と掲載承認は別の操作です。店名・所在地・公式サイトの確認記録が揃うまで、掲載は承認できません。</p><div style={{ marginTop: 24 }}>{!diningRepository ? <div className="catalog-empty"><h2>管理機能は接続準備中です</h2><p>店舗データベースと編集権限の確認が完了してから利用できます。</p><a href="#/admin">ブラウザ内で掲載情報の下書きを作る</a></div> : loading ? <p role="status">ログイン状態を確認しています…</p> : !user ? <div className="catalog-empty"><h2>運営者のログインが必要です</h2><p>{(googleSignInEnabled || emailSignInEnabled) ? '上部のログインから、編集権限のあるアカウントでログインしてください。' : 'ログイン設定の確認が完了してから利用できます。'}</p></div> : <EditorWorkspace key={user.id} />}</div></div>;
 }

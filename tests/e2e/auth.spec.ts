@@ -13,6 +13,7 @@ test('signed-in account never reads legacy profile table and cannot gain editor 
   const requests: string[] = [];
   await page.route('https://test-project.supabase.co/**', async route => {
     requests.push(route.request().url());
+    if (route.request().url().endsWith('/rpc/dining_owner_trial_context')) { await route.fulfill({status:403,json:{code:'42501'}}); return; }
     await route.fulfill({ json: route.request().url().endsWith('/rpc/dining_editor_access') ? false : [] });
   });
   await signedInFixture(page);
@@ -27,6 +28,7 @@ test('authorized editor can read the queue and sign out without a legacy profile
   const requests: string[] = [];
   await page.route('https://test-project.supabase.co/**', async route => {
     const url = route.request().url(); requests.push(url);
+    if (url.endsWith('/rpc/dining_owner_trial_context')) { await route.fulfill({status:403,json:{code:'42501'}}); return; }
     if (url.includes('/auth/v1/logout')) await route.fulfill({ status: 204, body: '' });
     else await route.fulfill({ json: url.endsWith('/rpc/dining_editor_access') ? true : [] });
   });

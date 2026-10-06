@@ -4,6 +4,7 @@ import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supaba
 import { AuthContext } from "./auth";
 import { observeAuthSession } from "../lib/authSession";
 import { buildEmailLinkRequest } from "../lib/emailLogin";
+import { rememberLoginDestination } from "../lib/authLanding";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(Boolean(supabase));
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase || !emailSignInEnabled) throw new Error("メールログインは準備中です。");
     if (emailInFlight.current || Date.now() < nextEmailRequestAt.current) throw new Error("時間をおいてお試しください。");
     const request = buildEmailLinkRequest(email, window.location.origin);
+    rememberLoginDestination(window.localStorage, window.location.hash);
     nextEmailRequestAt.current = Date.now() + 60_000;
     setEmailRetryAt(nextEmailRequestAt.current);
     emailInFlight.current = true;

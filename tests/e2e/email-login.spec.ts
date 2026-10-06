@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { mock as ownerMock } from './helpers/ownerTrial';
 const base = 'http://127.0.0.1:4182';
 async function openLogin(page: Page, isMobile: boolean) {
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
@@ -48,14 +49,16 @@ function callbackUrl(type = 'magiclink') {
   const token = `${part({ alg: 'HS256', typ: 'JWT' })}.${part({ sub: callbackUser.id, exp: Math.floor(Date.now() / 1000) + 3600 })}.synthetic-signature`;
   return `${base}/#${new URLSearchParams({ access_token: token, refresh_token: 'synthetic-refresh', expires_in: '3600', token_type: 'bearer', type })}`;
 }
-test('authorized callback lands on all ten editorial rows with safe history, reload and normal homepage persistence', async ({ page }) => {
+test('remembered management callback returns to ten editorial rows with safe history and session persistence', async ({ page }) => {
   let roleChecks = 0;
   await page.route('https://test-project.supabase.co/**', async route => {
     const url = route.request().url();
+    if (url.endsWith('/rpc/dining_owner_trial_context')) { await route.fulfill({status:403,json:{code:'42501'}}); return; }
     if (url.endsWith('/rpc/dining_editor_access')) roleChecks++;
     await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : url.endsWith('/rpc/dining_editor_access') ? true : url.endsWith('/rpc/dining_editor_queue') ? queue : [] });
   });
   await page.goto(`${base}/#/about`);
+  await page.evaluate(() => localStorage.setItem('ed-login-destination:v1', JSON.stringify({target:'#/curation',expiresAt:Date.now()+60000})));
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(/#\/curation$/);
   await expect(page.locator('.curation-card')).toHaveCount(10);
@@ -69,12 +72,13 @@ test('authorized callback lands on all ten editorial rows with safe history, rel
   await page.reload();
   await expect(page).toHaveURL(/#\/$/);
   await expect(page.getByRole('heading', { name: /名古屋の会食/ })).toBeVisible();
-  expect(roleChecks).toBe(beforeHome);
+  expect(roleChecks).toBeGreaterThan(beforeHome);
 });
 test('callback intent and metadata never redirect an account denied by the server', async ({ page }) => {
   let checks = 0, queues = 0;
   await page.route('https://test-project.supabase.co/**', async route => {
-    const url = route.request().url(); if (url.endsWith('/rpc/dining_editor_access')) checks++; if (url.endsWith('/rpc/dining_editor_queue')) queues++;
+    const url = route.request().url();
+    if (url.endsWith('/rpc/dining_owner_trial_context')) { await route.fulfill({status:403,json:{code:'42501'}}); return; } if (url.endsWith('/rpc/dining_editor_access')) checks++; if (url.endsWith('/rpc/dining_editor_queue')) queues++;
     await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : url.endsWith('/rpc/dining_editor_access') ? false : [] });
   });
   await page.goto(callbackUrl());
@@ -88,6 +92,7 @@ test('new navigation during the callback permission check is never pulled back t
   const gate = new Promise<void>(resolve => { release = resolve; });
   await page.route('https://test-project.supabase.co/**', async route => {
     const url = route.request().url();
+    if (url.endsWith('/rpc/dining_owner_trial_context')) { await route.fulfill({status:403,json:{code:'42501'}}); return; }
     if (url.endsWith('/rpc/dining_editor_access')) { checks++; await gate; await route.fulfill({ json: true }).catch(() => {}); }
     else await route.fulfill({ json: url.includes('/auth/v1/user') ? callbackUser : [] });
   });
@@ -106,4 +111,17 @@ test('expired callback reports a generic error and never sends mail without a cl
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText('ログインリンクを確認できませんでした');
   await expect(page.getByText('private-provider-detail', { exact: true })).toHaveCount(0);
   expect(requests.some(url => url.includes('/auth/v1/otp'))).toBe(false);
+});
+
+test('owner invitation lands at the single entry with ten real stores and restores in a new tab', async ({ page, context }) => {
+  await ownerMock(page);
+  await page.route('**/auth/v1/user', route => route.fulfill({json:callbackUser}));
+  await page.goto(callbackUrl('invite'));
+  await expect(page).toHaveURL(`${base}/#/`);
+  await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
+  await expect(page).not.toHaveURL(/access_token|refresh_token/);
+  await page.reload();await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
+  const second=await context.newPage();await ownerMock(second);await second.goto(base);
+  await expect(second.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
+  await second.close();
 });

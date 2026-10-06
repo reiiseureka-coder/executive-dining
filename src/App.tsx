@@ -3,6 +3,8 @@ import type { Page } from "./types";
 import type { SearchParams } from "./lib/search";
 import { parseRoute, routeHash } from "./lib/routing";
 import { isAdminEmailCallback } from "./lib/authLanding";
+import { AppAccessProvider } from "./contexts/AppAccessProvider";
+import { useAppAccess } from "./contexts/appAccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import AdminCallbackLanding from "./components/AdminCallbackLanding";
@@ -36,7 +38,8 @@ function subscribe(callback: () => void) {
     window.removeEventListener("popstate", changed);
   };
 }
-export default function App() {
+function AppShell() {
+  const access = useAppAccess();
   const hash = useSyncExternalStore(
     subscribe,
     () => window.location.hash,
@@ -50,11 +53,11 @@ export default function App() {
   ) => {
     const search =
       params ??
-      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare"].includes(route.page) ? route.params : {});
+      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare", "pilot"].includes(route.page) ? route.params : {});
     window.location.hash = routeHash(
       page,
       restaurantId,
-      ["search", "detail", "nagoya", "nagoya-detail", "compare"].includes(page) ? search : {},
+      ["search", "detail", "home", "nagoya", "nagoya-detail", "compare", "pilot"].includes(page) ? (page === "home" && !params ? { ...search, view: undefined } : search) : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -84,7 +87,7 @@ export default function App() {
     document.title = `${labels[route.page]} | Executive Dining`;
   }, [route.page]);
   return (
-    <AuthProvider>
+    <>
       <AdminCallbackLanding />
       <a
         className="skip-link"
@@ -97,10 +100,11 @@ export default function App() {
         本文へ移動
       </a>
       <Header
-        key={route.page}
+        key={hash}
         currentPage={route.page}
         onNavigate={handleNavigate}
       />
+      {access.ownerTrial && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("home")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
         {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
         {route.page === "search" && (
@@ -117,12 +121,9 @@ export default function App() {
             onNavigate={handleNavigate}
           />
         )}
-        {(route.page === "home" || route.page === "nagoya") && <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />}
-        {route.page === "nagoya-detail" && <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} />}
+        {["home", "nagoya", "nagoya-detail", "compare", "pilot"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || route.page === "pilot" ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
         {route.page === "curation" && <Curation />}
-        {route.page === "compare" && <Compare params={route.params} onNavigate={handleNavigate} />}
         {route.page === "membership" && <Membership />}
-        {route.page === "pilot" && <OwnerTrial />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
       </main>
@@ -131,14 +132,14 @@ export default function App() {
           <span className="wordmark">EXECUTIVE DINING</span>
           <p>会食の店選びを、丁寧に。</p>
           <a href="#/about">掲載情報について</a>
-          <a href="#/admin">掲載情報の下書き</a>
-          <a href="#/curation">運営者向け審査</a>
-          <a href="#/pilot">実店舗の非公開テスト</a>
-          <a href="#/membership">会員画面の準備</a>
-          <a href="#/demo">サンプル・デモ</a>
+          {access.editor && <a href="#/curation">運営管理</a>}
           <span>© {new Date().getFullYear()} Executive Dining</span>
         </div>
       </footer>
-    </AuthProvider>
+    </>
   );
+}
+
+export default function App() {
+  return <AuthProvider><AppAccessProvider><AppShell /></AppAccessProvider></AuthProvider>;
 }
