@@ -170,3 +170,7 @@ npm run test:e2e
 - SDK既定のpersistSession/autoRefreshを維持。同じ安定したoriginとブラウザではsessionを再利用する。新しいVercel一時URL、別ブラウザ、ストレージ削除では共有されない。Google OAuthは低優先の別工程。
 
 この作業ではDB/security/Auth設定/公開gate/main/Productionを変更しない。fixtureはtests内のみで、実Previewの掲載情報として同梱しない。
+
+### 2026-10-06 private pilot基盤の適用
+
+Phase Aの提案`20261005234433_review_pilot_v2.sql`（SHA-256 `a4a20d2dcf38ca70ee011fb683527f5dc94ce9d02debb0b2e16eddb2bb703685`）は承認後、server version `20261006065548 review_pilot_v2`として適用・確認済み。新10private tablesはRLS/client accessなし、19RPCのclient EXECUTEなし、設定singleton以外の新tableは空、受付OFF。歴史的なSQL本文/ファイル名は保持し、元の公開gate/Auth/店舗状態を変更していない。本人限定の実店舗テストは別の[owner trial提案](owner-trial.md)で扱う。

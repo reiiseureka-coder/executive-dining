@@ -1589,3 +1589,12 @@ figure {
 .operator-badge small { font-size: 10px; }
 .operator-example { margin-block: 22px; padding: 18px; background: #f5f6f0; }
 @media (max-width:720px) { .membership-tiers { grid-template-columns:1fr; } }
+
+.owner-trial > h1 { font: 500 clamp(28px,4vw,44px)/1.6 'Noto Serif JP',serif; margin-bottom: 24px; }
+.pilot-toolbar, .pilot-tabs { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-block:20px; }
+.pilot-toolbar { justify-content:space-between; }
+.pilot-tabs .button-secondary[aria-pressed=true] { background:#e9efdf; border-color:#71845f; }
+.pilot-profile { margin-block:24px; font-size:12px; }
+.pilot-profile summary { cursor:pointer; font-weight:500; }
+.owner-trial .catalog-toolbar select { width:100%; border:1px solid #cbd1c2; padding:11px; background:#fffefb; }
+.owner-trial .review-draft-preview { margin-top:26px; }

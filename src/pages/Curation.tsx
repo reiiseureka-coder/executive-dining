@@ -62,7 +62,7 @@ function EditorWorkspace() {
   if (state === 'loading') return <p role="status">編集権限を確認しています…</p>;
   if (state === 'denied') return <div className="catalog-empty"><h2>編集権限が必要です</h2><p>このアカウントには運営者としての権限がありません。</p></div>;
   if (state === 'error') return <div className="catalog-empty" role="alert"><h2>審査データを読み込めません</h2><p>接続と権限を確認してください。</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>再読み込み</button></div>;
-  return <><ReviewReadiness /><p className="catalog-count">最新 {rows.length}件（最大200件） / 口コミ受付は別途準備中</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>一覧を再読み込み</button><div className="curation-list">{rows.map(row => <CandidateEditor key={`${row.id}:${row.version}`} row={row} reload={reload} />)}</div>{!rows.length && <div className="catalog-empty"><h2>確認待ちの候補はありません</h2><p>取得候補は、重複・出典を確認してから管理者が取り込みます。</p></div>}</>;
+  return <><a className="button-secondary" href="#/pilot">実店舗の非公開テストへ</a><ReviewReadiness /><p className="catalog-count">最新 {rows.length}件（最大200件） / 口コミ受付は別途準備中</p><button className="button-secondary" onClick={() => { setState('loading'); setRevision(value => value + 1); }}>一覧を再読み込み</button><div className="curation-list">{rows.map(row => <CandidateEditor key={`${row.id}:${row.version}`} row={row} reload={reload} />)}</div>{!rows.length && <div className="catalog-empty"><h2>確認待ちの候補はありません</h2><p>取得候補は、重複・出典を確認してから管理者が取り込みます。</p></div>}</>;
 }
 export default function Curation() {
   const { user, loading } = useAuth();

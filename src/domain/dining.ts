@@ -73,7 +73,7 @@ export function safeExternalUrl(value: string): string | null {
     return (url.protocol === 'https:' || url.protocol === 'http:') && !url.username && !url.password ? url.href : null;
   } catch { return null; }
 }
-export function factValue(restaurant: VerifiedRestaurant, field: FactField): string | null {
+export function factValue(restaurant: Pick<VerifiedRestaurant, 'facts'>, field: FactField): string | null {
   return restaurant.facts.find(fact => fact.field === field)?.value ?? null;
 }
 export function verifiedCoordinates(restaurant: VerifiedRestaurant): [number, number] | null {
