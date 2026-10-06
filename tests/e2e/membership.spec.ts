@@ -1,0 +1,27 @@
+import { test, expect } from '@playwright/test';
+const base='http://127.0.0.1:4181';
+test('membership demo has locked fictitious identity, explicit public preview consent and no persistence or RPC writes',async({page})=>{
+ const requests:string[]=[];
+ await page.route('https://test-project.supabase.co/**',route=>{requests.push(route.request().url());return route.fulfill({json:[]});});
+ await page.goto(`${base}/#/membership`);
+ await expect(page.getByRole('heading',{name:'体験の背景が、ほどよく伝わる。'})).toBeVisible();
+ await expect(page.getByText('会員登録の操作デモです。すべて架空の情報で、実際の個人情報は入力できません。登録・送信・課金・特典付与は行いません。')).toBeVisible();
+ for(const label of ['実会社名（非公開）','氏名（非公開）','正式な役職（非公開）']) await expect(page.getByLabel(label,{exact:true})).toHaveAttribute('readonly','');
+ await page.getByRole('button',{name:'架空データで公開表示を試す',exact:true}).click();
+ const label=page.locator('.public-identity-preview'); await expect(label).toContainText('部門マネジメント / K・T');
+ await expect(label).not.toContainText('デモ製薬株式会社'); await expect(label).not.toContainText('検証 太郎');
+ const next=page.getByRole('button',{name:'会員機能の案を見る',exact:true}); await expect(next).toBeDisabled();
+ const consent=page.getByLabel('この公開表示を確認する（操作デモ）',{exact:true}); await consent.check();
+ await page.getByLabel('公開する役割の区分',{exact:true}).selectOption('team'); await expect(consent).not.toBeChecked(); await expect(next).toBeDisabled();
+ await consent.check(); await next.click();
+ for(const name of ['Member','Plus','Prime']) await expect(page.getByRole('heading',{name,exact:true})).toBeVisible();
+ await expect(page.locator('.operator-example .operator-badge')).toContainText('Owner');
+ await expect(page.getByRole('button',{name:'会員登録は準備中',exact:true})).toBeDisabled();
+ await expect(page.locator('header .operator-badge')).toHaveCount(0);
+ await page.getByRole('button',{name:'公開表示を見直す',exact:true}).click(); await expect(consent).not.toBeChecked();
+ expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>/profile|membership|identity/.test(key)))).toEqual([]);
+ expect(requests.filter(url=>/\/rpc\//.test(url))).toEqual([]);
+ expect(page.url()).toBe(`${base}/#/membership`);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+ await page.reload(); await expect(page.getByRole('heading',{name:'まずは、登録情報を。'})).toBeVisible();
+});

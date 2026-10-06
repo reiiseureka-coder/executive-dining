@@ -1570,3 +1570,22 @@ figure {
 .review-draft-preview button { margin-top: 14px; }
 .review-readiness ul { padding-left: 20px; list-style: disc; }
 @media (max-width: 720px) { .review-draft-grid { grid-template-columns: 1fr; } .visit-draft, .feedback-draft, .review-readiness { padding: 14px; } }
+
+.membership-page > h1 { font: 500 clamp(28px,4vw,45px)/1.6 'Noto Serif JP',serif; }
+.membership-steps { display: flex; flex-wrap: wrap; gap: 18px; font-size: 12px; color: #79806d; margin: 26px 0; }
+.membership-steps [aria-current=step] { color: #405234; font-weight: 600; }
+.membership-card { padding: clamp(20px,4vw,40px); border: 1px solid #d6dccf; background: #fffefb; line-height: 2; font-size: 13px; }
+.membership-card h2 { font: 500 25px/1.7 'Noto Serif JP',serif; margin-bottom: 18px; }
+.membership-card label { display: grid; gap: 7px; margin-block: 16px; }
+.membership-card input:not([type=checkbox]), .membership-card select { min-width: 0; width: 100%; background: #f6f7f0; border: 1px solid #cbd1c2; padding: 11px; }
+.membership-card .draft-check { display: flex; align-items: center; gap: 9px; }
+.public-identity-preview { margin-block: 24px; border-left: 3px solid #7c9368; padding: 18px; background: #f1f4eb; overflow-wrap: anywhere; }
+.public-identity-preview strong { font-size: 15px; font-weight: 500; }
+.public-identity-preview p { color: #6b7362; font-size: 11px; }
+.membership-tiers { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-block: 24px; }
+.membership-tiers article { padding: 18px; border: 1px solid #d6dccf; }
+.membership-tiers h3 { font: 500 23px/1.5 'Noto Serif JP',serif; }
+.operator-badge { display: inline-flex; align-items: center; gap: 7px; border: 1px solid #859b75; color: #435735; font-size: 12px; padding: 3px 10px; }
+.operator-badge small { font-size: 10px; }
+.operator-example { margin-block: 22px; padding: 18px; background: #f5f6f0; }
+@media (max-width:720px) { .membership-tiers { grid-template-columns:1fr; } }

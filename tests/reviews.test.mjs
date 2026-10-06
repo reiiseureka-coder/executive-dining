@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { decodeReviewDraft, emptyReviewDraft, reviewDraftErrors, currentVisitMonth, emptyFeedbackDraft, decodeFeedbackDraft, feedbackDraftErrors, moderationPreflight } from '../src/domain/reviews.ts';
+import { publicProfileLabel } from '../src/domain/membership.ts';
 import { ProposedReviewRepository, decodeReviewCapabilities } from '../src/data/repositories/proposedReviewRepository.ts';
 const restaurant = 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
 const author = 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb';
@@ -8,8 +9,10 @@ const editor = 'cccccccc-cccc-4ccc-cccc-cccccccccccc';
 const requestId = 'dddddddd-dddd-4ddd-dddd-dddddddddddd';
 const review = 'eeeeeeee-eeee-4eee-eeee-eeeeeeeeeeee';
 const valid = () => ({ displayName: '食事メモ', visitedMonth: '2026-09', relationship: 'customer', rating: 4, comment: '自分で来店して食事をした体験の記録です。', hasVisited: true, privacyChecked: true });
-const caps = { contractVersion: 2, signedIn: true, acceptingReviews: true, acceptingReports: true, acceptingCorrections: true, canManageOwn: true, canModerate: true, policyVersion: 'test-policy-1' };
-const context = { requestId, acceptedPolicyVersion: 'test-policy-1' };
+const choice = { industry: 'pharmaceutical', companySize: 'large', roleLayer: 'department', familyRomanization: 'Kensho', givenRomanization: 'Taro' };
+const snapshot = { profileVersion: 1, industry: choice.industry, companySize: choice.companySize, roleLayer: choice.roleLayer, initials: 'K・T', label: publicProfileLabel(choice), declaration: 'self_declared', operatorAtSubmission: false };
+const caps = { contractVersion: 2, privatePilot: true, acceptingProfiles: true, profileReady: true, profileVersion: 1, operatorBadge: null, publicAuthor: snapshot, signedIn: true, acceptingReviews: true, acceptingReports: true, acceptingCorrections: true, canManageOwn: true, canModerate: true, policyVersion: 'test-policy-1' };
+const context = { requestId, acceptedPolicyVersion: 'test-policy-1', profileVersion: 1 };
 function repository(capabilities = caps, result = { id: review, status: 'pending', version: 1, requestId }) {
   const calls = [];
   const repo = new ProposedReviewRepository({ rpc: async (name, args) => { calls.push({ name, args }); return name === 'dining_review_capabilities_v2' ? { data: capabilities, error: null } : typeof result === 'function' ? result(name, args) : { data: result, error: null }; } });
@@ -64,7 +67,7 @@ test('future adapter includes relationship/month/declarations and omits caller-s
   const sent = calls[1]; assert.equal(sent.name, 'dining_submit_review_v2');
   assert.equal(sent.args.relationship, 'customer'); assert.equal(sent.args.visited_month, '2026-09-01');
   assert.equal(sent.args.request_id, requestId); assert.equal(sent.args.has_visited, true);
-  assert.equal(sent.args.authorId, undefined); assert.equal(sent.args.status, undefined); assert.equal(sent.args.company, undefined);
+  assert.equal(sent.args.display_name, undefined); assert.equal(sent.args.profile_version, 1); assert.equal(sent.args.authorId, undefined); assert.equal(sent.args.status, undefined); assert.equal(sent.args.company, undefined);
 });
 test('capabilities are rechecked for each write and request IDs stay stable for server reconciliation', async () => {
   const { repo, calls } = repository();
@@ -113,7 +116,7 @@ test('moderation requires current backend permission and does not send client ro
   assert.equal(allowed.calls[1].args.actor_id, undefined); assert.equal(allowed.calls[1].args.role, undefined);
 });
 test('own-review reads have no caller-selected author and strip unrelated sensitive fields', async () => {
-  const { repo, calls } = repository(caps, [{ ...valid(), id: review, restaurantId: restaurant, status: 'pending', version: 1, email: 'private', authorId: author }]);
+  const { repo, calls } = repository(caps, [{ ...valid(), displayName: snapshot.label, authorSnapshot: snapshot, operatorBadge: null, id: review, restaurantId: restaurant, status: 'pending', version: 1, email: 'private', authorId: author }]);
   const rows = await repo.listMine();
   assert.deepEqual(calls[1], { name: 'dining_my_reviews_v2', args: {} });
   assert.equal(rows[0].email, undefined); assert.equal(rows[0].authorId, undefined);

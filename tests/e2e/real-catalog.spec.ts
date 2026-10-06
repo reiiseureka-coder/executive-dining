@@ -168,7 +168,7 @@ test('visit drafts stay local, recover during navigation and restore saved month
   page.on('request', request => { if (/\/rpc\/dining_.*review|\/rpc\/dining_.*correction/.test(request.url())) mutations.push(request.url()); });
   await page.goto(`${base}/#/nagoya/${rows[0].id}`);
   const draft = page.locator('.visit-draft'); await draft.locator('summary').click();
-  await draft.getByLabel('公開用ニックネーム', { exact: true }).fill('会食メモ');
+  await draft.getByLabel('下書きのメモ名（非公開）', { exact: true }).fill('会食メモ');
   await draft.getByLabel('訪問月', { exact: true }).fill('2026-09');
   await draft.getByLabel('店舗との関係', { exact: true }).selectOption('customer');
   await draft.getByLabel('体験の総合評価', { exact: true }).selectOption('4');
@@ -176,7 +176,7 @@ test('visit drafts stay local, recover during navigation and restore saved month
   await page.getByRole('button', { name: '検索条件を保って一覧へ', exact: true }).click();
   await page.locator(`#verified-${rows[0].id}`).getByRole('button', { name: '詳細と確認情報を見る', exact: true }).click();
   await draft.locator('summary').click();
-  await expect(draft.getByLabel('公開用ニックネーム', { exact: true })).toHaveValue('会食メモ');
+  await expect(draft.getByLabel('下書きのメモ名（非公開）', { exact: true })).toHaveValue('会食メモ');
   await draft.getByLabel('本人が実際に訪問した体験です', { exact: true }).check();
   await draft.getByLabel('個人情報・会食相手・機密情報を含めていません', { exact: true }).check();
   await draft.getByRole('button', { name: '公開前の表示内容を確認', exact: true }).click();
@@ -196,30 +196,30 @@ test('draft validation, delete cancellation and confirmed removal never act as s
   const draft = page.locator('.visit-draft'); await draft.locator('summary').click();
   await draft.getByRole('button', { name: '公開前の表示内容を確認', exact: true }).click();
   await expect(draft.getByRole('alert')).toContainText('本人の実際の訪問体験');
-  await draft.getByLabel('公開用ニックネーム', { exact: true }).fill('途中の下書き');
+  await draft.getByLabel('下書きのメモ名（非公開）', { exact: true }).fill('途中の下書き');
   await draft.getByRole('button', { name: 'このブラウザに下書き保存', exact: true }).click();
   await draft.getByRole('button', { name: '下書きを削除', exact: true }).click();
   await draft.getByRole('button', { name: 'キャンセル', exact: true }).click();
-  await expect(draft.getByLabel('公開用ニックネーム', { exact: true })).toHaveValue('途中の下書き');
+  await expect(draft.getByLabel('下書きのメモ名（非公開）', { exact: true })).toHaveValue('途中の下書き');
   await draft.getByRole('button', { name: '下書きを削除', exact: true }).click();
   await draft.getByRole('button', { name: '下書きの削除を確定', exact: true }).click();
-  await expect(draft.getByLabel('公開用ニックネーム', { exact: true })).toHaveValue('');
+  await expect(draft.getByLabel('下書きのメモ名（非公開）', { exact: true })).toHaveValue('');
   expect(await page.evaluate(id => localStorage.getItem(`executive-dining:visit-draft:v1:${id}`), rows[0].id)).toBeNull();
 });
 test('blocked draft storage keeps input, and another tab change cannot be silently overwritten', async ({ page }) => {
   await mockCatalog(page); await page.goto(`${base}/#/nagoya/${rows[0].id}`);
   const draft = page.locator('.visit-draft'); await draft.locator('summary').click();
-  await draft.getByLabel('公開用ニックネーム', { exact: true }).fill('残す入力');
+  await draft.getByLabel('下書きのメモ名（非公開）', { exact: true }).fill('残す入力');
   await page.evaluate(() => { const original = Storage.prototype.setItem; Storage.prototype.setItem = function(key, value) { if (key.includes('visit-draft')) throw new DOMException('Blocked', 'QuotaExceededError'); return original.call(this, key, value); }; });
   await draft.getByRole('button', { name: 'このブラウザに下書き保存', exact: true }).click();
   await expect(draft.getByRole('alert')).toContainText('保存できませんでした');
-  await expect(draft.getByLabel('公開用ニックネーム', { exact: true })).toHaveValue('残す入力');
+  await expect(draft.getByLabel('下書きのメモ名（非公開）', { exact: true })).toHaveValue('残す入力');
   await expect(draft.getByText('このブラウザに下書きを保存しました。送信・受付・公開はされていません。')).toHaveCount(0);
 });
 test('separate-tab changes to a saved draft block stale overwrite and deletion', async ({ page }) => {
   await mockCatalog(page); await page.goto(`${base}/#/nagoya/${rows[0].id}`);
   const draft = page.locator('.visit-draft'); await draft.locator('summary').click();
-  await draft.getByLabel('公開用ニックネーム', { exact: true }).fill('この画面の変更');
+  await draft.getByLabel('下書きのメモ名（非公開）', { exact: true }).fill('この画面の変更');
   await page.evaluate(id => localStorage.setItem(`executive-dining:visit-draft:v1:${id}`, '{"otherTab":"newer"}'), rows[0].id);
   await draft.getByRole('button', { name: 'このブラウザに下書き保存', exact: true }).click();
   await expect(draft.getByRole('alert')).toContainText('別タブでの変更');

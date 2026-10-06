@@ -14,6 +14,7 @@ import About from "./pages/About";
 import Nagoya from "./pages/Nagoya";
 import NagoyaDetail from "./pages/NagoyaDetail";
 import Compare from "./pages/Compare";
+import Membership from "./pages/Membership";
 import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
@@ -70,6 +71,7 @@ export default function App() {
       demo: "サンプル・デモ",
       "nagoya-detail": "名古屋の店舗情報",
       compare: "会食候補を比較",
+      membership: "会員画面の準備",
       search: "お店を探す",
       detail: "店舗情報",
       about: "このサービスについて",
@@ -117,6 +119,7 @@ export default function App() {
         {route.page === "nagoya-detail" && <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} />}
         {route.page === "curation" && <Curation />}
         {route.page === "compare" && <Compare params={route.params} onNavigate={handleNavigate} />}
+        {route.page === "membership" && <Membership />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
       </main>
@@ -127,6 +130,7 @@ export default function App() {
           <a href="#/about">掲載情報について</a>
           <a href="#/admin">掲載情報の下書き</a>
           <a href="#/curation">運営者向け審査</a>
+          <a href="#/membership">会員画面の準備</a>
           <a href="#/demo">サンプル・デモ</a>
           <span>© {new Date().getFullYear()} Executive Dining</span>
         </div>

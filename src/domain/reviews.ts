@@ -17,7 +17,7 @@ export function currentVisitMonth(now = new Date()): string {
 }
 export function reviewDraftErrors(draft: ReviewDraft, now = new Date()): string[] {
   const errors: string[] = [];
-  if (!draft.displayName.trim() || draft.displayName.length > 40) errors.push('公開用のニックネームを40文字以内で入力してください。');
+  if (draft.displayName.length > 40) errors.push('下書きのメモ名は40文字以内で入力してください。');
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(draft.visitedMonth) || draft.visitedMonth < '2000-01' || draft.visitedMonth > currentVisitMonth(now)) errors.push('訪問月は2000年1月から今月までの年月で入力してください。');
   if (!Object.hasOwn(RELATIONSHIP_LABELS, draft.relationship)) errors.push('店舗との関係を選択してください。');
   if (!Number.isInteger(draft.rating) || draft.rating < 1 || draft.rating > 5) errors.push('評価を1〜5から選択してください。');

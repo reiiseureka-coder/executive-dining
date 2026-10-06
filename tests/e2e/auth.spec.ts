@@ -6,7 +6,7 @@ async function signedInFixture(page: Page) {
     const jwtPart = (value: unknown) => btoa(JSON.stringify(value)).replaceAll('=', '').replaceAll('+', '-').replaceAll('/', '_');
     const expiry = Math.floor(Date.now() / 1000) + 3600;
     const token = `${jwtPart({ alg: 'HS256', typ: 'JWT' })}.${jwtPart({ sub: id, exp: expiry, role: 'authenticated' })}.test-signature`;
-    localStorage.setItem('sb-test-project-auth-token', JSON.stringify({ access_token: token, refresh_token: 'synthetic-test-only', expires_at: expiry, expires_in: 3600, token_type: 'bearer', user: { id, aud: 'authenticated', role: 'authenticated', email: 'fixture@example.test', created_at: '2026-10-05T00:00:00Z', app_metadata: {}, user_metadata: { admin: true, rank: 'ルビー' } } }));
+    localStorage.setItem('sb-test-project-auth-token', JSON.stringify({ access_token: token, refresh_token: 'synthetic-test-only', expires_at: expiry, expires_in: 3600, token_type: 'bearer', user: { id, aud: 'authenticated', role: 'authenticated', email: 'fixture@example.test', created_at: '2026-10-05T00:00:00Z', app_metadata: {}, user_metadata: { admin: true, rank: 'ルビー', operatorBadge: 'Owner', plan: 'Plus' } } }));
   }, { id: userId });
 }
 test('signed-in account never reads legacy profile table and cannot gain editor access from metadata', async ({ page }) => {
@@ -21,6 +21,7 @@ test('signed-in account never reads legacy profile table and cannot gain editor 
   expect(requests.some(url => url.includes('user_profiles'))).toBe(false);
   expect(requests.some(url => url.includes('dining_editor_queue'))).toBe(false);
   await expect(page.locator('.review-readiness')).toHaveCount(0);
+  await expect(page.locator('header .operator-badge')).toHaveCount(0);
 });
 test('authorized editor can read the queue and sign out without a legacy profile table', async ({ page, isMobile }) => {
   const requests: string[] = [];
@@ -43,6 +44,7 @@ test('authorized editor can read the queue and sign out without a legacy profile
   await expect(page.getByRole('heading', { name: '運営者のログインが必要です' })).toBeVisible();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('.review-readiness')).toHaveCount(0);
+  await expect(page.locator('header .operator-badge')).toHaveCount(0);
 });
 test('unconfigured Google provider is not offered just because a database key is configured', async ({ page, isMobile }) => {
   await page.route('https://test-project.supabase.co/**', route => route.fulfill({ json: [] }));
