@@ -23,7 +23,7 @@ test('owner can search exact real facts and compare real course/room conditions 
  await page.getByRole('button',{name:'候補を比較（2）',exact:true}).click();const table=page.getByRole('table');await expect(table).toContainText('サービス料15%');await expect(table).toContainText('個室8室');await expect(table).toContainText('未確認');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>/profile|pilot|owner.trial/.test(key)))).toEqual([]);
- await page.reload();await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
+ await page.reload();await expect(page.getByRole('table')).toContainText('サービス料15%');await expect(page.getByRole('table')).toContainText('個室8室');
 });
 test('anonymous or non-owner metadata never unlocks the private catalog',async({page})=>{
  const state=await mock(page,{denied:true});await page.goto(`${base}/#/pilot`);await expect(page.getByRole('heading',{name:'オーナーのログインが必要です'})).toBeVisible();expect(state.calls.filter(c=>c.name.startsWith('dining_owner_trial_'))).toHaveLength(0);
