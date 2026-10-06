@@ -30,7 +30,7 @@ async function mock(page:Page,{denied=false,expired=false,uncertain=false}={}){
   throw new Error(`Unexpected test RPC: ${name}`);
  });return{calls};
 }
-async function prepare(page:Page){await page.getByLabel('架空のプロフィールだけを非公開テスト用に保存します',{exact:true}).check();await page.getByRole('button',{name:'架空プロフィールを準備する',exact:true}).click();await expect(page.getByText('テスト用プロフィールは準備済みです。',{exact:true})).toBeVisible();}
+async function prepare(page:Page){await page.getByLabel('架空のプロフィールだけを非公開テスト用に保存します',{exact:true}).check();await page.getByRole('button',{name:'架空プロフィールを準備する',exact:true}).click();await expect(page.locator('.pilot-profile summary')).toHaveText('架空プロフィール（準備済み）');}
 test('real ten-venue private flow reaches dummy submission, queue, withdrawal and deletion',async({page})=>{
  await login(page);const state=await mock(page);await page.goto(`${base}/#/pilot`);await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
  for(const row of catalog)await expect(page.getByRole('heading',{name:row.name,exact:true})).toBeVisible();
