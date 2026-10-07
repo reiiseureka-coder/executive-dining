@@ -24,7 +24,7 @@ test('both portals work through desktop and mobile navigation, history and reloa
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     await expect(page.locator('dialog')).not.toBeVisible();
     await expect(page.locator('input, textarea, form')).toHaveCount(0);
-    await page.getByRole('button', {name:'相談前の確認リストを見る'}).click();
+    await page.getByRole('button', {name: route === 'corporate' ? '導入を考える方へ' : '相談前の確認リストを見る', exact:true}).click();
     await expect(page.locator('#consultation')).toBeFocused();
     await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', {configurable:true, value:{writeText:async()=>{throw new Error('blocked')}}}); });
     await page.getByRole('button', {name:'確認リストをコピー'}).click();
@@ -53,7 +53,7 @@ test('owner homepage does not mislabel demo or corporate page as real private da
 
 test('corporate membership centers employer-funded employee access without promising meals or partners', async ({page}) => {
   await page.goto('/#/corporate');
-  await expect(page.getByRole('heading',{name:'会社が利用料を負担',exact:true})).toBeVisible();
+  await expect(page.getByText('会社が会員利用料を負担',{exact:true})).toBeVisible();
   await expect(page.getByText('飲食代の補助とは別のプランです。',{exact:false})).toBeVisible();
   await page.getByText('社員の飲食代も含まれますか？',{exact:true}).click();
   await expect(page.getByText('飲食代の負担や食事補助は含む前提ではなく、別途検討が必要です。',{exact:false})).toBeVisible();
@@ -76,4 +76,21 @@ test('homepage presents four cities in order with only Nagoya enabled', async ({
   await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています',exact:true})).toBeVisible();
   await page.goBack();
   await expect(page.locator('.city-list button strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
+});
+
+test('corporate landing has audience-specific content and distinct membership scope', async ({page}) => {
+  await page.goto('/#/corporate');
+  await expect(page.locator('.concept-membership')).toContainText('CONCEPT');
+  await expect(page.getByRole('heading',{name:'ふたりの記念日に',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'企業・人事ご担当者',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'利用する社員の方',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'いつもの検索に、もうひとつの選び方を。',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'利用する社員の方',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'企業・人事ご担当者',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'制度を増やすだけでなく、使う理由をつくる。',exact:true})).toBeVisible();
+  await expect(page.locator('.corporate-scope-grid')).toContainText('基本サービスの方針');
+  await expect(page.locator('.corporate-scope-grid')).toContainText('法人会員向けに検討中');
+  await expect(page.locator('.corporate-journey li')).toHaveCount(4);
+  await expect(page.locator('.corporate-faq details')).toHaveCount(6);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

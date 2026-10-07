@@ -11,6 +11,7 @@ import AdminCallbackLanding from "./components/AdminCallbackLanding";
 import DemoHome from "./pages/DemoHome";
 import Home from "./pages/Home";
 import PartnerPage from "./pages/PartnerPage";
+import Corporate from "./pages/Corporate";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Admin from "./pages/Admin";
@@ -111,7 +112,8 @@ function AppShell() {
       {access.ownerTrial && ["nagoya", "nagoya-detail", "compare", "pilot", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
         {route.page === "home" && <Home onNavigate={handleNavigate} />}
-        {(route.page === "restaurants" || route.page === "corporate") && <PartnerPage key={route.page} audience={route.page} />}
+        {route.page === "restaurants" && <PartnerPage audience="restaurants" />}
+        {route.page === "corporate" && <Corporate />}
         {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
         {route.page === "search" && (
           <Search
