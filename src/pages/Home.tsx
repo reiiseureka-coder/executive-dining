@@ -16,7 +16,7 @@ export default function Home({ onNavigate }: Props) {
         <p className="hero-description">個室、予算、アクセス。<br />会食の条件をひとつずつ確かめて、<br className="mobile-break" />次の一軒を見つける。</p>
         <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
           <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
-          <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="名古屋の店名・エリア・料理" type="search" />
+          <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="店名・エリア・料理" type="search" />
           <button type="submit">探す<ArrowRight size={17} /></button>
         </form>
         <div className="quick-links"><span>気になる条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>

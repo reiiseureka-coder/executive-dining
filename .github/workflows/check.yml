@@ -17,4 +17,20 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npx playwright install --with-deps chromium
+      - name: Prepare pre-mobile visual reference
+        run: |
+          git fetch --depth=1 origin 095f58467f1b42a38ae5af66e4a021f0c6c1c6c0
+          git worktree add --detach "$RUNNER_TEMP/dining-mobile-before" 095f58467f1b42a38ae5af66e4a021f0c6c1c6c0
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-mobile-before/node_modules"
+          cd "$RUNNER_TEMP/dining-mobile-before"
+          VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4183 > "$RUNNER_TEMP/dining-mobile-before.log" 2>&1 &
       - run: npm run test:e2e
+        env:
+          MOBILE_BASELINE_URL: http://127.0.0.1:4183
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-layout-screenshots
+          path: test-results/**/*.png
+          retention-days: 14
+          if-no-files-found: ignore

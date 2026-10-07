@@ -46,7 +46,7 @@ const INITIAL: FormData = {
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 space-y-4">
       <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
         <Icon size={18} className="text-indigo-500" />
         <h3 className="font-semibold text-slate-800">{title}</h3>
@@ -67,7 +67,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
-const inputCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors";
+const inputCls = "min-w-0 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:border-indigo-400 transition-colors";
 
 const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElement>, msg = 'この項目は必須です') => {
   e.currentTarget.setCustomValidity(msg);
@@ -75,7 +75,7 @@ const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElem
 const clearValidity = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
   e.currentTarget.setCustomValidity('');
 };
-const selectCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
+const selectCls = "min-w-0 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
 
 export default function Admin() {
   const [form, setForm] = useState<FormData>(() => readDraft('executive-dining:listing-draft:v1', INITIAL));
@@ -192,7 +192,7 @@ export default function Admin() {
               </Field>
             </div>
             <Field label="店舗説明">
-              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="店舗の特徴やビジネス利用上の強みを記入してください。" className={`${inputCls} resize-none`} />
+              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="店舗の特徴やビジネス利用上の強みを記入してください。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -240,7 +240,7 @@ export default function Admin() {
               </Field>
             </div>
             <Field label="個室の詳細説明">
-              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="防音性能、広さ、設備、雰囲気などを具体的に。" className={`${inputCls} resize-none`} />
+              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="防音性能、広さ、設備、雰囲気などを具体的に。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -285,7 +285,7 @@ export default function Admin() {
                     key={method}
                     type="button"
                     onClick={() => togglePayment(method)}
-                    className={`px-3 py-1.5 rounded-full text-sm border transition-colors cursor-pointer ${
+                    className={`min-h-11 px-3 py-1.5 rounded-full text-sm border transition-colors cursor-pointer ${
                       form.paymentMethods.includes(method)
                         ? 'bg-indigo-500 text-white border-indigo-500'
                         : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'
@@ -316,13 +316,15 @@ export default function Admin() {
           {/* Service Level */}
           <Section title="接客レベル" icon={Star}>
             <p className="text-sm text-slate-500">接客の総合レベルを⭐️で評価してください。</p>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-wrap items-center gap-1 mt-2">
               {[1, 2, 3, 4, 5].map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => update('serviceLevel', v)}
-                  className="cursor-pointer transition-transform hover:scale-110"
+                  aria-label={`接客レベル ${v}`}
+                  aria-pressed={v === form.serviceLevel}
+                  className="min-w-11 min-h-11 grid place-items-center cursor-pointer transition-transform hover:scale-110"
                 >
                   <Star
                     size={28}
@@ -330,7 +332,7 @@ export default function Admin() {
                   />
                 </button>
               ))}
-              <span className="ml-2 text-sm text-slate-500">
+              <span className="w-full sm:w-auto sm:ml-2 text-sm text-slate-500">
                 {['', '要改善', '普通', '良い', '非常に良い', '最高水準'][form.serviceLevel]}
               </span>
             </div>
@@ -376,7 +378,7 @@ export default function Admin() {
                   placeholder="完全個室、接待最適..."
                   className={inputCls}
                 />
-                <button type="button" onClick={addTag} className="px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
+                <button type="button" onClick={addTag} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
                   追加
                 </button>
               </div>
@@ -384,7 +386,7 @@ export default function Admin() {
                 {form.tags.map((tag) => (
                   <span key={tag} className="flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full">
                     {tag}
-                    <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${tag}を削除`} onClick={() => removeTag(tag)} className="min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>
@@ -400,7 +402,7 @@ export default function Admin() {
                   placeholder="役員接待、海外VIP接待..."
                   className={inputCls}
                 />
-                <button type="button" onClick={addScene} className="px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
+                <button type="button" onClick={addScene} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
                   追加
                 </button>
               </div>
@@ -408,7 +410,7 @@ export default function Admin() {
                 {form.recommendedFor.map((s) => (
                   <span key={s} className="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full">
                     {s}
-                    <button type="button" onClick={() => removeScene(s)} className="ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${s}を削除`} onClick={() => removeScene(s)} className="min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>
@@ -444,7 +446,7 @@ export default function Admin() {
           )}
 
           {/* Submit */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={() => setForm(INITIAL)}
@@ -455,7 +457,7 @@ export default function Admin() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-8 py-3 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-5 sm:px-8 py-3 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
             >
               <Save size={16} />
               {saving ? '保存中...' : '下書きを保存する'}

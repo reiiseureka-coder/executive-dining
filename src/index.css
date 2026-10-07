@@ -1675,3 +1675,174 @@ figure {
 .enterprise-consultation small { display: block; font-size: 10px; line-height: 1.9; color: #748068; margin-top: 18px; }
 .enterprise-checklist { align-self: center; white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 13px; line-height: 2.3; color: #58664e; padding: 24px; margin: 0; background: #f8f8f1; }
 @media (max-width:760px) { .enterprise-page { padding-block: 24px 50px; } .enterprise-hero > .eyebrow { margin-top: 35px; } .enterprise-hero h1 { font-size: 27px; letter-spacing: 0; } .enterprise-hero h2 { font-size: 20px; } .enterprise-intro { font-size: 14px; } .enterprise-features,.enterprise-consultation { grid-template-columns: 1fr; } .enterprise-features article,.enterprise-features article:first-child { padding: 24px 0; border-right: 0; border-bottom: 1px solid #d3dac9; } .enterprise-features article:last-child { border-bottom: 0; } .enterprise-consultation { padding: 25px; gap: 25px; } .enterprise-checklist { padding: 16px; font-size: 11px; } }
+
+/* Phone-first readability. Keep secondary details legible without shrinking controls. */
+html { scroll-padding-top: 96px; }
+button, a, input, select, textarea, summary { touch-action: manipulation; }
+.hero-copy, .enterprise-consultation > *, .consultation-panel > *, .planning-inner > * { min-width: 0; }
+@media (max-width: 760px) {
+  html { scroll-padding-top: 80px; }
+  .page-width { width: calc(100% - 32px); }
+  .header-inner { height: 64px; }
+  .brand { min-height: 44px; gap: 10px; }
+  .header-actions { gap: 8px; }
+  .header-saved, .mobile-menu { min-width: 44px; min-height: 44px; justify-content: center; }
+  .mobile-menu { padding: 10px; }
+  .hero-copy h1 { font-size: clamp(28px, 7.4vw, 38px); line-height: 1.6; letter-spacing: .02em; margin-block: 16px; }
+  .home-hero { padding-top: 28px; gap: 24px; }
+  .hero-description { font-size: 15px; line-height: 1.9; margin-bottom: 24px; color: #56634f; }
+  .hero-search { gap: 8px; padding: 6px 6px 6px 12px; }
+  .hero-search input { font-size: 16px; min-height: 44px; }
+  .hero-search button { min-height: 44px; padding: 10px 14px; gap: 6px; font-size: 14px; }
+  .quick-links { gap: 8px; margin-top: 12px; font-size: 13px; }
+  .quick-links > span { width: 100%; color: #64715c; }
+  .quick-links button { min-height: 44px; padding: 8px 14px; border: 1px solid #ccd3c2; }
+  .home-availability { font-size: 13px; line-height: 1.85; margin-top: 18px; color: #616c59; }
+  .hero-figure { height: 230px; }
+  .hero-figure figcaption { flex-wrap: wrap; font-size: 12px; padding-inline: 16px; }
+  .hero-figure figcaption span:first-child { font-size: 10px; }
+  .eyebrow { font-size: 11px; letter-spacing: .12em; }
+  .section-space { padding-top: 40px; }
+  .section-heading { display: block; margin-bottom: 22px; }
+  .section-heading h2, .planning-inner h2 { font-size: clamp(22px, 5.8vw, 26px); line-height: 1.65; }
+  .section-heading p:not(.eyebrow) { font-size: 14px; color: #616c59; }
+  .section-heading .text-link { margin-top: 12px; font-size: 14px; }
+  .text-link, .catalog-back { min-height: 44px; font-size: 14px; }
+  .quiet-label, .sample-caption { font-size: 12px; line-height: 1.85; color: #616c59; }
+  .area-list small { font-size: 13px; margin-left: 12px; }
+  .area-list button { min-height: 80px; padding: 18px 8px; }
+  .area-list strong { font-size: 22px; }
+  .home-principles h3 { font-size: 20px; margin-block: 12px; }
+  .home-principles p, .home-partners p { font-size: 15px; }
+  .home-partners a { padding: 22px; }
+  .home-partners span { font-size: 14px; margin-top: 22px; min-height: 44px; }
+  .home-partners small { font-size: 11px; }
+  .home-partners h3 { margin-top: 14px; }
+  .planning-inner > div > p:not(.eyebrow), .planning-inner li p { font-size: 14px; }
+  .planning-inner li h3 { font-size: 16px; line-height: 1.8; }
+  .footer-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+  .footer-inner > .wordmark, .footer-inner > span:last-child { grid-column: 1 / -1; padding-block: 12px; }
+  .footer-inner a { font-size: 13px; min-height: 44px; display: flex; align-items: center; }
+
+  /* Main actions and fields are comfortable to tap and do not trigger iOS input zoom. */
+  .primary-button, .outline-button, .button-secondary, .filter-button, .catalog-reset { min-height: 48px; font-size: 14px; }
+  .primary-button, .outline-button, .button-secondary { max-width: 100%; white-space: normal; line-height: 1.6; }
+  .primary-button svg, .outline-button svg, .button-secondary svg { flex-shrink: 0; }
+  input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea,
+  .hero-search input, .search-input input, .catalog-search input, .review-form input, .review-form textarea { font-size: 16px; }
+  input:not([type=checkbox]):not([type=radio]):not([type=range]), select { min-height: 48px; }
+  input[type=checkbox], input[type=radio] { width: 20px; height: 20px; flex-shrink: 0; }
+  textarea { min-height: 120px; }
+  .sample-notice, .catalog-explainer { font-size: 13px; line-height: 1.85; padding: 16px; }
+  .sample-notice { flex-wrap: wrap; }
+  .site-dialog { max-height: calc(100dvh - 24px); width: min(440px, calc(100% - 24px)); overscroll-behavior: contain; }
+  .dialog-content { padding: 28px 20px max(24px, env(safe-area-inset-bottom)); }
+  .dialog-content .eyebrow { padding-right: 40px; }
+  .dialog-close { width: 44px; height: 44px; top: 10px; right: 10px; display: grid; place-items: center; }
+  .dialog-content > p:not(.eyebrow) { font-size: 14px; overflow-wrap: anywhere; }
+  .dialog-nav button { font-size: 16px; min-height: 54px; }
+  .email-login-form label, .form-error { font-size: 14px; }
+  .private-mode-banner .page-width { flex-wrap: wrap; gap: 4px; font-size: 13px; line-height: 1.8; padding-block: 10px; }
+  .private-mode-banner button { min-height: 44px; }
+
+  /* Catalog, private pilot and detail: give the search and facts their own line. */
+  .catalog-page { padding-block: 28px 56px; }
+  .catalog-heading { display: block; padding-bottom: 24px; }
+  .catalog-heading > p { font-size: 14px; margin-top: 14px; }
+  .catalog-toolbar { flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .catalog-search { flex: 1 1 100%; min-width: 0; padding: 4px 12px; }
+  .catalog-toolbar > select { flex: 1 1 100%; min-width: 0; }
+  .catalog-toolbar .button-secondary { min-height: 48px; padding: 10px 16px; }
+  .catalog-filters label, .catalog-filters .catalog-saved-filter { font-size: 14px; min-height: 44px; }
+  .catalog-filters > label:not(.catalog-saved-filter) { width: 100%; }
+  .catalog-filters select { width: 100%; max-width: none; min-height: 48px; }
+  .catalog-filter-note, .catalog-count, .map-caption, .map-privacy, .comparison-scroll-note { font-size: 13px; line-height: 1.85; }
+  .catalog-result-heading { flex-wrap: wrap; }
+  .catalog-empty { padding: 36px 18px; }
+  .catalog-empty p, .catalog-empty a { font-size: 14px; }
+  .verified-card, .curation-card { padding: 20px 16px; }
+  .verified-card-heading { display: block; }
+  .verified-card-heading p:not(.eyebrow) { font-size: 14px; line-height: 1.8; }
+  .verified-card-actions { gap: 10px 16px; font-size: 14px; }
+  .verified-card-actions a { min-height: 44px; }
+  .verified-card-actions span { font-size: 12px; }
+  .verified-facts > div { grid-template-columns: 1fr; gap: 3px; font-size: 15px; padding-block: 9px; border-bottom: 1px solid #ecece3; }
+  .verified-facts dt { font-size: 13px; font-weight: 500; }
+  .fact-evidence, .verified-reviews, .verified-reviews h3, .operating-notice { font-size: 14px; }
+  .fact-evidence summary, .curation-card summary, .pilot-profile summary { min-height: 44px; padding-block: 10px; }
+  .fact-evidence small { font-size: 12px; }
+  .curation-card p, .curation-card li, .curation-card label, .curation-card details, .pilot-profile { font-size: 14px; }
+  .curation-actions > button { flex: 1 1 auto; }
+  .visit-draft, .feedback-draft, .review-readiness { font-size: 14px; padding: 16px; }
+  .visit-draft summary, .feedback-draft summary, .review-readiness summary { font-size: 16px; line-height: 1.8; min-height: 44px; }
+  .draft-privacy-note { font-size: 13px; }
+  .review-draft-grid { grid-template-columns: 1fr; }
+  .review-draft-preview { padding: 16px; }
+  .membership-card { padding: 20px 16px; font-size: 15px; }
+  .membership-card h2 { font-size: 22px; }
+  .membership-steps { gap: 12px; font-size: 14px; }
+  .public-identity-preview { padding: 14px; }
+  .public-identity-preview p { font-size: 13px; }
+  .membership-tiers { grid-template-columns: 1fr; }
+  .comparison-tray { position: static; padding: 16px; margin-bottom: env(safe-area-inset-bottom); }
+  .comparison-tray p, .comparison-table small, .comparison-table thead p, .comparison-share { font-size: 13px; }
+  .comparison-tray > div { flex-basis: 100%; }
+  .comparison-table th, .comparison-table td { font-size: 14px; }
+  .comparison-table-scroll { overscroll-behavior-x: contain; }
+
+  /* Partner and enterprise pages retain the concise desktop hierarchy. */
+  .partner-hero { padding-block: 20px 24px; }
+  .partner-hero > .eyebrow, .enterprise-hero > .eyebrow { margin-top: 24px; }
+  .partner-hero h1 { font-size: clamp(27px, 7.2vw, 36px); letter-spacing: 0; margin-block: 20px; }
+  .partner-intro, .enterprise-intro { font-size: 16px; line-height: 1.9; }
+  .partner-status { font-size: 13px; margin-top: 8px; }
+  .partner-hero .outline-button { width: 100%; padding-inline: 14px; gap: 10px; }
+  .store-evidence h2 { font-size: clamp(23px, 6vw, 28px); }
+  .store-evidence-types article { padding: 20px 16px; }
+  .store-evidence p, .partner-faq details p { font-size: 15px; }
+  .store-evidence-types span { font-size: 13px; }
+  .partner-faq summary { min-height: 44px; }
+  .consultation-panel, .enterprise-consultation { padding: 22px 16px; gap: 24px; }
+  .consultation-panel h2 { font-size: 23px; line-height: 1.7; }
+  .consultation-panel p, .enterprise-consultation p { font-size: 15px; }
+  .consultation-checklist, .enterprise-checklist { padding: 16px 12px; font-size: 14px; line-height: 2; }
+  .consultation-panel .outline-button, .enterprise-consultation .primary-button { width: 100%; padding-inline: 12px; gap: 8px; }
+  .enterprise-hero { padding-bottom: 30px; }
+  .enterprise-hero h1 { font-size: clamp(24px, 6.5vw, 32px); line-height: 1.65; }
+  .enterprise-hero h2 { font-size: 21px; }
+  .enterprise-note, .enterprise-consultation small { font-size: 13px; color: #616e58; }
+  .enterprise-features p { font-size: 15px; }
+  .enterprise-features h3 { font-size: 20px; margin-top: 12px; }
+  .enterprise-consultation { margin-top: 32px; }
+  .enterprise-consultation h2 { font-size: 25px; }
+
+  /* Demo/detail routes remain usable too, without pretending sample data is real. */
+  .restaurant-grid { grid-template-columns: 1fr; }
+  .restaurant-facts, .restaurant-description, .restaurant-meta, .restaurant-tags, .filter-fields label { font-size: 13px; }
+  .detail-navigation { flex-wrap: wrap; }
+  .detail-navigation .text-link, .detail-navigation .outline-button, .detail-tabs button { font-size: 14px; }
+  .detail-tabs { gap: 20px; overflow-x: auto; }
+  .detail-tabs button { white-space: nowrap; flex-shrink: 0; }
+  .detail-section > p:not(.eyebrow):not(.sample-caption), .review-example p, .about-copy p, .about-copy li { font-size: 15px; }
+  .details-list > div, .detail-aside > p, .detail-aside li, .ai-preparation, .review-form label, .review-form legend { font-size: 14px; }
+  .detail-aside { padding: 22px 18px; }
+  .detail-aside .outline-button { font-size: 14px; }
+  .detail-summary { flex-wrap: wrap; gap: 20px; }
+  .detail-summary small, .review-example small, .review-example > div:first-child span { font-size: 12px; }
+  .review-form fieldset button { min-width: 44px; min-height: 44px; }
+}
+@media (max-width: 360px) {
+  .hero-search > svg { display: none; }
+  .hero-search button { padding-inline: 12px; }
+  .hero-copy h1 { font-size: 27px; }
+  .detail-tabs { gap: 16px; }
+  .brand { gap: 8px; }
+  .wordmark { font-size: 11px; }
+}
+.comparison-table-scroll { min-width: 0; max-width: 100%; }
+@media (max-width: 760px) { .draft-check { min-height: 44px; } }
+@media (max-width: 760px) {
+  #main-content input:not([type=checkbox]):not([type=radio]):not([type=range]),
+  #main-content select, #main-content textarea, .site-dialog input { font-size: 16px; }
+  .owner-trial .catalog-toolbar > label { width: 100%; min-width: 0; font-size: 14px; }
+}
