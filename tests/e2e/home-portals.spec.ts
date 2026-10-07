@@ -59,3 +59,21 @@ test('corporate membership centers employer-funded employee access without promi
   await expect(page.getByText('飲食代の負担や食事補助は含む前提ではなく、別途検討が必要です。',{exact:false})).toBeVisible();
   await expect(page.getByText('M&A',{exact:false})).toHaveCount(0);
 });
+
+test('homepage presents four cities in order with only Nagoya enabled', async ({page}) => {
+  await page.goto('/');
+  const cities = page.locator('.city-list button');
+  await expect(cities.locator('strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
+  for (const index of [0, 1, 3]) {
+    await expect(cities.nth(index)).toBeDisabled();
+    await expect(cities.nth(index)).toContainText('準備中');
+  }
+  await expect(cities.nth(2)).toBeEnabled();
+  await expect(page.getByText('まずは、名古屋の一席から。',{exact:true})).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await cities.nth(2).click();
+  await expect(page).toHaveURL(/#\/nagoya$/);
+  await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています',exact:true})).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('.city-list button strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
+});

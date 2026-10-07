@@ -1635,3 +1635,10 @@ figure {
 @media (min-width: 761px) { .desktop-nav { gap: 22px; } .desktop-nav button { white-space: nowrap; } }
 @media (max-width: 1050px) { .desktop-nav, .desktop-login { display: none; } .mobile-menu { display: block; } }
 @media (max-width: 760px) { .home-principles, .home-partners, .consultation-panel { grid-template-columns: 1fr; gap: 16px; } .home-principles article { padding: 22px 0; } .home-partners a { padding: 25px; } .partner-hero > .eyebrow { margin-top: 32px; } .consultation-panel { padding: 24px; } .consultation-checklist { padding: 16px; font-size: 12px; } }
+
+.city-list { grid-template-columns: repeat(4, 1fr); }
+.city-list button:disabled { opacity: 1; cursor: default; color: #838a7d; }
+.city-list button:disabled:hover { background: transparent; }
+.city-list button:disabled small { color: #747e69; }
+@media (min-width: 761px) and (max-width: 1000px) { .city-list { grid-template-columns: repeat(2, 1fr); } .city-list button:nth-child(2) { border-right: 0; } .city-list button:nth-child(-n+2) { border-bottom: 1px solid #d7dacd; } }
+@media (max-width: 760px) { .city-list { grid-template-columns: 1fr; } }
