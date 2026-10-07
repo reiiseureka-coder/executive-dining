@@ -39,7 +39,7 @@ export default function Home({ onNavigate }: Props) {
     </section>
     <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">GROW WITH US</p><h2>いい食の時間を、<br />ともにつくる。</h2><p>店舗と企業、それぞれに合う関わり方を。</p></div><div className="home-partners">
       <a href="#/restaurants"><small>FOR RESTAURANTS</small><h3>店舗の方へ</h3><p>掲載リクエストと、情報確認の流れ。</p><span>掲載のご案内<ArrowRight size={16} /></span></a>
-      <a href="#/corporate"><small>FOR COMPANIES</small><h3>法人の方へ</h3><p>会食選びの支援と、食の福利厚生を検討中。</p><span>法人プランのご案内<ArrowRight size={16} /></span></a>
+      <a href="#/corporate"><small>FOR COMPANIES</small><h3>法人の方へ</h3><p>会社から社員へ。食の福利厚生プランを検討中。</p><span>法人プランのご案内<ArrowRight size={16} /></span></a>
     </div></div></section>
   </>;
 }

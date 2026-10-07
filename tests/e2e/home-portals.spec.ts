@@ -17,7 +17,7 @@ test('real homepage preserves design, searches real catalog and keeps samples se
 });
 test('both portals work through desktop and mobile navigation, history and reload', async ({ page, isMobile }) => {
   await page.goto('/');
-  for (const [label, route, heading] of [['店舗の方へ', 'restaurants', 'お店の魅力を、 必要とする一席へ。'], ['法人の方へ', 'corporate', '食の時間を、 企業の力に。']]) {
+  for (const [label, route, heading] of [['店舗の方へ', 'restaurants', 'お店の魅力を、 必要とする一席へ。'], ['法人の方へ', 'corporate', '会社から、 社員の食の楽しみを。']]) {
     if (isMobile) await page.getByRole('button', {name:'メニューを開く'}).click();
     await page.getByRole('button', {name:label, exact:true}).click();
     await expect(page).toHaveURL(new RegExp(`#/${route}$`));
@@ -49,4 +49,13 @@ test('owner homepage does not mislabel demo or corporate page as real private da
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
   await page.goto('http://127.0.0.1:4181/#/corporate');
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
+});
+
+test('corporate membership centers employer-funded employee access without promising meals or partners', async ({page}) => {
+  await page.goto('/#/corporate');
+  await expect(page.getByRole('heading',{name:'会社が利用料を負担',exact:true})).toBeVisible();
+  await expect(page.getByText('飲食代の補助とは別のプランです。',{exact:false})).toBeVisible();
+  await page.getByText('社員の飲食代も含まれますか？',{exact:true}).click();
+  await expect(page.getByText('飲食代の負担や食事補助は含む前提ではなく、別途検討が必要です。',{exact:false})).toBeVisible();
+  await expect(page.getByText('M&A',{exact:false})).toHaveCount(0);
 });
