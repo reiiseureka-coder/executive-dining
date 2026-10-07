@@ -65,7 +65,7 @@ for (const width of widths) {
 
     await corporate.click();
     await expect(page).toHaveURL(/#\/corporate$/);
-    await expect(page.getByRole('heading', { name: 'エンタープライズプラン', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'エンタープライズプラン', exact: true })).toBeInViewport();
   });
 
   test(`corporate introduction and consultation stay near the top at ${width}px`, async ({ page }, info) => {
