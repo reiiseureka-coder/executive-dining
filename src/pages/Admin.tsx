@@ -132,7 +132,7 @@ export default function Admin() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 max-w-md w-full text-center">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-12 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5">
             <CheckCircle size={32} className="text-emerald-500" />
           </div>
@@ -384,9 +384,9 @@ export default function Admin() {
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.tags.map((tag) => (
-                  <span key={tag} className="flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full">
+                  <span key={tag} className="max-w-full break-all flex items-center gap-1 text-sm bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full">
                     {tag}
-                    <button type="button" aria-label={`${tag}を削除`} onClick={() => removeTag(tag)} className="min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${tag}を削除`} onClick={() => removeTag(tag)} className="shrink-0 min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>
@@ -408,9 +408,9 @@ export default function Admin() {
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.recommendedFor.map((s) => (
-                  <span key={s} className="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full">
+                  <span key={s} className="max-w-full break-all flex items-center gap-1 text-sm bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full">
                     {s}
-                    <button type="button" aria-label={`${s}を削除`} onClick={() => removeScene(s)} className="min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${s}を削除`} onClick={() => removeScene(s)} className="shrink-0 min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>

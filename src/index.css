@@ -1784,7 +1784,7 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .public-identity-preview { padding: 14px; }
   .public-identity-preview p { font-size: 13px; }
   .membership-tiers { grid-template-columns: 1fr; }
-  .comparison-tray { position: static; padding: 16px; margin-bottom: env(safe-area-inset-bottom); }
+  .comparison-tray { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); padding: 12px; gap: 8px 12px; }
   .comparison-tray p, .comparison-table small, .comparison-table thead p, .comparison-share { font-size: 13px; }
   .comparison-tray > div { flex-basis: 100%; }
   .comparison-table th, .comparison-table td { font-size: 14px; }
@@ -1845,4 +1845,28 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   #main-content input:not([type=checkbox]):not([type=radio]):not([type=range]),
   #main-content select, #main-content textarea, .site-dialog input { font-size: 16px; }
   .owner-trial .catalog-toolbar > label { width: 100%; min-width: 0; font-size: 14px; }
+}
+@media (max-width: 1050px) {
+  .mobile-menu { min-width: 44px; min-height: 44px; }
+  .dialog-close { min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 760px) {
+  .comparison-tray .primary-button { flex: 1; padding-inline: 10px; }
+  .comparison-tray .catalog-reset { padding-inline: 4px; }
+  .comparison-tray > div { min-width: 0; }
+}
+
+.pilot-guidance { margin-bottom: 12px; font-size: 14px; }
+.pilot-guidance summary { cursor: pointer; min-height: 44px; padding-block: 10px; }
+@media (max-width: 760px) {
+  .mobile-break { display: block; }
+  .footer-inner a { margin-left: 0; }
+  .home-principles p { font-size: 16px; }
+  .pilot-toolbar { margin-block: 12px; gap: 0; }
+  .pilot-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; margin-block: 8px; gap: 8px; }
+  .pilot-tabs .button-secondary { padding: 10px 6px; font-size: 13px; }
+  .pilot-profile { margin-block: 12px 20px; padding: 8px 16px; }
+  .owner-trial:has(.pilot-detail) > h1 { font-size: 22px; margin-bottom: 12px; }
+  .pilot-detail h2 { font-size: 26px; }
 }

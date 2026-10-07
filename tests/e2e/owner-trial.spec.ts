@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import {catalog,comment,login,mock} from './helpers/ownerTrial';
 const base='http://127.0.0.1:4181';
-async function prepare(page:Page){await page.getByLabel('架空のプロフィールだけを非公開テスト用に保存します',{exact:true}).check();await page.getByRole('button',{name:'架空プロフィールを準備する',exact:true}).click();await expect(page.locator('.pilot-profile summary')).toHaveText('架空プロフィール（準備済み）');}
+async function prepare(page:Page){if(!await page.locator('.pilot-profile').getAttribute('open').then(value=>value!==null))await page.locator('.pilot-profile summary').click();await page.getByLabel('架空のプロフィールだけを非公開テスト用に保存します',{exact:true}).check();await page.getByRole('button',{name:'架空プロフィールを準備する',exact:true}).click();await expect(page.locator('.pilot-profile summary')).toHaveText('架空プロフィール（準備済み）');}
 test('real ten-venue private flow reaches dummy submission, queue, withdrawal and deletion',async({page})=>{
  await login(page);const state=await mock(page);await page.goto(`${base}/#/pilot`);await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
  for(const row of catalog)await expect(page.getByRole('heading',{name:row.name,exact:true})).toBeVisible();
