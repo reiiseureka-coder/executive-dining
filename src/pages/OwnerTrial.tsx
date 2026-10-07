@@ -23,8 +23,8 @@ function Workspace({ route, onNavigate }: TrialProps) {
    window.history.replaceState(null, '', routeHash(route.page, route.restaurantId, next));
    window.dispatchEvent(new HashChangeEvent('hashchange'));
  };
- const navigate = (next: 'catalog'|'compare'|'mine'|'queue') => onNavigate(next === 'compare' ? 'compare' : 'home', undefined, { ...params, view: next === 'catalog' || next === 'compare' ? undefined : next });
- const select = (id: string) => onNavigate(id ? 'nagoya-detail' : 'home', id || undefined, { ...params, view: undefined });
+ const navigate = (next: 'catalog'|'compare'|'mine'|'queue') => onNavigate(next === 'compare' ? 'compare' : 'nagoya', undefined, { ...params, view: next === 'catalog' || next === 'compare' ? undefined : next });
+ const select = (id: string) => onNavigate(id ? 'nagoya-detail' : 'nagoya', id || undefined, { ...params, view: undefined });
  const [context,setContext]=useState<OwnerTrialContext|null>(null);
  const [rows,setRows]=useState<PilotRestaurant[]>([]);
  const [profile,setProfile]=useState<TrialProfile|null>(null);

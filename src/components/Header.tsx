@@ -14,8 +14,9 @@ interface HeaderProps {
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const access = useAppAccess();
   const items: { label: string; page: Page }[] = [
-    { label: "お店を探す", page: "home" },
-    { label: "このサービスについて", page: "about" },
+    { label: "店舗一覧", page: "nagoya" },
+    { label: "店舗の方へ", page: "restaurants" },
+    { label: "法人の方へ", page: "corporate" },
     ...(access.editor ? [{ label: "運営管理", page: "curation" as Page }] : []),
   ];
   const [modal, setModal] = useState<"menu" | "login" | null>(null);
@@ -176,7 +177,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   </button>
                   <p className="quiet-label">
                     {user ? user.email : "Googleの認証画面へ移動します。"}
-                  </p>{user && <button className="button-secondary" onClick={() => navigate("home")}>お店を探す</button>}{access.editor && <button className="button-secondary" onClick={() => navigate("curation")}>運営管理を開く</button>}</>}
+                  </p>{user && <button className="button-secondary" onClick={() => navigate("nagoya")}>店舗一覧</button>}{access.editor && <button className="button-secondary" onClick={() => navigate("curation")}>運営管理を開く</button>}</>}
                 </>
               )}
               {error && (

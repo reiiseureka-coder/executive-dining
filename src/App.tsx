@@ -8,7 +8,9 @@ import { useAppAccess } from "./contexts/appAccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import AdminCallbackLanding from "./components/AdminCallbackLanding";
-import DemoHome from "./pages/Home";
+import DemoHome from "./pages/DemoHome";
+import Home from "./pages/Home";
+import PartnerPage from "./pages/PartnerPage";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Admin from "./pages/Admin";
@@ -57,7 +59,7 @@ function AppShell() {
     window.location.hash = routeHash(
       page,
       restaurantId,
-      ["search", "detail", "home", "nagoya", "nagoya-detail", "compare", "pilot"].includes(page) ? (page === "home" && !params ? { ...search, view: undefined } : search) : {},
+      ["search", "detail", "nagoya", "nagoya-detail", "compare", "pilot"].includes(page) ? search : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -71,7 +73,9 @@ function AppShell() {
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "名古屋の会食店を探す",
+      home: "大切な話を、心地よい一席で。",
+      restaurants: "店舗の方へ・掲載リクエスト",
+      corporate: "法人の方へ・福利厚生プラン",
       demo: "サンプル・デモ",
       "nagoya-detail": "名古屋の店舗情報",
       compare: "会食候補を比較",
@@ -104,8 +108,10 @@ function AppShell() {
         currentPage={route.page}
         onNavigate={handleNavigate}
       />
-      {access.ownerTrial && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("home")}>店舗一覧へ</button></div></div>}
+      {access.ownerTrial && ["nagoya", "nagoya-detail", "compare", "pilot", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
+        {route.page === "home" && <Home onNavigate={handleNavigate} />}
+        {(route.page === "restaurants" || route.page === "corporate") && <PartnerPage key={route.page} audience={route.page} />}
         {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
         {route.page === "search" && (
           <Search
@@ -121,7 +127,7 @@ function AppShell() {
             onNavigate={handleNavigate}
           />
         )}
-        {["home", "nagoya", "nagoya-detail", "compare", "pilot"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || route.page === "pilot" ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
+        {["nagoya", "nagoya-detail", "compare", "pilot"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || route.page === "pilot" ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
         {route.page === "curation" && <Curation />}
         {route.page === "membership" && <Membership />}
         {route.page === "admin" && <Admin />}
@@ -131,6 +137,9 @@ function AppShell() {
         <div className="page-width footer-inner">
           <span className="wordmark">EXECUTIVE DINING</span>
           <p>会食の店選びを、丁寧に。</p>
+          <a href="#/nagoya">店舗一覧</a>
+          <a href="#/restaurants">店舗の方へ</a>
+          <a href="#/corporate">法人の方へ</a>
           <a href="#/about">掲載情報について</a>
           {access.editor && <a href="#/curation">運営管理</a>}
           <span>© {new Date().getFullYear()} Executive Dining</span>

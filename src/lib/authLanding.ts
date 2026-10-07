@@ -10,7 +10,7 @@ export function isUnclaimedLoginLanding(hash: string): boolean {
 
 export const LOGIN_RETURN_KEY = 'ed-login-destination:v1';
 const allowed = (value: unknown): value is string => typeof value === 'string' &&
-  (/^#\/(?:curation|about|nagoya|compare|pilot)?$/.test(value) || /^#\/nagoya\/[0-9a-f-]{36}$/i.test(value));
+  (/^#\/(?:curation|about|nagoya|compare|pilot|restaurants|corporate)?$/.test(value) || /^#\/nagoya\/[0-9a-f-]{36}$/i.test(value));
 /** A short-lived first-party route only: no query text, credentials, or identity. */
 export function rememberLoginDestination(storage: Pick<Storage, 'setItem'>, hash: string, now = Date.now()) {
   const target = hash.split('?')[0];

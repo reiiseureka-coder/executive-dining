@@ -1,200 +1,45 @@
-import { useState } from "react";
-import { ArrowRight, Search as SearchIcon } from "lucide-react";
-import type { Page } from "../types";
-import type { SearchParams } from "../lib/search";
-import { restaurants } from "../data/mockData";
-import RestaurantCard from "../components/RestaurantCard";
-import SampleNotice from "../components/SampleNotice";
-interface HomeProps {
-  onNavigate: (
-    page: Page,
-    restaurantId?: string,
-    params?: SearchParams,
-  ) => void;
-}
-export default function Home({ onNavigate }: HomeProps) {
-  const [query, setQuery] = useState("");
-  return (
-    <>
-      <section className="home-hero page-width">
-        <div className="hero-copy">
-          <p className="eyebrow">SAMPLE / DESIGN DEMO</p>
-          <h1>
-            <span>大切な話を、</span>
-            <span>心地よい一席で。</span>
-          </h1>
-          <p className="hero-description">
-            個室、予算、アクセス。
-            <br />
-            会食の条件をひとつずつ確かめて、
-            <br className="mobile-break" />
-            次の一軒を見つける。
-          </p>
-          <form
-            className="hero-search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              onNavigate("search", undefined, { query: query.trim() });
-            }}
-          >
-            <label className="sr-only" htmlFor="home-query">
-              店名・エリア・料理を検索
-            </label>
-            <SearchIcon size={19} aria-hidden="true" />
-            <input
-              id="home-query"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="店名・エリア・料理"
-              type="search"
-            />
-            <button type="submit">
-              探す
-              <ArrowRight size={17} />
-            </button>
-          </form>
-          <div className="quick-links">
-            <span>条件から</span>
-            <button
-              onClick={() =>
-                onNavigate("search", undefined, { privateRoom: "完全個室" })
-              }
-            >
-              完全個室
-            </button>
-            <button
-              onClick={() =>
-                onNavigate("search", undefined, { budget: "20000" })
-              }
-            >
-              2万円以内
-            </button>
-            <button
-              onClick={() => onNavigate("search", undefined, { meal: "lunch" })}
-            >
-              ランチ
-            </button>
-          </div>
-        </div>
-        <figure className="hero-figure">
-          <img
-            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85"
-            alt="落ち着いたレストランのテーブルセッティングのイメージ"
-            fetchPriority="high"
-          />
-          <figcaption>
-            <span>THE DINING NOTE</span>
-            <span>ゆっくり話せる、その場所へ。</span>
-          </figcaption>
-        </figure>
-      </section>
-      <div className="page-width">
-        <SampleNotice compact />
+import { useState } from 'react';
+import { ArrowRight, Search } from 'lucide-react';
+import type { Page } from '../types';
+import type { SearchParams } from '../lib/search';
+import { useAppAccess } from '../contexts/appAccess';
+interface Props { onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
+export default function Home({ onNavigate }: Props) {
+  const [query, setQuery] = useState('');
+  const access = useAppAccess();
+  const explore = (value = '') => onNavigate('nagoya', undefined, { query: value });
+  return <>
+    <section className="home-hero page-width">
+      <div className="hero-copy">
+        <p className="eyebrow">EXECUTIVE DINING / STARTING IN NAGOYA</p>
+        <h1><span>大切な話を、</span><span>心地よい一席で。</span></h1>
+        <p className="hero-description">個室、予算、アクセス。<br />会食の条件をひとつずつ確かめて、<br className="mobile-break" />次の一軒を見つける。</p>
+        <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
+          <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
+          <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="名古屋の店名・エリア・料理" type="search" />
+          <button type="submit">探す<ArrowRight size={17} /></button>
+        </form>
+        <div className="quick-links"><span>気になる条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
+        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。店舗一覧から非公開の実店舗情報を確認できます。' : '名古屋から掲載準備を進めています。公開承認済みの店舗情報だけを表示します。招待済みの方はログインしてください。'}</p>
       </div>
-      <section className="page-width section-space">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">EXPLORE BY AREA</p>
-            <h2>集まりやすい街から。</h2>
-          </div>
-          <button
-            className="text-link"
-            onClick={() => onNavigate("search", undefined, {})}
-          >
-            すべてのお店
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="area-list">
-          {[
-            { name: "東京", sub: "銀座・六本木・恵比寿・新宿", q: "東京" },
-            { name: "京都", sub: "南禅寺", q: "京都" },
-            { name: "大阪", sub: "北堀江", q: "大阪" },
-          ].map((area, index) => (
-            <button
-              key={area.name}
-              onClick={() => onNavigate("search", undefined, { query: area.q })}
-            >
-              <span className="area-number">0{index + 1}</span>
-              <span>
-                <strong>{area.name}</strong>
-                <small>{area.sub}</small>
-              </span>
-              <ArrowRight size={20} />
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="page-width section-space selection-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">THE COLLECTION</p>
-            <h2>一席を選ぶ、手がかり。</h2>
-            <p>気になるお店を保存して、条件を見比べる。</p>
-          </div>
-          <span className="quiet-label demo-sample-count">
-            掲載サンプル {restaurants.length} 店
-          </span>
-        </div>
-        <div className="restaurant-grid">
-          {restaurants.slice(0, 3).map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              restaurant={restaurant}
-              onClick={(id) => onNavigate("detail", id)}
-            />
-          ))}
-        </div>
-        <div className="section-action">
-          <button
-            className="outline-button"
-            onClick={() => onNavigate("search", undefined, {})}
-          >
-            条件を指定して探す
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </section>
-      <section className="planning-section">
-        <div className="page-width planning-inner">
-          <div>
-            <p className="eyebrow">BEFORE YOU BOOK</p>
-            <h2>
-              いい会食は、
-              <br />
-              小さな確認から。
-            </h2>
-            <button className="text-link" onClick={() => onNavigate("about")}>
-              このサービスについて
-              <ArrowRight size={16} />
-            </button>
-          </div>
-          <ol>
-            {[
-              {
-                title: "話す内容に合った席を",
-                text: "個室の仕切りや音の通り方は、予約時にお店へ確認。",
-              },
-              {
-                title: "総額を先に確かめる",
-                text: "コースに加えて、飲み物・サービス料・個室料も確認。",
-              },
-              {
-                title: "行きも帰りも、無理なく",
-                text: "駅からの道順、集合時間、帰りの交通手段まで。",
-              },
-            ].map((item, index) => (
-              <li key={item.title}>
-                <span>0{index + 1}</span>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-    </>
-  );
+      <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>THE DINING NOTE / IMAGE</span><span>ゆっくり話せる、その場所へ。</span></figcaption></figure>
+    </section>
+    <section className="page-width section-space">
+      <div className="section-heading"><div><p className="eyebrow">OUR FIRST CHAPTER</p><h2>まずは、名古屋の一席から。</h2><p>街を広げる前に、一軒ごとの情報を丁寧に。</p></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
+      <div className="area-list">{[{name:'名駅',sub:'集まりやすさを、駅から考える。'},{name:'栄',sub:'街の中心で、会話を楽しむ。'},{name:'名古屋',sub:'エリアを広げて、条件を見比べる。'}].map((area,index) => <button key={area.name} onClick={() => explore(area.name)}><span className="area-number">0{index+1}</span><span><strong>{area.name}</strong><small>{area.sub}</small></span><ArrowRight size={20} /></button>)}</div>
+      <p className="quiet-label">エリア名からの検索です。掲載数や空席を保証するものではありません。</p>
+    </section>
+    <section className="page-width section-space">
+      <div className="section-heading"><div><p className="eyebrow">A CLEARER WAY TO CHOOSE</p><h2>一席を選ぶ、確かな手がかり。</h2></div></div>
+      <div className="home-principles">{[
+        ['01','条件を、そのまま。','公式のコース価格、個室の条件、営業のお知らせ。確認した情報と出典・確認日を、一緒に表示します。'],
+        ['02','候補を、並べて。','気になるお店を保存して比較。価格だけでは見えない違いを、会食の目的に合わせて確かめます。'],
+        ['03','わからないことは、明確に。','未確認の情報を推測で埋めません。空席や最新の利用条件は、予約前にお店へご確認ください。'],
+      ].map(([number,title,text]) => <article key={number}><span className="eyebrow">{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+    </section>
+    <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">GROW WITH US</p><h2>いい食の時間を、<br />ともにつくる。</h2><p>店舗と企業、それぞれに合う関わり方を。</p></div><div className="home-partners">
+      <a href="#/restaurants"><small>FOR RESTAURANTS</small><h3>店舗の方へ</h3><p>掲載リクエストと、情報確認の流れ。</p><span>掲載のご案内<ArrowRight size={16} /></span></a>
+      <a href="#/corporate"><small>FOR COMPANIES</small><h3>法人の方へ</h3><p>会食選びの支援と、食の福利厚生を検討中。</p><span>法人プランのご案内<ArrowRight size={16} /></span></a>
+    </div></div></section>
+  </>;
 }

@@ -1603,3 +1603,35 @@ figure {
 .private-mode-banner .page-width { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding-top: 9px; padding-bottom: 9px; }
 .private-mode-banner button { color: inherit; background: transparent; border: 0; text-decoration: underline; white-space: nowrap; cursor: pointer; }
 @media (max-width: 600px) { .private-mode-banner .page-width { align-items: flex-start; font-size: .72rem; } }
+
+/* Public entry and preparatory partner portals share the original dining palette. */
+.home-availability { max-width: 460px; font-size: 12px; line-height: 1.9; color: #73796d; margin-top: 24px; }
+.home-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.home-principles article { border-top: 1px solid #cfd3c7; padding: 28px 0; }
+.home-principles h3 { font-size: 20px; font-weight: 500; margin: 16px 0; }
+.home-principles p, .partner-page p, .home-partners p { line-height: 1.9; color: #68705f; }
+.home-partners { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.home-partners a { border: 1px solid #c6ccbd; padding: 30px; color: inherit; text-decoration: none; transition: background .2s; }
+.home-partners a:hover { background: #e9eddf; }
+.home-partners small { font-size: 10px; letter-spacing: .15em; }
+.home-partners h3 { font-size: 25px; font-weight: 400; margin: 20px 0 12px; }
+.home-partners span { display: flex; align-items: center; gap: 14px; font-size: 12px; margin-top: 30px; }
+.partner-hero { padding-top: 38px; padding-bottom: 46px; }
+.partner-hero > .eyebrow { margin-top: 58px; }
+.partner-status { display: inline-block; border: 1px solid #cbd1c3; border-radius: 30px; font-size: 12px; padding: 5px 16px; }
+.partner-hero h1 { font-family: 'Noto Serif JP', serif; font-weight: 400; font-size: clamp(36px, 5vw, 62px); line-height: 1.55; letter-spacing: .06em; margin: 26px 0; }
+.partner-hero h1 span { display: block; }
+.partner-intro { max-width: 640px; font-size: 16px; margin-bottom: 28px; }
+.partner-hero .outline-button, .home-partners a { text-decoration: none; }
+.partner-faq { max-width: 900px; }
+.partner-faq h2 { margin-bottom: 28px; }
+.partner-faq details { border-top: 1px solid #d7dbcf; padding: 22px 0; }
+.partner-faq summary { cursor: pointer; font-size: 16px; line-height: 1.6; }
+.partner-faq details p { margin: 20px 0 0; }
+.consultation-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; background: #eceee5; padding: 42px; margin-bottom: 80px; }
+.consultation-panel h2 { font-size: 25px; font-weight: 400; }
+.consultation-panel p { font-size: 14px; }
+.consultation-checklist { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 14px; line-height: 2.2; padding: 24px; background: #f8f7f3; }
+@media (min-width: 761px) { .desktop-nav { gap: 22px; } .desktop-nav button { white-space: nowrap; } }
+@media (max-width: 1050px) { .desktop-nav, .desktop-login { display: none; } .mobile-menu { display: block; } }
+@media (max-width: 760px) { .home-principles, .home-partners, .consultation-panel { grid-template-columns: 1fr; gap: 16px; } .home-principles article { padding: 22px 0; } .home-partners a { padding: 25px; } .partner-hero > .eyebrow { margin-top: 32px; } .consultation-panel { padding: 24px; } .consultation-checklist { padding: 16px; font-size: 12px; } }

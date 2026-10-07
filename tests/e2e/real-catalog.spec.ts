@@ -14,12 +14,12 @@ async function mockCatalog(page: Page, recordRequest?: () => void, catalog = row
   });
 }
 test('homepage and primary search use real catalog, while six-sample demo stays explicit', async ({ page, isMobile }) => {
-  await mockCatalog(page); await page.goto(base);
+  await mockCatalog(page); await page.goto(`${base}/#/nagoya`);
   await expect(page.getByText('確認済み掲載 2件')).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
-  await page.getByRole('button', { name: 'お店を探す', exact: true }).click();
-  await expect(page).toHaveURL(`${base}/#/`);
+  await page.getByRole('button', { name: '店舗一覧', exact: true }).click();
+  await expect(page).toHaveURL(`${base}/#/nagoya`);
   await expect(page.getByRole('link', { name: 'サンプル・デモ', exact: true })).toHaveCount(0);
   await page.goto(`${base}/#/demo`);
   await expect(page.getByText('掲載サンプル 6 店')).toBeVisible();
@@ -29,7 +29,7 @@ test('homepage and primary search use real catalog, while six-sample demo stays 
 });
 test('real filters, saved candidates and detail URLs preserve price/closure evidence across history and reload', async ({ page }) => {
   let calls = 0; await mockCatalog(page, () => { calls++; });
-  await page.goto(base);
+  await page.goto(`${base}/#/nagoya`);
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('栄 半個室');
   await page.getByLabel('料理', { exact: true }).selectOption('日本料理');
   await page.getByLabel('確認できる情報', { exact: true }).selectOption('price');
@@ -54,7 +54,7 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
 test('map pins follow real filters without reloading the base style and missing positions stay absent', async ({ page }) => {
   await mockCatalog(page); let styles = 0;
   await page.route('https://tiles.openfreemap.org/**', route => { styles++; return route.fulfill({ json: { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e9eddf' } }] } }); });
-  await page.goto(base); await page.getByRole('button', { name: '地図を表示' }).click();
+  await page.goto(`${base}/#/nagoya`); await page.getByRole('button', { name: '地図を表示' }).click();
   await expect(page.locator('.catalog-map')).toHaveAttribute('data-map-status', 'ready');
   await expect(page.locator('.restaurant-map-pin')).toHaveCount(1);
   const beforeFilter = styles;
@@ -68,7 +68,7 @@ test('map pins follow real filters without reloading the base style and missing 
 test('saved storage failure is visible and no successful durable-save claim is made', async ({ page }) => {
   await mockCatalog(page);
   await page.addInitScript(() => { const original = Storage.prototype.setItem; Storage.prototype.setItem = function(key, value) { if (key === 'executive-dining:verified-saved:v1') throw new DOMException('Blocked', 'QuotaExceededError'); return original.call(this, key, value); }; });
-  await page.goto(base);
+  await page.goto(`${base}/#/nagoya`);
   await page.getByRole('button', { name: `候補に保存：${rows[0].name}`, exact: true }).click();
   await expect(page.getByText('ブラウザの保存領域が使えないため、候補は再読み込みで消える場合があります。')).toBeVisible();
   await page.reload();
@@ -84,7 +84,7 @@ test('missing or unpublished detail stays unavailable without substituting sampl
 });
 
 test('compare preserves conditions and unknown fields through detail, history and reload', async ({ page }) => {
-  await mockCatalog(page); await page.goto(base);
+  await mockCatalog(page); await page.goto(`${base}/#/nagoya`);
   for (const row of rows) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   await page.getByRole('button', { name: '選んだお店を比較', exact: true }).click();
   const comparisonUrl = page.url();
@@ -108,7 +108,7 @@ test('compare preserves conditions and unknown fields through detail, history an
 });
 test('comparison selection is capped at three, survives reload and can be changed', async ({ page }) => {
   const extra = ['cccccccc-cccc-4ccc-cccc-cccccccccccc', 'dddddddd-dddd-4ddd-dddd-dddddddddddd'].map((id, index) => ({ ...rows[1], id, name: `検証用 追加店${index + 1}`, facts: rows[1].facts.map(item => item.field === 'name' ? { ...item, value: `検証用 追加店${index + 1}` } : item) }));
-  const catalog = [...rows, ...extra]; await mockCatalog(page, undefined, catalog); await page.goto(base);
+  const catalog = [...rows, ...extra]; await mockCatalog(page, undefined, catalog); await page.goto(`${base}/#/nagoya`);
   for (const row of catalog.slice(0, 3)) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   const fourth = page.getByRole('button', { name: `比較に追加：${extra[1].name}`, exact: true });
   await expect(fourth).toBeDisabled(); await page.reload();
@@ -156,7 +156,7 @@ test('shared comparisons do not restore unpublished or invalid identifiers from 
 test('comparison storage failure is visible and clearing remains possible', async ({ page }) => {
   await mockCatalog(page);
   await page.addInitScript(() => { const original = Storage.prototype.setItem; Storage.prototype.setItem = function(key, value) { if (key === 'executive-dining:comparison:v1') throw new DOMException('Blocked', 'QuotaExceededError'); return original.call(this, key, value); }; });
-  await page.goto(base); await page.getByRole('button', { name: `比較に追加：${rows[0].name}`, exact: true }).click();
+  await page.goto(`${base}/#/nagoya`); await page.getByRole('button', { name: `比較に追加：${rows[0].name}`, exact: true }).click();
   await expect(page.getByText('比較候補の変更を保存できませんでした。再読み込みで選択が失われる場合があります。')).toBeVisible();
   await page.getByRole('button', { name: '選択を解除', exact: true }).click();
   await expect(page.getByText('0 / 3店を選択', { exact: true })).toBeVisible();
