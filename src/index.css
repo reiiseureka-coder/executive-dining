@@ -1890,3 +1890,57 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .editorial-preview { padding: 12px; }
   .editorial-preview-surface { padding: 16px 12px; }
 }
+
+/* Put the next useful action before secondary explanation on narrow screens. */
+.home-audience-links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 18px; border-top: 1px solid #d4dacb; padding-top: 8px; }
+.home-audience-links a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: #3d5034; font-size: 14px; }
+.home-audience-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.enterprise-consultation + .enterprise-features { margin-top: 40px; }
+.enterprise-consultation { margin-top: 0; }
+@media (max-width: 760px) {
+  .home-hero { padding-block: 20px 12px; gap: 18px; }
+  .hero-copy h1 { font-size: clamp(27px, 7vw, 32px); line-height: 1.5; margin-block: 12px; }
+  .hero-description { margin-bottom: 16px; line-height: 1.75; }
+  .quick-links { gap: 8px; margin-top: 8px; }
+  .quick-links > span { width: auto; }
+  .quick-links button { padding-inline: 10px; }
+  .home-availability { margin-top: 10px; line-height: 1.75; }
+  .home-audience-links { margin-top: 12px; padding-top: 6px; gap: 4px 18px; }
+  .home-audience-links a { font-size: 14px; }
+  .hero-figure { height: 144px; }
+  .home-cities.section-space, .home-value.section-space { padding-top: 28px; }
+  .home-cities .section-heading { margin-bottom: 12px; }
+  .home-cities .section-heading .text-link { margin-top: 0; }
+  .home-cities .city-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-cities .city-list button { min-height: 88px; padding: 12px 8px; gap: 10px; }
+  .home-cities .city-list button:nth-child(odd) { border-right: 1px solid #d9dece; }
+  .home-cities .city-list button:nth-child(-n+2) { border-bottom: 1px solid #d9dece; }
+  .home-cities .city-list button:nth-child(n+3) { border-bottom: 0; }
+  .home-cities .city-list .area-number { display: none; }
+  .home-cities .city-list strong { font-size: 19px; }
+  .home-cities .city-list small { display: block; margin-left: 0; font-size: 12px; }
+  .home-cities .city-list button > span:nth-child(2) { display: block; }
+  .home-cities .city-list svg { width: 16px; flex-shrink: 0; }
+  .home-value .section-heading { margin-bottom: 12px; }
+  .home-value .home-principles { gap: 0; }
+  .home-value .home-principles article { padding-block: 16px; }
+  .home-value .home-principles h3 { margin-block: 6px; font-size: 18px; }
+  .home-value .home-principles p { line-height: 1.8; font-size: 15px; }
+  .enterprise-page { padding-top: 12px; }
+  .enterprise-hero { padding-bottom: 18px; }
+  .enterprise-hero > .eyebrow { margin-top: 12px; }
+  .enterprise-hero h1 { margin-block: 12px; line-height: 1.5; }
+  .enterprise-hero h2 { margin-bottom: 12px; font-size: 20px; line-height: 1.65; }
+  .enterprise-intro { font-size: 15px; line-height: 1.8; }
+  .enterprise-hero .enterprise-note { margin-top: 12px; line-height: 1.75; }
+  .enterprise-consultation { margin-top: 0; padding: 18px 16px; gap: 16px; }
+  .enterprise-consultation h2 { margin-block: 6px 8px; font-size: 23px; }
+  .enterprise-consultation p { line-height: 1.75; }
+  .enterprise-consultation .primary-button { margin-top: 12px; padding-block: 12px; }
+  .enterprise-consultation small { margin-top: 10px; line-height: 1.75; }
+  .enterprise-checklist { padding: 12px; line-height: 1.9; }
+  .enterprise-consultation + .enterprise-features { margin-top: 24px; }
+  .enterprise-features article, .enterprise-features article:first-child { padding-block: 18px; }
+  .enterprise-features h3 { margin-block: 8px; font-size: 18px; }
+  .enterprise-features p { line-height: 1.8; }
+}

@@ -19,8 +19,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Prepare pre-mobile visual reference
         run: |
-          git fetch --depth=1 origin 095f58467f1b42a38ae5af66e4a021f0c6c1c6c0
-          git worktree add --detach "$RUNNER_TEMP/dining-mobile-before" 095f58467f1b42a38ae5af66e4a021f0c6c1c6c0
+          git fetch --depth=1 origin f669177685bd15fe535aa8c712c2ff214473fd13
+          git worktree add --detach "$RUNNER_TEMP/dining-mobile-before" f669177685bd15fe535aa8c712c2ff214473fd13
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-mobile-before/node_modules"
           cd "$RUNNER_TEMP/dining-mobile-before"
           VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4183 > "$RUNNER_TEMP/dining-mobile-before.log" 2>&1 &
@@ -31,6 +31,8 @@ jobs:
         if: always()
         with:
           name: mobile-layout-screenshots
-          path: test-results/**/*.png
+          path: |
+            test-results/**/*.png
+            test-results/**/density-metrics.json
           retention-days: 14
           if-no-files-found: ignore

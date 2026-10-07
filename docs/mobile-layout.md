@@ -15,6 +15,10 @@ This update keeps the existing ivory/green visual identity, concise enterprise o
 
 `npm run check` runs unit/database permission tests, ESLint and TypeScript/Vite build. `npm run test:e2e` retains the full desktop/mobile flow suite and adds 320, 375, 390, 430 and 768px coverage, including menu/history, no page overflow, minimum form text sizes and a 320×440 login-dialog test.
 
-CI saves screenshots as the `mobile-layout-screenshots` artifact. A separate read-only local reference server uses commit `095f58467f1b42a38ae5af66e4a021f0c6c1c6c0` so home/enterprise before images are from the actual previous source, not reconstructed approximations. Screenshots are review artifacts, not pixel-equality assertions.
+CI saves screenshots as the `mobile-layout-screenshots` artifact. A separate read-only local reference server uses commit `f669177685bd15fe535aa8c712c2ff214473fd13` so home/enterprise before images are from the actual previous source, not reconstructed approximations. Screenshots are review artifacts, not pixel-equality assertions.
 
 The mobile project is Chromium with an iPhone-sized emulated viewport. This does not constitute physical iOS/Safari or real on-screen keyboard verification. The shortened viewport test checks reduced space, not a real device keyboard.
+
+## Follow-up: mobile information order
+
+The enterprise consultation follows the short plan introduction, before the feature list. Home exposes company/store entry links immediately under search. Phone-only spacing, photo height and city grids are denser; readable input sizes and touch targets are preserved. `mobile-density.spec.ts` compares consultation/entry positions against the pre-density commit and records the measurements alongside review screenshots.

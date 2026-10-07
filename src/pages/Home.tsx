@@ -13,23 +13,24 @@ export default function Home({ onNavigate }: Props) {
       <div className="hero-copy">
         <p className="eyebrow">EXECUTIVE DINING / FIND YOUR NEXT TABLE</p>
         <h1><span>大切な話を、</span><span>心地よい一席で。</span></h1>
-        <p className="hero-description">個室、予算、アクセス。<br />会食の条件をひとつずつ確かめて、<br className="mobile-break" />次の一軒を見つける。</p>
+        <p className="hero-description">個室・予算・アクセスから、<br />会食に合う一軒を見つける。</p>
         <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
           <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
           <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="店名・エリア・料理" type="search" />
           <button type="submit">探す<ArrowRight size={17} /></button>
         </form>
         <div className="quick-links"><span>気になる条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
-        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。店舗一覧から非公開の実店舗情報を確認できます。' : '現在の検索対象は名古屋です。公開承認済みの店舗情報だけを表示します。招待済みの方はログインしてください。'}</p>
+        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。名古屋の非公開情報を確認できます。' : '現在は名古屋に対応。公開承認済みの情報を表示します。招待済みの方はログインしてください。'}</p>
+        <nav className="home-audience-links" aria-label="目的別のご案内"><a href="#/corporate">法人導入のご案内<ArrowRight size={16} /></a><a href="#/restaurants">店舗掲載のご案内<ArrowRight size={16} /></a></nav>
       </div>
       <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>THE DINING NOTE / IMAGE</span><span>ゆっくり話せる、その場所へ。</span></figcaption></figure>
     </section>
-    <section className="page-width section-space">
-      <div className="section-heading"><div><p className="eyebrow">EXPLORE BY CITY</p><h2>集まる街から、一席を。</h2><p>東京、大阪、名古屋、福岡。街ごとに、食の時間を探す。</p></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
+    <section className="page-width section-space home-cities">
+      <div className="section-heading"><div><p className="eyebrow">EXPLORE BY CITY</p><h2>集まる街から、一席を。</h2></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
       <div className="area-list city-list">{['東京', '大阪', '名古屋', '福岡'].map((city,index) => <button key={city} disabled={city !== '名古屋'} onClick={() => explore()}><span className="area-number">0{index+1}</span><span><strong>{city}</strong><small>{city === '名古屋' ? '店舗情報を見る' : '準備中'}</small></span>{city === '名古屋' && <ArrowRight size={20} />}</button>)}</div>
-      <p className="quiet-label">現在の対応エリアは名古屋のみです。東京・大阪・福岡は準備中です。掲載の公開状況は店舗一覧でご確認ください。</p>
+      <p className="quiet-label">名古屋のみ対応。東京・大阪・福岡は準備中です。</p>
     </section>
-    <section className="page-width section-space">
+    <section className="page-width section-space home-value">
       <div className="section-heading"><div><p className="eyebrow">A CLEARER WAY TO CHOOSE</p><h2>一席を選ぶ、確かな手がかり。</h2></div></div>
       <div className="home-principles">{[
         ['01','条件を、そのまま。','公式のコース価格、個室の条件、営業のお知らせ。確認した情報と出典・確認日を、一緒に表示します。'],
