@@ -1870,3 +1870,23 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .owner-trial:has(.pilot-detail) > h1 { font-size: 22px; margin-bottom: 12px; }
   .pilot-detail h2 { font-size: 26px; }
 }
+
+/* Real catalog photography remains explicit until usage rights are recorded. */
+.catalog-photo { min-height: 180px; padding: 24px; margin-bottom: 24px; background: #eeeee6; border: 1px solid #ddded2; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #68725d; }
+.catalog-photo-label { display: grid; justify-items: start; gap: 9px; }
+.catalog-photo-label > span { font: 500 20px/1.6 'Noto Serif JP', serif; color: #424e39; }
+.catalog-photo-label small { font-size: 12px; line-height: 1.8; }
+.catalog-photo > a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; color: #42563a; }
+.catalog-photo-detail { min-height: 240px; }
+.editorial-preview { margin: 20px 0; padding: 16px; border: 1px solid #d9ddcf; background: #f7f8f2; }
+.editorial-preview > summary { min-height: 44px; display: list-item; align-content: center; cursor: pointer; font-weight: 600; }
+.editorial-preview .curation-actions { margin: 16px 0; }
+.editorial-preview .curation-actions [aria-pressed="true"] { background: #41563b; color: white; }
+.editorial-preview-surface { margin-top: 16px; }
+.catalog-presentation-heading { margin-bottom: 20px; }
+@media (max-width: 640px) {
+  .catalog-photo { min-height: 190px; padding: 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .catalog-photo-detail { min-height: 230px; }
+  .editorial-preview { padding: 12px; }
+  .editorial-preview-surface { padding: 16px 12px; }
+}

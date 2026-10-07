@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import EditorialPreview from '../components/CatalogPresentation';
 import ReviewReadiness from '../components/ReviewReadiness';
 import { useAppAccess } from '../contexts/appAccess';
 import { useAuth } from '../contexts/auth';
@@ -23,7 +24,7 @@ function CandidateEditor({ row, reload }: { row: EditorialRestaurant; reload: ()
     catch { setError('更新できませんでした。確認項目の不足、権限、または別の編集による変更を確認し、一覧を再読み込みしてください。'); }
     finally { setBusy(false); guard.current = false; setConfirm(null); }
   };
-  return <article className="curation-card"><p className="eyebrow">{statusLabels[row.status]} · v{row.version}</p><h2>{row.name}</h2><p>{row.address}</p>
+  return <article className="curation-card"><p className="eyebrow">{statusLabels[row.status]} · v{row.version}</p><h2>{row.name}</h2><p>{row.address}</p><EditorialPreview restaurant={row} />
     <details><summary>取得元・利用条件（{row.sources.length}件）</summary><ul>{row.sources.map(source => <li key={source.id}>{source.provider} · {safeExternalUrl(source.sourceUrl) && <a href={safeExternalUrl(source.sourceUrl)!} target="_blank" rel="noreferrer">出典を開く</a>}<br />取得 {source.fetchedAt} / 確認 {source.verifiedAt ?? '未確認'}<br />ライセンス：{source.licenses.join(', ') || '未記載'} · 公開根拠：{source.publicationBasis}<br />{source.attributions.join(' / ')}{source.rawRecord && <details><summary>取得時の資料を見る（未審査）</summary><pre className="source-snapshot">{JSON.stringify(source.rawRecord, null, 2)}</pre></details>}</li>)}</ul></details>
     <details><summary>確認済み項目（{row.facts.length}件）</summary><ul>{row.facts.map(fact => <li key={fact.field}>{FACT_LABELS[fact.field]}：{fact.value}</li>)}</ul></details>
     <details><summary>公式情報を確認して記録する</summary><p>店舗の公式ページを開き、事実を自分の言葉で短く記録してください。写真・紹介文・他サイトの口コミは転載しません。保存すると掲載承認は解除され、再審査になります。</p><form onSubmit={event => { event.preventDefault(); if (checked) void execute(() => diningRepository!.recordFact(row.id, row.version, field, value, url)); }}>

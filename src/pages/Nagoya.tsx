@@ -1,3 +1,4 @@
+import { CatalogPhoto } from '../components/CatalogPresentation';
 import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import { ArrowUpRight, Bookmark, MapPin, Search } from 'lucide-react';
 import type { Page } from '../types';
@@ -49,7 +50,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
       const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
       const saved = savedIds.includes(restaurant.id);
       return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
-        <div className="verified-card-heading"><div><p className="eyebrow">公式情報確認 · {date(restaurant.verifiedAt)}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
+        <CatalogPhoto restaurant={restaurant} /><div className="verified-card-heading"><div><p className="eyebrow">公式情報確認 · {date(restaurant.verifiedAt)}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
         <VerifiedFactList restaurant={restaurant} compact />
         <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>詳細と確認情報を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button><span>{verifiedCoordinates(restaurant) ? '地図位置確認済み' : '地図位置は確認中'}</span></div>
         <VerifiedEvidence restaurant={restaurant} /><VerifiedReviews restaurant={restaurant} />

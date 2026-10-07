@@ -1,3 +1,4 @@
+import { CatalogPhoto } from '../components/CatalogPresentation';
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { ArrowLeft, ArrowUpRight, Bookmark } from 'lucide-react';
 import type { Page } from '../types';
@@ -32,7 +33,7 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
   const saved = savedIds.includes(restaurant.id);
   return <div className="page-width catalog-page catalog-detail">
     <button className="catalog-back" onClick={back}><ArrowLeft size={16} />{returnToComparison ? '比較に戻る' : '検索条件を保って一覧へ'}</button>
-    <article className="verified-card"><div className="verified-card-heading"><div><p className="eyebrow">NAGOYA / VERIFIED FACTS</p><h1 id="verified-detail-title" tabIndex={-1}>{restaurant.name}</h1><p>{restaurant.address}</p><p>掲載判断の確認日：{new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(restaurant.verifiedAt))}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
+    <article className="verified-card"><CatalogPhoto restaurant={restaurant} detail /><div className="verified-card-heading"><div><p className="eyebrow">NAGOYA / VERIFIED FACTS</p><h1 id="verified-detail-title" tabIndex={-1}>{restaurant.name}</h1><p>{restaurant.address}</p><p>掲載判断の確認日：{new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(restaurant.verifiedAt))}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
       {storageWarning && <p role="status" className="sample-notice">{storageWarning}</p>}
       <VerifiedFactList restaurant={restaurant} />
       <p className="catalog-filter-note">料金は掲載コースとその条件です。平均利用額・空席・防音性を保証するものではありません。予約前に最新情報をお店へご確認ください。</p>
