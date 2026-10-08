@@ -74,7 +74,7 @@ function AppShell() {
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "会食に合うお店を探す",
+      home: "大切な話を、心地よい一席で。",
       restaurants: "店舗掲載のご案内",
       corporate: "法人の方へ・福利厚生プラン",
       demo: "サンプル・デモ",
@@ -138,7 +138,7 @@ function AppShell() {
       <footer className="site-footer">
         <div className="page-width footer-inner">
           <span className="wordmark">EXECUTIVE DINING</span>
-          <p>会食のお店を探して、比べる。</p>
+          <p>会食の店選びを、丁寧に。</p>
           <a href="#/nagoya">店舗一覧</a>
           <a href="#/restaurants">店舗の方へ</a>
           <a href="#/corporate">法人の方へ</a>

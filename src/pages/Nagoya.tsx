@@ -29,7 +29,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' }); element?.focus({ preventScroll: true });
   }, []);
   return <div className="page-width catalog-page">
-    <div className="catalog-heading"><div><p className="eyebrow">NAGOYA / VERIFIED FACTS</p><h1>名古屋の会食店を<br />条件で探す</h1></div><p>公式情報で確認できた内容を掲載しています。<br />個室や料金などの最新情報は、予約前にお店へご確認ください。</p></div>
+    <div className="catalog-heading"><div><p className="eyebrow">NAGOYA / VERIFIED FACTS</p><h1>名古屋の会食、<br />確かめた情報から。</h1></div><p>公式情報で確認できた内容を掲載しています。<br />個室や料金などの最新情報は、予約前にお店へご確認ください。</p></div>
     <div className="catalog-explainer"><MapPin size={19} aria-hidden="true" /><p>料金は公式のコース価格と利用条件を掲載しています。平均予算・空席・防音性は未確認です。口コミの投稿受付と審査の仕組みは準備中です。</p></div>
     <div className="catalog-toolbar"><label className="catalog-search"><Search size={18} aria-hidden="true" /><input aria-label="名古屋の確認済み店舗を検索" placeholder="店名・エリア・個室などで検索" value={params.query ?? ''} onChange={event => update('query', event.target.value)} /></label><button className="button-secondary" onClick={() => update('view', showMap ? '' : 'map')} aria-pressed={showMap}>{showMap ? '地図を閉じる' : '地図を表示'}</button></div>
     <div className="catalog-filters">

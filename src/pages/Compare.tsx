@@ -10,7 +10,7 @@ export default function Compare({ params, onNavigate }: { params: SearchParams; 
   const ids = parseComparisonIds(params.ids);
   const restaurants = ids.flatMap(id => rows.filter(row => row.id === id));
   const back = () => onNavigate('nagoya', undefined, {});
-  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">COMPARE / UP TO THREE PLACES</p><h1>候補のお店を比較する</h1></div></div>
+  return <div className="page-width catalog-page"><div className="catalog-heading"><div><p className="eyebrow">COMPARE / UP TO THREE PLACES</p><h1>会食の候補を、見比べる。</h1></div></div>
     <p className="catalog-explainer">各店舗の公式情報をもとに、料金や個室の条件を比較できます。税・サービス料などの条件や、未確認の項目も表示しています。実際に訪問してつけた評価ではありません。</p>
     {loading ? <p role="status" className="catalog-count">店舗情報を読み込んでいます…</p> : error ? <div className="catalog-empty" role="alert"><p>{error}</p><button className="button-secondary" onClick={() => void reload()}>再読み込み</button></div> : !restaurants.length ? <div className="catalog-empty"><h2>比較できる公開情報がありません</h2><p>お店を1〜3件選んでください。未公開のお店や、掲載が取り下げられたお店は表示されません。</p><button className="button-secondary" onClick={back}>お店を探す</button></div> : <>
       <div className="catalog-result-heading"><p className="catalog-count">表示できる候補 {restaurants.length} / {ids.length}件</p><button className="catalog-reset" onClick={back}>一覧へ戻る</button></div>

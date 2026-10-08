@@ -12,12 +12,12 @@ export default function Corporate() {
       <a className="text-link" href="#/">ホームへ</a>
       <p className="eyebrow">FOR COMPANIES</p>
       <h1>エンタープライズプラン</h1>
-      <h2>社員のプライベートな<br className="mobile-break" />食事のお店選びに。</h2>
+      <h2>社員の食事に、<br className="mobile-break" />選ぶ楽しみを。</h2>
       <p className="enterprise-intro">会社が会員利用料を負担し、社員が家族や友人との食事のお店選びに使える法人向けプランです。</p>
       <p className="enterprise-note">提供準備中です。料金・機能・特典は未定で、お申込みはまだ受け付けていません。</p>
     </section>
     <section className="enterprise-consultation" id="consultation" aria-labelledby="enterprise-consultation-title">
-      <div><p className="eyebrow">CONSULTATION</p><h2 id="enterprise-consultation-title">導入のご相談</h2><p>相談に向けて、社員数や利用地域をメモにまとめられます。</p><button className="primary-button" onClick={() => void copy()}>{copyState.startsWith('相談メモをコピーしました') ? <Check size={16} /> : <Copy size={16} />}相談メモをコピー<ArrowRight size={16} /></button>{copyState && <p role="status">{copyState}</p>}<small>お問い合わせ窓口は準備中です。情報は送信されません。</small></div>
+      <div><p className="eyebrow">CONSULTATION</p><h2 id="enterprise-consultation-title">導入のご相談</h2><p>社員数や利用地域、ご希望を相談メモに。</p><button className="primary-button" onClick={() => void copy()}>{copyState.startsWith('相談メモをコピーしました') ? <Check size={16} /> : <Copy size={16} />}相談メモをコピー<ArrowRight size={16} /></button>{copyState && <p role="status">{copyState}</p>}<small>お問い合わせ窓口は準備中です。情報は送信されません。</small></div>
       <pre className="enterprise-checklist">{checklist}</pre>
     </section>
     <section className="enterprise-features" aria-label="プランの特徴">

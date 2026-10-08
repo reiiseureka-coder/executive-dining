@@ -9,12 +9,12 @@ export default function About({
     <div className="page-width about-page">
       <div className="page-heading">
         <p className="eyebrow">ABOUT EXECUTIVE DINING</p>
-        <h1>Executive Diningについて</h1>
-        <p>個室やコース料金を確認しながら、会食のお店を探せます。</p>
+        <h1>会食の店選びを、丁寧に。</h1>
+        <p>料理だけでなく、会話をする場所としてお店を考える。</p>
       </div>
       <div className="about-copy">
         <section>
-          <h2>どんなサービスか</h2>
+          <h2>会食に合う一軒を選ぶために</h2>
           <p>
             Executive Diningは、会食のお店を探して比較するためのサービスです。
             個室やコース料金などの公式情報を確認し、情報源と確認日を添えて掲載します。

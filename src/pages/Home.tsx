@@ -12,14 +12,14 @@ export default function Home({ onNavigate }: Props) {
     <section className="home-hero page-width">
       <div className="hero-copy">
         <p className="eyebrow">EXECUTIVE DINING</p>
-        <h1><span>会食に合う</span><span>お店を探す。</span></h1>
-        <p className="hero-description">個室やコース料金を確かめて、<br />気になるお店を比較できます。</p>
+        <h1><span>大切な話を、</span><span>心地よい一席で。</span></h1>
+        <p className="hero-description">個室・予算・アクセスから、<br />会食に合う一軒を見つける。</p>
         <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
           <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
           <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="店名・エリア・料理" type="search" />
           <button type="submit">探す<ArrowRight size={17} /></button>
         </form>
-        <div className="quick-links"><span>よく使う条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
+        <div className="quick-links"><span>気になる条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
         <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。名古屋の非公開情報を確認できます。' : '現在は名古屋に対応しています。招待済みの方は、ログインすると非公開の店舗情報も確認できます。'}</p>
         <nav className="home-audience-links" aria-label="目的別のご案内"><a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}>法人導入のご案内<ArrowRight size={16} /></a><a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}>店舗掲載のご案内<ArrowRight size={16} /></a></nav>
       </div>
@@ -31,11 +31,11 @@ export default function Home({ onNavigate }: Props) {
       <p className="quiet-label">名古屋のみ対応。東京・大阪・福岡は準備中です。</p>
     </section>
     <section className="page-width section-space home-value">
-      <div className="section-heading"><div><p className="eyebrow">HOW TO USE</p><h2>お店選びに使えること</h2></div></div>
+      <div className="section-heading"><div><p className="eyebrow">OUR APPROACH</p><h2>会食の店選びに、確かめたいこと。</h2></div></div>
       <div className="home-principles">{[
-        ['01','料金や個室の条件を確認','コース料金、個室の利用条件、営業のお知らせを掲載。情報源と確認日も確認できます。'],
-        ['02','気になるお店を保存・比較','候補をこのブラウザに保存できます。最大3店を並べて、料金や個室の条件を比べられます。'],
-        ['03','予約前に最新情報を確認','確認できていない項目は「未確認」と表示します。空席や最新の利用条件は、予約前にお店へご確認ください。'],
+        ['01','個室と料金のこと','コース料金、個室の利用条件、営業のお知らせ。お店選びに必要な情報を、出典・確認日とともに掲載します。'],
+        ['02','気になるお店を、候補に。','気になるお店を保存して、最大3店を比較。料金や個室の条件を見比べられます。候補はこのブラウザ内に保存されます。'],
+        ['03','予約前に知っておくこと','確認できていない項目は「未確認」と表示します。空席や最新の利用条件は、予約前にお店へご確認ください。'],
       ].map(([number,title,text]) => <article key={number}><span className="eyebrow">{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
     </section>
     <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">FOR RESTAURANTS & COMPANIES</p><h2>店舗掲載と<br />法人プランのご案内</h2><p>どちらも受付に向けて準備中です。</p></div><div className="home-partners">

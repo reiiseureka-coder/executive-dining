@@ -20,8 +20,8 @@ export default function Home({ onNavigate }: HomeProps) {
         <div className="hero-copy">
           <p className="eyebrow">SAMPLE / DESIGN DEMO</p>
           <h1>
-            <span>会食に合う</span>
-            <span>お店を探す。</span>
+            <span>大切な話を、</span>
+            <span>心地よい一席で。</span>
           </h1>
           <p className="hero-description">
             個室、予算、アクセス。
@@ -160,9 +160,9 @@ export default function Home({ onNavigate }: HomeProps) {
           <div>
             <p className="eyebrow">BEFORE YOU BOOK</p>
             <h2>
-              予約前に
+              いい会食は、
               <br />
-              確認したいこと
+              小さな確認から。
             </h2>
             <button className="text-link" onClick={() => onNavigate("about")}>
               このサービスについて

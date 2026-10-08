@@ -213,7 +213,7 @@ test('public comparison stays reachable above a long catalog at 320px', async ({
   await fits(page);
   await screenshot(page, info, 'public-comparison-tray');
   await compare.click();
-  await expect(page.getByRole('heading', { name: '候補のお店を比較する', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '会食の候補を、見比べる。', exact: true })).toBeVisible();
   await expect(page.getByRole('table').getByRole('columnheader')).toHaveCount(3);
   await fits(page);
   await screenshot(page, info, 'public-comparison-table');

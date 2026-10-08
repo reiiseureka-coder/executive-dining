@@ -21,7 +21,7 @@ test('single entry restores owner session, real ten stores, details/back and com
  await expect(page.getByRole('heading',{name:'店舗情報の確認・審査'})).toBeVisible();
  await expect(page.locator('.private-mode-banner')).toBeVisible();
  await page.getByRole('button',{name:'Executive Dining ホーム',exact:true}).click();
- await expect(page.getByRole('heading',{name:/会食に合う\s*お店を探す。/})).toBeVisible();
+ await expect(page.getByRole('heading',{name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
  await expect(page.locator('.private-mode-banner')).toHaveCount(0);
  await page.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
  await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();

@@ -88,7 +88,7 @@ test('compare preserves conditions and unknown fields through detail, history an
   for (const row of rows) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   await page.getByRole('button', { name: '選んだお店を比較', exact: true }).click();
   const comparisonUrl = page.url();
-  await expect(page.getByRole('heading', { name: '候補のお店を比較する' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '会食の候補を、見比べる。' })).toBeVisible();
   const table = page.getByRole('table');
   await expect(table.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
   await expect(table.getByText('2026年10月5日は休業。再開後の空席は要確認')).toBeVisible();
