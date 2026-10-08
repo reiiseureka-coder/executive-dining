@@ -4,7 +4,7 @@ test('membership demo has locked fictitious identity, explicit public preview co
  const requests:string[]=[];
  await page.route('https://test-project.supabase.co/**',route=>{requests.push(route.request().url());return route.fulfill({json:[]});});
  await page.goto(`${base}/#/membership`);
- await expect(page.getByRole('heading',{name:'体験の背景が、ほどよく伝わる。'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'会員登録のデモ'})).toBeVisible();
  await expect(page.getByText('会員登録の操作デモです。すべて架空の情報で、実際の個人情報は入力できません。登録・送信・課金・特典付与は行いません。')).toBeVisible();
  for(const label of ['実会社名（非公開）','氏名（非公開）','正式な役職（非公開）']) await expect(page.getByLabel(label,{exact:true})).toHaveAttribute('readonly','');
  await page.getByRole('button',{name:'架空データで公開表示を試す',exact:true}).click();
@@ -23,5 +23,5 @@ test('membership demo has locked fictitious identity, explicit public preview co
  expect(requests.filter(url=>/\/rpc\//.test(url))).toEqual([]);
  expect(page.url()).toBe(`${base}/#/membership`);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
- await page.reload(); await expect(page.getByRole('heading',{name:'まずは、登録情報を。'})).toBeVisible();
+ await page.reload(); await expect(page.getByRole('heading',{name:'登録情報の例'})).toBeVisible();
 });

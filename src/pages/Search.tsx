@@ -91,9 +91,9 @@ export default function Search({ params, onChange, onNavigate }: SearchProps) {
   return (
     <div className="page-width search-page">
       <div className="page-heading">
-        <p className="eyebrow">FIND YOUR TABLE</p>
-        <h1>サンプルで検索を試す。</h1>
-        <p>この画面は動作確認用の6件のサンプルです。<a href="#/nagoya">名古屋の実データ掲載はこちら</a></p>
+        <p className="eyebrow">SAMPLE SEARCH</p>
+        <h1>サンプルで検索を試す</h1>
+        <p>この画面は動作確認用の6件のサンプルです。<a href="#/nagoya">名古屋の店舗一覧はこちら</a></p>
       </div>
       <SampleNotice compact />
       <section className="search-panel" aria-label="検索条件">
@@ -182,7 +182,7 @@ export default function Search({ params, onChange, onNavigate }: SearchProps) {
         )}
       </section>
       <p className="filter-explainer">
-        予算・時間帯の絞り込みはサンプルの目安金額・営業時間に基づきます。空席検索ではありません。候補はこのブラウザに保存されます。
+        予算と時間帯は、サンプルの金額・営業時間で絞り込みます。空席は確認できません。候補の保存先は、このブラウザ内のみです。
       </p>
       {storageWarning && (
         <p role="status" className="sample-notice">
@@ -222,13 +222,13 @@ export default function Search({ params, onChange, onNavigate }: SearchProps) {
           <SearchIcon size={30} />
           <h2>
             {params.saved === "1" && savedIds.length === 0
-              ? "候補はまだ保存されていません。"
-              : "条件に合うお店が見つかりませんでした。"}
+              ? "保存した候補はありません"
+              : "条件に合うお店がありません"}
           </h2>
           <p>
             {params.saved === "1" && savedIds.length === 0
               ? "お店の写真の右上にある保存ボタンで、候補に追加できます。"
-              : "掲載サンプルは6店です。キーワードや条件を少し広げてみてください。"}
+              : "検索できるサンプルは6店です。キーワードや条件を変えてお試しください。"}
           </p>
           <button className="primary-button" onClick={() => onChange({})}>
             すべてのお店を見る

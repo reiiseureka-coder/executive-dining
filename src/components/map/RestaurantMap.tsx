@@ -51,8 +51,8 @@ export default function RestaurantMap({ restaurants, onSelect }: { restaurants: 
   const pinCount = restaurants.filter(restaurant => verifiedCoordinates(restaurant)).length;
   return <section className="catalog-map" aria-label="名古屋エリアの地図" data-map-status={failure ?? (ready ? 'ready' : 'loading')}>
     <div ref={container} className="catalog-map-canvas" />
-    {failure ? <p className="map-error" role="status">地図を読み込めませんでした。店舗情報は一覧から確認できます。<br />{MAP_FAILURE_LABELS[failure]}</p> : !ready && <p className="map-error" role="status">背景地図を読み込んでいます…</p>}
-    <div className="map-caption"><span>確認済みの位置：{pinCount}件。位置が未確認のお店は表示しません。</span><span>背景地図の施設名は当サービスの確認済み掲載を示しません。</span>
+    {failure ? <p className="map-error" role="status">地図を読み込めませんでした。店舗情報は一覧から確認できます。<br />{MAP_FAILURE_LABELS[failure]}</p> : !ready && <p className="map-error" role="status">地図を読み込んでいます…</p>}
+    <div className="map-caption"><span>位置を確認済みのお店：{pinCount}件。位置が未確認のお店は表示しません。</span><span>地図上の施設名には、このサービスに掲載していないお店も含まれます。</span>
       <span><a href={provider.attributionUrl} target="_blank" rel="noreferrer">{provider.name}</a>{provider.name === 'OpenFreeMap' && <> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></>}</span>
     </div>
   </section>;

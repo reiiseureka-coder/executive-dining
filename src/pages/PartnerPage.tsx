@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { ArrowRight, Check, Copy } from 'lucide-react';
 const content = {
   restaurants: {
-    eyebrow: 'FOR RESTAURANTS', title: 'お店の魅力を、\n必要とする一席へ。', intro: '会食に向いたお店の情報を、条件とともに丁寧に伝える。名古屋から、掲載の仕組みを準備しています。', label: '掲載リクエスト',
-    heading: '伝えたいのは、選ぶための情報。',
+    eyebrow: 'FOR RESTAURANTS', title: '店舗掲載の\nご案内', intro: '個室やコース料金など、会食のお店選びに必要な情報を掲載します。現在、名古屋の店舗から掲載準備を進めています。', label: '掲載申込み',
+    heading: '掲載する情報と確認の流れ',
     cards: [
-      ['個室・席の条件','人数、仕切り、利用時間、個室料など。写真の印象だけに頼らず、会食前に確かめたいことを整理します。'],
-      ['料金・営業の情報','コースの価格と適用条件、税・サービス料、営業日など。公式情報の出典と確認日を付けて掲載します。'],
-      ['中立で、更新できる掲載','掲載依頼だけで公開を確約するものではありません。事実確認と掲載承認を経て表示し、有料の評価操作や順位保証は行いません。'],
+      ['個室・席の条件','利用できる人数、仕切り、利用時間、個室料などを確認して掲載します。'],
+      ['料金・営業の情報','コース料金、税・サービス料、営業日などを掲載します。情報源と確認日も記載します。'],
+      ['掲載前に内容を確認','内容と掲載可否を確認してから公開します。申込みによって掲載が決まるわけではありません。料金と引き換えに評価や順位を上げることもありません。'],
     ],
-    steps: ['掲載対象・情報源・写真などの利用権限を確認', '店舗情報と表記内容を確認し、公開可否を判断', '承認後の掲載と、訂正・更新の運用を整備'],
+    steps: ['店舗の公式情報と、写真・文章の掲載許可を確認', '掲載内容を確認し、公開できるか判断', '掲載後の訂正・更新方法を確認'],
     questions: [
-      ['掲載依頼はもう送れますか？','現在は受付準備中です。このページには送信機能がなく、掲載料・審査期間・連絡窓口も未確定です。下の確認リストを相談準備にご利用ください。'],
-      ['口コミや予約も利用できますか？','公開口コミの受付と、このサイト内での予約は準備中です。掲載は予約枠の提供や会員限定店への参加を意味しません。'],
-      ['会員限定の予約枠を提供したい場合は？','将来の選択肢として検討しています。通常の情報掲載とは別に、提供枠、会員確認、キャンセル条件、店舗との契約を確認してから設計します。'],
+      ['掲載依頼はもう送れますか？','まだ受け付けていません。掲載料・審査期間・連絡窓口は未定です。下の確認リストで、相談に必要な情報を整理できます。'],
+      ['口コミや予約も利用できますか？','口コミの投稿とサイト内での予約は、まだ利用できません。通常の情報掲載に、予約枠の提供や会員限定店への参加は含まれません。'],
+      ['会員限定の予約枠を提供したい場合は？','今後の機能として検討しています。通常の情報掲載とは別に、予約枠やキャンセル条件、会員の確認方法などを店舗と相談して決める予定です。'],
     ],
-    checklist: '【掲載相談の確認リスト】\n・店舗の公式情報を確認できるページ\n・個室の人数、利用条件、追加料金\n・コース価格、税・サービス料、営業情報\n・写真や文章の掲載許可\n・掲載内容の確認と更新を担当する窓口\n・通常掲載か、将来の会員限定予約枠も検討するか',
+    checklist: '【掲載相談の確認リスト】\n・店舗の公式情報を確認できるページ\n・個室の人数、利用条件、追加料金\n・コース価格、税・サービス料、営業情報\n・写真や文章の掲載許可\n・掲載内容の確認と更新を担当する窓口\n・希望する掲載内容、会員限定の予約枠に関するご希望',
   },
 
 };
@@ -28,10 +28,10 @@ export default function PartnerPage({ audience }: { audience: keyof typeof conte
   };
   return <div className="partner-page">
     <section className="page-width partner-hero"><a className="text-link" href="#/">ホームへ</a><p className="eyebrow">{data.eyebrow}</p><p className="partner-status">{data.label} · 準備中</p><h1>{data.title.split('\n').map(line => <span key={line}>{line}</span>)}</h1><p className="partner-intro">{data.intro}</p><button className="outline-button" onClick={() => { document.getElementById('consultation')?.scrollIntoView({behavior:'smooth'}); document.getElementById('consultation')?.focus({preventScroll:true}); }}>相談前の確認リストを見る<ArrowRight size={16} /></button></section>
-    <section className="page-width section-space"><div className="section-heading"><div><p className="eyebrow">OUR APPROACH</p><h2>{data.heading}</h2></div></div><div className="home-principles">{data.cards.map(([title,text],index) => <article key={title}><span className="eyebrow">0{index+1}</span><h3>{title}</h3><p>{text}</p></article>)}</div></section>
-    <section className="page-width section-space store-evidence"><div><p className="eyebrow">FACTS AND EXPERIENCES</p><h2>お店からの情報と、<br />体験の声を分けて伝える。</h2><p>店舗の実在確認は、実際に訪問したことの証明ではありません。情報の種類と確認状況を明確にします。</p></div><div className="store-evidence-types"><article><span>店舗提供情報・公式情報</span><h3>変わる条件を、正確に。</h3><p>営業時間、コースの条件、席数、個室料。情報源と確認日を付け、掲載前に内容と利用権限を確認します。</p></article><article><span>体験にもとづくレビュー</span><h3>体験の評価は、独立して。</h3><p>店舗の希望だけで好意的に書き換えません。虚偽や権利侵害などの申告は個別に確認する方針です。公開受付は準備中です。</p></article></div></section>
-    <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">BEFORE WE BEGIN</p><h2>開始までに、<br />確かめること。</h2><p>以下は想定する流れです。<br />現在、申込みの受付は行っていません。</p></div><ol>{data.steps.map((text,index) => <li key={text}><span>0{index+1}</span><div><h3>{text}</h3></div></li>)}</ol></div></section>
+    <section className="page-width section-space"><div className="section-heading"><div><p className="eyebrow">LISTING</p><h2>{data.heading}</h2></div></div><div className="home-principles">{data.cards.map(([title,text],index) => <article key={title}><span className="eyebrow">0{index+1}</span><h3>{title}</h3><p>{text}</p></article>)}</div></section>
+    <section className="page-width section-space store-evidence"><div><p className="eyebrow">INFORMATION & REVIEWS</p><h2>店舗情報と<br />口コミの扱い</h2><p>公式情報の確認と、口コミの投稿者が訪問したかどうかの確認は、別に扱います。</p></div><div className="store-evidence-types"><article><span>店舗提供情報・公式情報</span><h3>情報源と確認日を記載</h3><p>営業時間、コースの条件、席数、個室料などを掲載します。公開前に内容と掲載許可を確認します。</p></article><article><span>利用者の口コミ</span><h3>店舗の都合で評価を変えない</h3><p>店舗からの依頼で好意的な内容に書き換えることはありません。虚偽や権利侵害の申告は個別に確認する方針です。口コミの受付は準備中です。</p></article></div></section>
+    <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">PROCESS</p><h2>掲載までの<br />確認事項</h2><p>受付開始後は、以下の流れを予定しています。<br />現在、申込みの受付は行っていません。</p></div><ol>{data.steps.map((text,index) => <li key={text}><span>0{index+1}</span><div><h3>{text}</h3></div></li>)}</ol></div></section>
     <section className="page-width section-space partner-faq"><p className="eyebrow">QUESTIONS & ANSWERS</p><h2>よくあるご質問</h2>{data.questions.map(([question,answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</section>
-    <section className="page-width section-space consultation-panel" id="consultation" tabIndex={-1}><div><p className="eyebrow">PREPARE FOR A CONVERSATION</p><h2>相談の前に、整理しておくこと。</h2><p>受付窓口を準備しています。確認リストをコピーして、お手元のメモとしてご利用ください。このページでは情報の入力・保存・送信は行いません。</p><button className="outline-button" onClick={() => void copy()}>{copyState.startsWith('確認リスト') ? <Check size={16} /> : <Copy size={16} />}確認リストをコピー</button>{copyState && <p role="status">{copyState}</p>}</div><pre className="consultation-checklist">{data.checklist}</pre></section>
+    <section className="page-width section-space consultation-panel" id="consultation" tabIndex={-1}><div><p className="eyebrow">CHECKLIST</p><h2>掲載相談の確認リスト</h2><p>受付窓口は準備中です。相談前のメモとして、確認リストをコピーできます。このページで情報の入力・保存・送信はできません。</p><button className="outline-button" onClick={() => void copy()}>{copyState.startsWith('確認リスト') ? <Check size={16} /> : <Copy size={16} />}確認リストをコピー</button>{copyState && <p role="status">{copyState}</p>}</div><pre className="consultation-checklist">{data.checklist}</pre></section>
   </div>;
 }

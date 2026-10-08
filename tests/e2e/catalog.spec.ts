@@ -12,15 +12,15 @@ const fixture = {
 test('default preview has a closed public catalog, hidden management and legacy route compatibility', async ({ page }) => {
   await page.goto('/#/nagoya');
   await expect(page.getByRole('heading', { name: '名古屋の掲載情報を準備しています' })).toBeVisible();
-  await expect(page.getByText('確認済み掲載 0件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 0件')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expect(page.getByRole('link', { name: '運営管理', exact:true })).toHaveCount(0);
   await page.evaluate(() => { window.location.hash = '#/curation'; });
-  await expect(page.getByRole('heading', { name: '管理機能は接続準備中です' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '管理機能は準備中です' })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('heading', { name: '名古屋の掲載情報を準備しています' })).toBeVisible();
   await page.reload();
-  await expect(page.getByText('確認済み掲載 0件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 0件')).toBeVisible();
   await expect(page.getByRole('link', { name: /サンプルで検索画面/ })).toHaveCount(0);
   await page.goto('/#/search');
   await expect(page.getByText('サンプル', { exact: false }).first()).toBeVisible();
@@ -30,7 +30,7 @@ test('map failure keeps list usable, attribution visible, and repeated close/ope
   await page.route('https://tiles.openfreemap.org/**', route => route.abort());
   await page.goto('/#/nagoya');
   await page.getByRole('button', { name: '地図を表示' }).click();
-  await expect(page.getByText('確認済みの位置：0件。位置が未確認のお店は表示しません。')).toBeVisible();
+  await expect(page.getByText('位置を確認済みのお店：0件。位置が未確認のお店は表示しません。')).toBeVisible();
   await expect(page.getByText('地図を読み込めませんでした。店舗情報は一覧から確認できます。')).toBeVisible();
   await expect(page.getByRole('link', { name: '© OpenStreetMap contributors', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '地図を閉じる' }).click();
@@ -46,12 +46,12 @@ test('verified RPC facts display, unknown stays unknown, and sources are readabl
   await page.goto('http://127.0.0.1:4181/#/nagoya');
   await expect(page.getByRole('heading', { name: fixture.name })).toBeVisible();
   await expect(page.getByText('未確認の候補')).toHaveCount(0);
-  await expect(page.getByText('確認済み掲載 1件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
   await expect(page.getByText('公開された口コミはまだありません。')).toBeVisible();
   await page.getByText('出典・確認日を見る').click();
   await expect(page.getByRole('link', { name: '個室の出典' })).toHaveAttribute('href', 'https://example.com/rooms');
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('半個室 名古屋');
-  await expect(page.getByText('確認済み掲載 1件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('存在しない');
   await expect(page.getByRole('heading', { name: '条件に合うお店がありません' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -65,7 +65,7 @@ test('RPC error is explicit and retry recovers without fallback fake data', asyn
     } else await route.fulfill({ json: [] });
   });
   await page.goto('http://127.0.0.1:4181/#/nagoya');
-  await expect(page.getByRole('heading', { name: '掲載情報を取得できません' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '店舗情報を読み込めませんでした' })).toBeVisible();
   await page.getByRole('button', { name: '再読み込み' }).click();
   await expect(page.getByRole('heading', { name: fixture.name })).toBeVisible();
 });
@@ -91,6 +91,6 @@ test('MapLibre initializes WebGL and finishes rendering with a controlled base s
 test('a verified label cannot display a venue without eligible official core facts', async ({ page }) => {
   await page.route('https://test-project.supabase.co/**', route => route.fulfill({ json: [{ ...fixture, facts: fixture.facts.filter(fact => fact.field !== 'name') }] }));
   await page.goto('http://127.0.0.1:4181/#/nagoya');
-  await expect(page.getByRole('heading', { name: '掲載情報を取得できません' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '店舗情報を読み込めませんでした' })).toBeVisible();
   await expect(page.getByRole('heading', { name: fixture.name })).toHaveCount(0);
 });

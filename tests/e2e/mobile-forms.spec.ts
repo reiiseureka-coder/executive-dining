@@ -92,12 +92,12 @@ test.beforeEach(async ({ page }, info) => {
 test('public catalog and expanded review, correction and report drafts fit 320px', async ({ page }, info) => {
   const state = await mockReadOnlyData(page);
   await page.goto(`${base}/#/nagoya`);
-  await expect(page.getByText('確認済み掲載 1件', { exact: true })).toBeVisible();
+  await expect(page.getByText('掲載中のお店 1件', { exact: true })).toBeVisible();
   await readableFields(page.locator('main'));
   await comfortableTargets(page.locator('.catalog-toolbar button, .catalog-filters button, .verified-card-actions button'));
   await fits(page);
   await screenshot(page, info, 'public-catalog-fields');
-  await page.getByRole('button', { name: '詳細と確認情報を見る', exact: true }).click();
+  await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await expect(page.getByRole('heading', { name: restaurant.name, exact: true })).toBeVisible();
 
   const review = page.locator('.visit-draft');
@@ -106,11 +106,11 @@ test('public catalog and expanded review, correction and report drafts fit 320px
   await review.getByLabel('訪問月', { exact: true }).fill('2026-09');
   await review.getByLabel('店舗との関係', { exact: true }).selectOption('customer');
   await review.getByLabel('体験の総合評価', { exact: true }).selectOption('3');
-  await review.getByLabel('本人の体験本文', { exact: true }).fill('自動テスト専用の架空本文です。実際の来店評価ではありません。');
+  await review.getByLabel('来店したときの体験・感想', { exact: true }).fill('自動テスト専用の架空本文です。実際の来店評価ではありません。');
   await review.getByLabel('本人が実際に訪問した体験です', { exact: true }).check();
   await review.getByLabel('個人情報・会食相手・機密情報を含めていません', { exact: true }).check();
-  await review.getByRole('button', { name: '公開前の表示内容を確認', exact: true }).click();
-  await expect(review.getByRole('region', { name: '口コミの送信前確認' })).toBeVisible();
+  await review.getByRole('button', { name: '下書きの内容を確認', exact: true }).click();
+  await expect(review.getByRole('region', { name: '口コミの下書き確認' })).toBeVisible();
   await readableFields(review);
   await comfortableTargets(review.locator('button:visible, summary, .draft-check'));
   await fits(page);
@@ -149,7 +149,7 @@ test('actual mocked curation editor and confirmation fit 320px without writing',
   await editor.getByText('取得時の資料を見る（未審査）', { exact: true }).click();
   await editor.getByText('公式情報を確認して記録する', { exact: true }).click();
   await editor.getByLabel('確認項目', { exact: true }).selectOption('price');
-  await editor.getByLabel('確認した事実', { exact: true }).fill('表示確認用の架空コース料金と利用条件です。保存しません。');
+  await editor.getByLabel('確認した内容', { exact: true }).fill('表示確認用の架空コース料金と利用条件です。保存しません。');
   await editor.getByLabel('公式ページのURL', { exact: true }).fill(`https://example.com/${'long-editorial-path-'.repeat(8)}`);
   await editor.getByLabel('審査理由', { exact: true }).fill('狭い画面で確認ダイアログの表示を検証します。変更は確定しません。');
   await readableFields(editor);
@@ -201,7 +201,7 @@ test('public comparison stays reachable above a long catalog at 320px', async ({
   });
   const state = await mockReadOnlyData(page, false, catalog);
   await page.goto(`${base}/#/nagoya`);
-  await expect(page.getByText('確認済み掲載 8件', { exact: true })).toBeVisible();
+  await expect(page.getByText('掲載中のお店 8件', { exact: true })).toBeVisible();
   for (const row of catalog.slice(0, 2)) {
     await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   }
@@ -213,7 +213,7 @@ test('public comparison stays reachable above a long catalog at 320px', async ({
   await fits(page);
   await screenshot(page, info, 'public-comparison-tray');
   await compare.click();
-  await expect(page.getByRole('heading', { name: '会食の候補を、並べて確認。', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '候補のお店を比較する', exact: true })).toBeVisible();
   await expect(page.getByRole('table').getByRole('columnheader')).toHaveCount(3);
   await fits(page);
   await screenshot(page, info, 'public-comparison-table');

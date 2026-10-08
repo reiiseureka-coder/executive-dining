@@ -62,7 +62,7 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(/#\/curation$/);
   await expect(page.locator('.curation-card')).toHaveCount(10);
-  await expect(page.getByText('最新 10件（最大200件） / 口コミ受付は別途準備中')).toBeVisible();
+  await expect(page.getByText('最新 10件（最大200件） / 口コミの受付は準備中')).toBeVisible();
   await page.goBack(); await expect(page).toHaveURL(/#\/about$/);
   await expect(page).not.toHaveURL(/access_token|refresh_token/);
   await page.goForward(); await expect(page).toHaveURL(/#\/curation$/);
@@ -71,7 +71,7 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.getByRole('button', { name: 'Executive Dining ホーム', exact: true }).click();
   await page.reload();
   await expect(page).toHaveURL(/#\/$/);
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /会食に合う\s*お店を探す。/ })).toBeVisible();
   expect(roleChecks).toBeGreaterThan(beforeHome);
 });
 test('callback intent and metadata never redirect an account denied by the server', async ({ page }) => {
@@ -118,7 +118,7 @@ test('owner invitation lands at the single entry with ten real stores and restor
   await page.route('**/auth/v1/user', route => route.fulfill({json:callbackUser}));
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(`${base}/#/`);
-  await expect(page.getByRole('heading',{name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
+  await expect(page.getByRole('heading',{name:/会食に合う\s*お店を探す。/})).toBeVisible();
   await page.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
   await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await expect(page).not.toHaveURL(/access_token|refresh_token/);

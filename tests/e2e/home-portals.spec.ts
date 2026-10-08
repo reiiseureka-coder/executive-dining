@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { login, mock } from './helpers/ownerTrial';
 test('real homepage preserves design, searches real catalog and keeps samples separate', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /会食に合う\s*お店を探す。/ })).toBeVisible();
   await expect(page.locator('.hero-figure img')).toHaveAttribute('alt', /掲載店舗の写真ではありません/);
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   await page.getByRole('searchbox').fill('名古屋浅田');
@@ -10,14 +10,14 @@ test('real homepage preserves design, searches real catalog and keeps samples se
   await expect(page).toHaveURL(/#\/nagoya\?query=/);
   await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('名古屋浅田');
   await page.goBack();
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /会食に合う\s*お店を探す。/ })).toBeVisible();
   await page.goto('/#/demo');
   await expect(page.getByText('SAMPLE / DESIGN DEMO', {exact: true})).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(3);
 });
 test('both portals work through desktop and mobile navigation, history and reload', async ({ page, isMobile }) => {
   await page.goto('/');
-  for (const [label, route, heading] of [['店舗の方へ', 'restaurants', 'お店の魅力を、 必要とする一席へ。'], ['法人の方へ', 'corporate', 'エンタープライズプラン']]) {
+  for (const [label, route, heading] of [['店舗の方へ', 'restaurants', '店舗掲載の ご案内'], ['法人の方へ', 'corporate', 'エンタープライズプラン']]) {
     if (isMobile) await page.getByRole('button', {name:'メニューを開く'}).click();
     await page.getByRole('button', {name:label, exact:true}).click();
     await expect(page).toHaveURL(new RegExp(`#/${route}$`));
@@ -35,7 +35,7 @@ test('both portals work through desktop and mobile navigation, history and reloa
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.goBack();
-    await expect(page.getByRole('heading', {name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
+    await expect(page.getByRole('heading', {name:/会食に合う\s*お店を探す。/})).toBeVisible();
     await page.goForward();
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     await page.getByRole('button', {name:'Executive Dining ホーム'}).click();
@@ -76,7 +76,7 @@ test('enterprise page is concise, honest and copies an unsent consultation memo'
   await expect(page.getByRole('heading',{name:'エンタープライズプラン',exact:true})).toBeVisible();
   await expect(page.locator('.enterprise-features article')).toHaveCount(3);
   await expect(page.locator('.enterprise-intro')).toContainText('会社が会員利用料を負担');
-  await expect(page.locator('.enterprise-meal-note')).toContainText('飲食代は会員利用料に含む前提ではありません');
+  await expect(page.locator('.enterprise-meal-note')).toContainText('飲食代は会員利用料とは別にお支払いいただく想定');
   await expect(page.locator('.enterprise-hero')).toContainText('提供準備中');
   await expect(page.locator('.concept-membership, .corporate-audience-switch, details, form, input, textarea')).toHaveCount(0);
   await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', {configurable:true,value:{writeText:async (text:string)=>{if(!text.includes('対象となる社員数'))throw new Error('incorrect memo')}}}); });

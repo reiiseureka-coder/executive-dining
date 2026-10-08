@@ -20,15 +20,15 @@ export default function Home({ onNavigate }: HomeProps) {
         <div className="hero-copy">
           <p className="eyebrow">SAMPLE / DESIGN DEMO</p>
           <h1>
-            <span>大切な話を、</span>
-            <span>心地よい一席で。</span>
+            <span>会食に合う</span>
+            <span>お店を探す。</span>
           </h1>
           <p className="hero-description">
             個室、予算、アクセス。
             <br />
-            会食の条件をひとつずつ確かめて、
+            サンプルのお店で検索や保存を
             <br className="mobile-break" />
-            次の一軒を見つける。
+            試せます。
           </p>
           <form
             className="hero-search"
@@ -83,8 +83,8 @@ export default function Home({ onNavigate }: HomeProps) {
             fetchPriority="high"
           />
           <figcaption>
-            <span>THE DINING NOTE</span>
-            <span>ゆっくり話せる、その場所へ。</span>
+            <span>IMAGE</span>
+            <span>写真はイメージです</span>
           </figcaption>
         </figure>
       </section>
@@ -94,8 +94,8 @@ export default function Home({ onNavigate }: HomeProps) {
       <section className="page-width section-space">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">EXPLORE BY AREA</p>
-            <h2>集まりやすい街から。</h2>
+            <p className="eyebrow">AREA</p>
+            <h2>エリアから探す</h2>
           </div>
           <button
             className="text-link"
@@ -128,8 +128,8 @@ export default function Home({ onNavigate }: HomeProps) {
       <section className="page-width section-space selection-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">THE COLLECTION</p>
-            <h2>一席を選ぶ、手がかり。</h2>
+            <p className="eyebrow">SAMPLE RESTAURANTS</p>
+            <h2>掲載サンプル</h2>
             <p>気になるお店を保存して、条件を見比べる。</p>
           </div>
           <span className="quiet-label demo-sample-count">
@@ -160,9 +160,9 @@ export default function Home({ onNavigate }: HomeProps) {
           <div>
             <p className="eyebrow">BEFORE YOU BOOK</p>
             <h2>
-              いい会食は、
+              予約前に
               <br />
-              小さな確認から。
+              確認したいこと
             </h2>
             <button className="text-link" onClick={() => onNavigate("about")}>
               このサービスについて
@@ -172,15 +172,15 @@ export default function Home({ onNavigate }: HomeProps) {
           <ol>
             {[
               {
-                title: "話す内容に合った席を",
+                title: "個室や席の条件",
                 text: "個室の仕切りや音の通り方は、予約時にお店へ確認。",
               },
               {
-                title: "総額を先に確かめる",
+                title: "飲み物・追加料金を含む総額",
                 text: "コースに加えて、飲み物・サービス料・個室料も確認。",
               },
               {
-                title: "行きも帰りも、無理なく",
+                title: "お店までの行き方",
                 text: "駅からの道順、集合時間、帰りの交通手段まで。",
               },
             ].map((item, index) => (

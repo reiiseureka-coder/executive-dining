@@ -48,8 +48,8 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
   if (!restaurant)
     return (
       <div className="page-width empty-state">
-        <h1>店舗が見つかりませんでした。</h1>
-        <p>URLをご確認いただくか、お店の一覧から探してください。</p>
+        <h1>店舗が見つかりません</h1>
+        <p>URLを確認するか、店舗一覧から探してください。</p>
         <button className="primary-button" onClick={() => onNavigate("search")}>
           お店の一覧へ
         </button>
@@ -170,7 +170,7 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
               <h2>お店について</h2>
               <p>{restaurant.description}</p>
               <p className="sample-caption">
-                説明文は動作確認用の例です。実店舗による掲載承認や取材に基づく情報ではありません。
+                説明文はサンプルです。店舗の承認や取材に基づく情報ではありません。
               </p>
             </section>
             <section className="detail-section">
@@ -223,7 +223,7 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
           </div>
           <aside className="detail-aside">
             <h2>予約前の確認メモ</h2>
-            <p>サンプルから探した候補は、公式情報で条件を確かめてから。</p>
+            <p>この画面の情報はサンプルです。予約前に、以下の点をお店に確認してください。</p>
             <ul>
               {[
                 "人数・日時と個室の空き",
@@ -253,7 +253,7 @@ export default function Detail({ restaurantId, onNavigate }: DetailProps) {
             <div className="ai-preparation">
               <Lock size={16} />
               <h3>AI分析は準備中</h3>
-              <p>確認済みデータと安全なサーバー接続の整備後に公開予定です。</p>
+              <p>情報の確認方法や安全対策を準備しています。現在は利用できません。</p>
             </div>
           </aside>
         </div>

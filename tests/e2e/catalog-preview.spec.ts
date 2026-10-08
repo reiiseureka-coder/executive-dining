@@ -15,7 +15,7 @@ test('actual ten candidate records have read-only card and detail previews witho
   await expect(page.locator('.curation-card')).toHaveCount(10);
   for (const row of catalog) {
     const editor = page.locator('.curation-card').filter({ has: page.getByRole('heading', { name: row.name, exact: true }) });
-    await editor.getByText('掲載前の表示をプレビュー', { exact: true }).click();
+    await editor.getByText('掲載時の表示を確認する', { exact: true }).click();
     const preview = editor.getByRole('region');
     await expect(preview.getByText('写真未登録', { exact: true })).toBeVisible();
     await expect(preview.locator('img')).toHaveCount(0);
@@ -27,10 +27,10 @@ test('actual ten candidate records have read-only card and detail previews witho
     await expect(preview.getByRole('link', { name: '店舗名の出典', exact: true })).toBeVisible();
     await editor.getByRole('button', { name: '一覧カード', exact: true }).click();
     await expect(preview.getByText('営業時間', { exact: true })).toHaveCount(0);
-    await editor.getByText('掲載前の表示をプレビュー', { exact: true }).click();
+    await editor.getByText('掲載時の表示を確認する', { exact: true }).click();
   }
   const first = page.locator('.curation-card').first();
-  await first.getByText('掲載前の表示をプレビュー', { exact: true }).click();
+  await first.getByText('掲載時の表示を確認する', { exact: true }).click();
   await page.setViewportSize({ width: 320, height: 760 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await first.screenshot({ path: info.outputPath('actual-candidate-preview-320.png') });

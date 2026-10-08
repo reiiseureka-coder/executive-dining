@@ -12,8 +12,8 @@ export default function ComparisonShare({ ids }: { ids: string[] }) {
       await navigator.clipboard.writeText(url);
       setMessage('比較リンクをコピーしました。');
     } catch {
-      setManualUrl(url); setMessage(url ? '自動コピーできませんでした。下のリンクを選択してコピーしてください。' : '比較リンクを作れませんでした。候補を選び直してください。');
+      setManualUrl(url); setMessage(url ? 'リンクをコピーできませんでした。下の欄から選択してコピーしてください。' : '比較リンクを作れませんでした。候補を選び直してください。');
     } finally { setCopying(false); }
   };
-  return <div className="comparison-share"><button className="button-secondary" disabled={copying} onClick={() => void share()}>比較リンクをコピー</button><p className="catalog-filter-note">共有先では公開中の店舗情報だけを表示します。会社名・会食日時・相手名はリンクに含めません。</p>{message && <p role="status">{message}</p>}{manualUrl && <input aria-label="手動コピー用の比較リンク" readOnly value={manualUrl} onFocus={event => event.target.select()} />}</div>;
+  return <div className="comparison-share"><button className="button-secondary" disabled={copying} onClick={() => void share()}>比較リンクをコピー</button><p className="catalog-filter-note">リンクを開くと、その時点で公開中の店舗情報が表示されます。会社名・会食日時・相手の名前はリンクに含まれません。</p>{message && <p role="status">{message}</p>}{manualUrl && <input aria-label="手動コピー用の比較リンク" readOnly value={manualUrl} onFocus={event => event.target.select()} />}</div>;
 }

@@ -170,7 +170,7 @@ export default function Admin() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <p className="sample-notice">保存した情報は検索結果には反映されません。送信・公開には、運営側でのデータベース接続と内容確認が必要です。</p>
+          <p className="sample-notice">保存しても、店舗への申請やサイトへの掲載は行われません。下書きはこのブラウザ内に残ります。共有端末では個人情報を入力しないでください。</p>
           {/* Basic Info */}
           <Section title="基本情報" icon={Building2}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -192,7 +192,7 @@ export default function Admin() {
               </Field>
             </div>
             <Field label="店舗説明">
-              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="店舗の特徴やビジネス利用上の強みを記入してください。" className={`${inputCls} resize-y`} />
+              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="料理や席など、お店の特徴を記入してください。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -235,12 +235,12 @@ export default function Admin() {
                   {PRIVATE_ROOM_TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </Field>
-              <Field label="個室収容人数">
+              <Field label="個室の利用人数">
                 <input type="text" value={form.privateRoomCapacity} onChange={(e) => update('privateRoomCapacity', e.target.value)} placeholder="2〜8名 × 3室" className={inputCls} />
               </Field>
             </div>
             <Field label="個室の詳細説明">
-              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="防音性能、広さ、設備、雰囲気などを具体的に。" className={`${inputCls} resize-y`} />
+              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="人数、仕切り、広さ、設備など、確認できたことを記入してください。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -257,7 +257,7 @@ export default function Admin() {
               </Field>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="総収容人数">
+              <Field label="総席数">
                 <input type="number" value={form.capacity || ''} onChange={(e) => update('capacity', Number(e.target.value))} min={0} className={inputCls} />
               </Field>
               <Field label="1名あたり平均単価（円）">
@@ -315,7 +315,7 @@ export default function Admin() {
 
           {/* Service Level */}
           <Section title="接客レベル" icon={Star}>
-            <p className="text-sm text-slate-500">接客の総合レベルを⭐️で評価してください。</p>
+            <p className="text-sm text-slate-500">接客の評価例を1〜5で選んでください。</p>
             <div className="flex flex-wrap items-center gap-1 mt-2">
               {[1, 2, 3, 4, 5].map((v) => (
                 <button
@@ -339,15 +339,15 @@ export default function Admin() {
           </Section>
 
           {/* Business Specs */}
-          <Section title="ビジネス適性スペック評価" icon={Users}>
-            <p className="text-sm text-slate-500">各項目を1〜5で評価してください（5が最高）。</p>
+          <Section title="会食で気になる点の評価例" icon={Users}>
+            <p className="text-sm text-slate-500">表示の確認用に、各項目を1〜5で選んでください。</p>
             <div className="space-y-4">
               {([
-                ['serviceQuality', '接客の洗練さ', '礼儀、日英対応、所作の丁寧さ'],
+                ['serviceQuality', '接客', '案内や料理の説明、対応できる言語'],
                 ['quietness', '静かさ', '話しやすさ、BGMの音量、隣席との距離'],
                 ['accessEase', 'アクセスのしやすさ', '最寄り駅からの距離、迷いにくさ'],
-                ['confidentiality', '機密性', '個室の防音、視線の遮蔽、声の漏れにくさ'],
-                ['ambiance', '雰囲気・格式', '空間の品格、接待相手への印象'],
+                ['confidentiality', '機密性', '個室の防音、外からの見えにくさ、声の漏れにくさ'],
+                ['ambiance', '雰囲気・格式', '内装や席の雰囲気'],
               ] as const).map(([key, label, desc]) => (
                 <div key={key} className="flex items-start gap-4">
                   <div className="flex-1">
@@ -367,7 +367,7 @@ export default function Admin() {
           </Section>
 
           {/* Tags */}
-          <Section title="タグ・推奨シーン" icon={Phone}>
+          <Section title="タグ・利用場面" icon={Phone}>
             <Field label="タグ">
               <div className="flex gap-2">
                 <input
@@ -375,7 +375,7 @@ export default function Admin() {
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  placeholder="完全個室、接待最適..."
+                  placeholder="例：完全個室、テーブル席"
                   className={inputCls}
                 />
                 <button type="button" onClick={addTag} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
@@ -392,14 +392,14 @@ export default function Admin() {
               </div>
             </Field>
 
-            <Field label="推奨利用シーン">
+            <Field label="利用場面の例">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={sceneInput}
                   onChange={(e) => setSceneInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addScene())}
-                  placeholder="役員接待、海外VIP接待..."
+                  placeholder="例：取引先との会食、社内の食事会"
                   className={inputCls}
                 />
                 <button type="button" onClick={addScene} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
@@ -424,7 +424,7 @@ export default function Admin() {
             </Field>
             {form.imageUrl && (
               <div className="mt-2 rounded-xl overflow-hidden h-40 bg-slate-100">
-                <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                <img src={form.imageUrl} alt="入力した画像のプレビュー" className="w-full h-full object-cover" />
               </div>
             )}
           </Section>

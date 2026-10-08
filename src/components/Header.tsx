@@ -50,7 +50,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
       } else await signInWithGoogle();
     } catch {
       setError(
-        "ログイン処理が完了しませんでした。時間をおいてもう一度お試しください。",
+        "操作を完了できませんでした。少し待って、もう一度お試しください。",
       );
     } finally {
       setBusy(false);
@@ -157,7 +157,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           ) : (
             <>
               <p>
-                {user ? "ログイン状態はこのブラウザで保持されます。共有端末では利用後にログアウトしてください。" : "招待済みのアカウントでログインすると、利用できる店舗情報と管理メニューがここに表示されます。"}
+                {user ? "このブラウザではログインした状態が続きます。共有端末では、使い終わったらログアウトしてください。" : "招待されたアカウントでログインしてください。アカウントに応じた店舗情報や管理メニューを利用できます。"}
               </p>
               {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>

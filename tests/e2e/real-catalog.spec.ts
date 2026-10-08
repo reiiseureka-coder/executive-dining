@@ -15,7 +15,7 @@ async function mockCatalog(page: Page, recordRequest?: () => void, catalog = row
 }
 test('homepage and primary search use real catalog, while six-sample demo stays explicit', async ({ page, isMobile }) => {
   await mockCatalog(page); await page.goto(`${base}/#/nagoya`);
-  await expect(page.getByText('確認済み掲載 2件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 2件')).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
   await page.getByRole('button', { name: '店舗一覧', exact: true }).click();
@@ -24,7 +24,7 @@ test('homepage and primary search use real catalog, while six-sample demo stays 
   await page.goto(`${base}/#/demo`);
   await expect(page.getByText('掲載サンプル 6 店')).toBeVisible();
   await page.getByRole('button', { name: 'すべてのお店', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'サンプルで検索を試す。' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'サンプルで検索を試す' })).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(6);
 });
 test('real filters, saved candidates and detail URLs preserve price/closure evidence across history and reload', async ({ page }) => {
@@ -33,11 +33,11 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('栄 半個室');
   await page.getByLabel('料理', { exact: true }).selectOption('日本料理');
   await page.getByLabel('確認できる情報', { exact: true }).selectOption('price');
-  await expect(page.getByText('確認済み掲載 1件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
   await page.getByRole('button', { name: `候補に保存：${rows[0].name}`, exact: true }).click();
   await page.getByLabel('保存した候補のみ', { exact: true }).check();
   const listUrl = page.url();
-  await page.getByRole('button', { name: '詳細と確認情報を見る', exact: true }).click();
+  await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/nagoya/${rows[0].id}`));
   await expect(page.getByRole('heading', { name: rows[0].name })).toBeVisible();
   await expect(page.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
@@ -47,7 +47,7 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
   await expect(page.getByLabel('保存した候補のみ', { exact: true })).toBeChecked();
   await page.goForward(); await expect(page.getByRole('heading', { name: rows[0].name })).toBeVisible();
   await page.reload(); await expect(page.getByRole('button', { name: `候補から外す：${rows[0].name}`, exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: '検索条件を保って一覧へ', exact: true }).click();
+  await page.getByRole('button', { name: '検索結果に戻る', exact: true }).click();
   await expect(page).toHaveURL(listUrl);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
@@ -62,7 +62,7 @@ test('map pins follow real filters without reloading the base style and missing 
   await expect(page.locator(`#verified-${rows[0].id}`)).toHaveClass(/is-selected/);
   await page.getByLabel('料理', { exact: true }).selectOption('中国料理');
   await expect(page.locator('.restaurant-map-pin')).toHaveCount(0);
-  await expect(page.getByText('確認済み掲載 1件')).toBeVisible();
+  await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
   expect(styles).toBe(beforeFilter);
 });
 test('saved storage failure is visible and no successful durable-save claim is made', async ({ page }) => {
@@ -77,7 +77,7 @@ test('saved storage failure is visible and no successful durable-save claim is m
 test('missing or unpublished detail stays unavailable without substituting sample data', async ({ page }) => {
   await page.route('https://test-project.supabase.co/**', route => route.fulfill({ json: [] }));
   await page.goto(`${base}/#/nagoya/${rows[0].id}?query=栄`);
-  await expect(page.getByRole('heading', { name: 'この店舗の公開情報は見つかりません' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'この店舗の情報は現在表示できません' })).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   await page.getByRole('button', { name: '一覧へ戻る', exact: true }).click();
   await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('栄');
@@ -88,7 +88,7 @@ test('compare preserves conditions and unknown fields through detail, history an
   for (const row of rows) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   await page.getByRole('button', { name: '選んだお店を比較', exact: true }).click();
   const comparisonUrl = page.url();
-  await expect(page.getByRole('heading', { name: '会食の候補を、並べて確認。' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '候補のお店を比較する' })).toBeVisible();
   const table = page.getByRole('table');
   await expect(table.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
   await expect(table.getByText('2026年10月5日は休業。再開後の空席は要確認')).toBeVisible();
@@ -145,7 +145,7 @@ test('comparison copy reports success only after the clipboard accepts the ident
 test('shared comparisons do not restore unpublished or invalid identifiers from local data', async ({ page }) => {
   await mockCatalog(page, undefined, [rows[1]]);
   await page.goto(`${base}/#/compare?ids=${rows[0].id},${rows[1].id}`);
-  await expect(page.getByText('表示可能な候補 1 / 2件', { exact: true })).toBeVisible();
+  await expect(page.getByText('表示できる候補 1 / 2件', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: rows[0].name })).toHaveCount(0);
   await page.goto(`${base}/#/compare?ids=${rows[0].id}`);
   await expect(page.getByRole('heading', { name: '比較できる公開情報がありません' })).toBeVisible();
@@ -173,15 +173,15 @@ test('visit drafts stay local, recover during navigation and restore saved month
   await draft.getByLabel('訪問月', { exact: true }).fill('2026-09');
   await draft.getByLabel('店舗との関係', { exact: true }).selectOption('customer');
   await draft.getByLabel('体験の総合評価', { exact: true }).selectOption('4');
-  await draft.getByLabel('本人の体験本文', { exact: true }).fill('自分で訪問して食事をした、確認用の体験メモです。');
-  await page.getByRole('button', { name: '検索条件を保って一覧へ', exact: true }).click();
-  await page.locator(`#verified-${rows[0].id}`).getByRole('button', { name: '詳細と確認情報を見る', exact: true }).click();
+  await draft.getByLabel('来店したときの体験・感想', { exact: true }).fill('自分で訪問して食事をした、確認用の体験メモです。');
+  await page.getByRole('button', { name: '検索結果に戻る', exact: true }).click();
+  await page.locator(`#verified-${rows[0].id}`).getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await draft.locator('summary').click();
   await expect(draft.getByLabel('下書きのメモ名（非公開）', { exact: true })).toHaveValue('会食メモ');
   await draft.getByLabel('本人が実際に訪問した体験です', { exact: true }).check();
   await draft.getByLabel('個人情報・会食相手・機密情報を含めていません', { exact: true }).check();
-  await draft.getByRole('button', { name: '公開前の表示内容を確認', exact: true }).click();
-  await expect(page.getByRole('region', { name: '口コミの送信前確認' })).toBeVisible();
+  await draft.getByRole('button', { name: '下書きの内容を確認', exact: true }).click();
+  await expect(page.getByRole('region', { name: '口コミの下書き確認' })).toBeVisible();
   await expect(draft.getByRole('button', { name: '口コミ送信は準備中', exact: true })).toBeDisabled();
   await draft.getByRole('button', { name: 'このブラウザに下書き保存', exact: true }).click();
   await expect(draft.getByText('このブラウザに下書きを保存しました。送信・受付・公開はされていません。')).toBeVisible();
@@ -195,7 +195,7 @@ test('visit drafts stay local, recover during navigation and restore saved month
 test('draft validation, delete cancellation and confirmed removal never act as submission', async ({ page }) => {
   await mockCatalog(page); await page.goto(`${base}/#/nagoya/${rows[0].id}`);
   const draft = page.locator('.visit-draft'); await draft.locator('summary').click();
-  await draft.getByRole('button', { name: '公開前の表示内容を確認', exact: true }).click();
+  await draft.getByRole('button', { name: '下書きの内容を確認', exact: true }).click();
   await expect(draft.getByRole('alert')).toContainText('本人の実際の訪問体験');
   await draft.getByLabel('下書きのメモ名（非公開）', { exact: true }).fill('途中の下書き');
   await draft.getByRole('button', { name: 'このブラウザに下書き保存', exact: true }).click();
@@ -247,6 +247,6 @@ test('official correction and review report drafts remain distinct, unsent and w
   await report.getByLabel('確認してほしい内容', { exact: true }).fill('個人を特定できる記載の確認を希望します。');
   await report.getByRole('button', { name: 'メモの入力内容を確認', exact: true }).click();
   await expect(report.getByRole('button', { name: '通報の受付は準備中', exact: true })).toBeDisabled();
-  await expect(page.getByText('利用者個人の体験・感想です。公式情報の確認記録とは異なります。')).toBeVisible();
+  await expect(page.getByText('利用者の体験や感想を掲載しています。店舗の公式情報とは分けてご覧ください。')).toBeVisible();
   expect(calls).toEqual([]);
 });

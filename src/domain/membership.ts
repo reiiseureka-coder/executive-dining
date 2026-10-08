@@ -30,8 +30,8 @@ export function decodeOperatorBadge(value: unknown): OperatorBadge {
 }
 // Recognition and feature entitlements never feed identity verification, review scores or search order.
 export const MEMBERSHIP_COPY = {
-  member: { name: 'Member', description: '店舗の比較・候補保存・基本の検索と口コミ。最初の使いやすさを、すべての会員に。' },
-  plus: { name: 'Plus', description: '複数の会食リスト、条件セットの再利用、比較メモの書き出しなど。追加機能を準備しています。' },
-  prime: { name: 'Prime', description: '初期参加への感謝を示す称号。決められたPlus機能の継続特典を予定しています。' },
+  member: { name: 'Member', description: '検索、候補の保存、店舗の比較、口コミなど、基本の機能を使うプランです。' },
+  plus: { name: 'Plus', description: '会食ごとのリスト作成、検索条件の保存、比較メモの書き出しなどを検討しています。' },
+  prime: { name: 'Prime', description: '初期から参加する方の称号です。一部のPlus機能を使える特典を検討しています。内容や期間は未定です。' },
   owner: { name: 'Owner', description: '運営メンバーの表示。会員プランや投稿数で取得することはできません。' },
 } as const;
