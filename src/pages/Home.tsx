@@ -30,7 +30,7 @@ export default function Home({ onNavigate }: Props) {
       <div className="area-list city-list">{['東京', '大阪', '名古屋', '福岡'].map(city => <button key={city} disabled={city !== '名古屋'} onClick={() => explore()}><span><strong>{city}</strong><small>{city === '名古屋' ? '店舗情報を見る' : '準備中'}</small></span>{city === '名古屋' && <ArrowRight size={20} />}</button>)}</div>
     </section>
     <section className="page-width section-space home-value">
-      <div className="section-heading"><div><h2>会食の店選びに、確かめたいこと。</h2></div></div>
+      <div className="section-heading"><div><h2 className="home-value-title"><span>会食の店選びに、</span><span>確かめたいこと。</span></h2></div></div>
       <div className="home-principles">{[
         ['個室と料金のこと','コース料金や個室の条件を、出典・確認日とともに。予約前に確かめたい情報をまとめます。'],
         ['気になるお店を、候補に。','保存した候補から最大3店の料金や個室の条件を比較できます。候補はこのブラウザ内に保存されます。'],

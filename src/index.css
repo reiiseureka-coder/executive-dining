@@ -1948,6 +1948,7 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
 /* Quiet editorial hierarchy: navigation labels need no decorative numbering. */
 .home-cities .city-list button:not(:disabled) { background: #edf0e6; }
 .home-cities .city-list button:not(:disabled):hover { background: #e4e9da; }
+.home-value-title span { display: inline-block; }
 .home-value .home-principles h3 { margin-top: 0; }
 .home-value .home-principles p { font-size: 14px; }
 .enterprise-features h3 { margin-top: 0; }
