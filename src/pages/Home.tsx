@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import type { Page } from '../types';
 import type { SearchParams } from '../lib/search';
+import HomeCatalog from '../components/HomeCatalog';
 import { useAppAccess } from '../contexts/appAccess';
 interface Props { onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
 export default function Home({ onNavigate }: Props) {
@@ -25,6 +26,7 @@ export default function Home({ onNavigate }: Props) {
       </div>
       <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>IMAGE</span><span>写真はイメージです</span></figcaption></figure>
     </section>
+    <HomeCatalog onNavigate={onNavigate} />
     <section className="page-width section-space home-cities">
       <div className="section-heading"><div><p className="eyebrow">AREA</p><h2>エリアから探す</h2></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
       <div className="area-list city-list">{['東京', '大阪', '名古屋', '福岡'].map(city => <button key={city} disabled={city !== '名古屋'} onClick={() => explore()}><span><strong>{city}</strong><small>{city === '名古屋' ? '店舗情報を見る' : '準備中'}</small></span>{city === '名古屋' && <ArrowRight size={20} />}</button>)}</div>

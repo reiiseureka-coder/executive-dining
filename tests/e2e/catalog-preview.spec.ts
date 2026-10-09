@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { catalog, login, mock } from './helpers/ownerTrial';
 const base = 'http://127.0.0.1:4181';
-test('actual ten candidate records have read-only card and detail previews without image reuse or publication', async ({ page }, info) => {
+test('actual ten candidate records have read-only card and detail previews with labeled generated imagery and without publication', async ({ page }, info) => {
   await login(page); const writes: string[] = [];
   await page.route('https://test-project.supabase.co/**', async route => {
     const name = route.request().url().split('/').at(-1);
@@ -17,8 +17,8 @@ test('actual ten candidate records have read-only card and detail previews witho
     const editor = page.locator('.curation-card').filter({ has: page.getByRole('heading', { name: row.name, exact: true }) });
     await editor.getByText('掲載時の表示を確認する', { exact: true }).click();
     const preview = editor.getByRole('region');
-    await expect(preview.getByText('写真未登録', { exact: true })).toBeVisible();
-    await expect(preview.locator('img')).toHaveCount(0);
+    await expect(preview.getByText('イメージ', { exact: true })).toBeVisible();
+    await expect(preview.locator('img')).toHaveAttribute('alt', /実際の店舗・料理ではありません/);
     await expect(preview.getByRole('heading', { name: row.name, exact: true })).toBeVisible();
     await expect(preview.getByRole('link', { name: '公式サイトでお店を見る' })).toHaveAttribute('href', row.facts.find((f: {field:string}) => f.field === 'website').value);
     await editor.getByRole('button', { name: '詳細ページ', exact: true }).click();
@@ -54,7 +54,7 @@ test('actual ten-store search supports combined facts, normalization, empty resu
   await page.getByRole('button', { name: '検索条件をリセット', exact: true }).click(); await search.fill('名古屋浅田');
   const listUrl = page.url(); await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await expect(page.locator('.pilot-detail').getByText('未確認', { exact: true })).toHaveCount(2);
-  await expect(page.locator('.pilot-detail img')).toHaveCount(0);
+  await expect(page.locator('.pilot-detail img')).toHaveCount(1);
   await page.screenshot({ path: info.outputPath('actual-store-detail.png'), fullPage: true });
   await page.goBack(); await expect(page).toHaveURL(listUrl); await expect(search).toHaveValue('名古屋浅田');
   await page.goForward(); await page.reload(); await expect(page.getByRole('heading', { name: '名古屋浅田', exact: true })).toBeVisible();

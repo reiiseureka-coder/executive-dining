@@ -1,16 +1,19 @@
-import { Camera, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 import { factValue, safeExternalUrl, type EditorialRestaurant, type PublishedFact } from '../domain/dining';
+import { catalogImagery } from '../lib/catalogImagery';
 import { VerifiedEvidence, VerifiedFactList } from './VerifiedFacts';
 
 type DisplayRestaurant = { name: string; address: string; facts: PublishedFact[] };
-/** No image URL is inferred from a website or a provider record. Photo rights need their own evidence. */
-export function CatalogPhoto({ restaurant, detail = false }: { restaurant: Pick<DisplayRestaurant, 'facts'>; detail?: boolean }) {
+/** Generated imagery is separate from verified facts. No real photo is inferred or overwritten. */
+export function CatalogPhoto({ restaurant, detail = false, showWebsite = true }: { restaurant: Pick<DisplayRestaurant, 'facts'>; detail?: boolean; showWebsite?: boolean }) {
   const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
-  return <div className={`catalog-photo${detail ? ' catalog-photo-detail' : ''}`}>
-    <div className="catalog-photo-label"><Camera size={24} strokeWidth={1.3} aria-hidden="true" /><span>写真未登録</span><small>掲載許可を確認できた写真はまだありません</small></div>
-    {website && <a href={website} target="_blank" rel="noreferrer">公式サイトでお店を見る <ArrowUpRight size={15} aria-hidden="true" /></a>}
-  </div>;
+  const visual = catalogImagery(restaurant);
+  const [failed, setFailed] = useState(false);
+  return <figure className={`catalog-photo${detail ? ' catalog-photo-detail' : ''}`}>
+    <div className="catalog-photo-frame">{!failed ? <img src={visual.src} alt={visual.alt} width="1200" height="800" loading="lazy" onError={() => setFailed(true)} /> : <p className="catalog-image-failed">イメージを読み込めませんでした</p>}<span className="catalog-image-label">イメージ</span></div>
+    <figcaption><span>生成イメージ · 実際の店舗・料理ではありません</span>{showWebsite && website && <a href={website} target="_blank" rel="noreferrer">公式サイトでお店を見る <ArrowUpRight size={15} aria-hidden="true" /></a>}</figcaption>
+  </figure>;
 }
 export function CatalogPresentation({ restaurant, detail = false }: { restaurant: DisplayRestaurant; detail?: boolean }) {
   return <><CatalogPhoto restaurant={restaurant} detail={detail} /><div className="catalog-presentation-heading"><p className="eyebrow">{factValue(restaurant, 'genre') ?? '料理の情報は確認中'}</p><h2>{restaurant.name}</h2><p>{restaurant.address}</p></div><VerifiedFactList restaurant={restaurant} compact={!detail} />{detail && <><p className="catalog-filter-note">コースの価格と利用条件は、確認した時点の情報です。空席・防音性は未確認です。予約前に最新情報をお店へご確認ください。</p><VerifiedEvidence restaurant={restaurant} /></>}</>;
