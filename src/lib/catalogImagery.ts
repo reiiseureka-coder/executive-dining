@@ -6,6 +6,9 @@ export const diningImagery = {
 } as const;
 /** Decorative fallback only. Never turn this into a verified restaurant fact or photo. */
 export function catalogImagery(restaurant: { facts: PublishedFact[] }) {
+  const name = factValue(restaurant, 'name') ?? '';
+  // Mix in a neutral table illustration consistently, without claiming venue-specific decor.
+  if (name && [...name].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 3 === 1) return diningImagery.room;
   const genre = factValue(restaurant, 'genre') ?? '';
   return /中国|広東|中華/.test(genre) ? diningImagery.chinese : /日本|和食|懐石|会席|加賀/.test(genre) ? diningImagery.japanese : diningImagery.room;
 }

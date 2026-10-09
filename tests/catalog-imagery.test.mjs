@@ -8,6 +8,9 @@ test('illustrative cuisine selection is deterministic and never infers venue att
   assert.equal(catalogImagery(row('中国料理・広東料理')).src, diningImagery.chinese.src);
   assert.equal(catalogImagery(row('イタリア料理')).src, diningImagery.room.src);
   assert.equal(catalogImagery({ facts: [] }).src, diningImagery.room.src);
+  const named = { facts: [{ field: 'name', value: '中国料理「王朝」' }, { field: 'genre', value: '中国料理' }] };
+  assert.equal(catalogImagery(named).src, diningImagery.room.src);
+  assert.equal(catalogImagery(named).src, catalogImagery(named).src);
   for (const image of Object.values(diningImagery)) {
     assert.match(image.alt, /生成イメージ。実際の店舗・料理ではありません/);
     assert.ok(existsSync(new URL(`../public${image.src}`, import.meta.url)));

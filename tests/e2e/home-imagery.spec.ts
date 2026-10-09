@@ -14,6 +14,7 @@ test('anonymous home shows three honest generated image entry points without pri
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
     await page.screenshot({ path: info.outputPath(`home-images-anonymous-${width}.png`), fullPage: true });
   }
   await page.getByRole('link', { name: /和食を囲む一席/ }).click();
@@ -30,6 +31,7 @@ test('invited home shows three real stores and consistent placeholders across de
     await page.setViewportSize({ width, height: 900 });
     for (const img of await cards.locator('img').all()) { await img.scrollIntoViewIfNeeded(); await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true); }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
     await page.screenshot({ path: info.outputPath(`home-images-private-${width}.png`), fullPage: true });
   }
   const src = await cards.first().locator('img').getAttribute('src');
