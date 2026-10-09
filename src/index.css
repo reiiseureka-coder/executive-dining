@@ -1611,10 +1611,10 @@ figure {
 .home-principles h3 { font-size: 20px; font-weight: 500; margin: 16px 0; }
 .home-principles p, .partner-page p, .home-partners p { line-height: 1.9; color: #68705f; }
 .home-partners { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.home-partners a { border: 1px solid #c6ccbd; padding: 30px; color: inherit; text-decoration: none; transition: background .2s; }
+.home-partners a { border-top: 1px solid #c6ccbd; padding: 20px 0; color: inherit; text-decoration: none; transition: background .2s; }
 .home-partners a:hover { background: #e9eddf; }
 .home-partners small { font-size: 10px; letter-spacing: .15em; }
-.home-partners h3 { font-size: 25px; font-weight: 400; margin: 20px 0 12px; }
+.home-partners h3 { font: 400 25px/1.6 "Noto Serif JP", serif; margin: 0 0 12px; }
 .home-partners span { display: flex; align-items: center; gap: 14px; font-size: 12px; margin-top: 30px; }
 .partner-hero { padding-top: 38px; padding-bottom: 46px; }
 .partner-hero > .eyebrow { margin-top: 58px; }
@@ -1714,10 +1714,10 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .area-list strong { font-size: 22px; }
   .home-principles h3 { font-size: 20px; margin-block: 12px; }
   .home-principles p, .home-partners p { font-size: 15px; }
-  .home-partners a { padding: 22px; }
+  .home-partners a { padding: 20px 0; }
   .home-partners span { font-size: 14px; margin-top: 22px; min-height: 44px; }
   .home-partners small { font-size: 11px; }
-  .home-partners h3 { margin-top: 14px; }
+  .home-partners h3 { margin-top: 0; }
   .planning-inner > div > p:not(.eyebrow), .planning-inner li p { font-size: 14px; }
   .planning-inner li h3 { font-size: 16px; line-height: 1.8; }
   .footer-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
@@ -1919,7 +1919,7 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .home-cities .city-list .area-number { display: none; }
   .home-cities .city-list strong { font-size: 19px; }
   .home-cities .city-list small { display: block; margin-left: 0; font-size: 12px; }
-  .home-cities .city-list button > span:nth-child(2) { display: block; }
+  .home-cities .city-list button > span { display: block; }
   .home-cities .city-list svg { width: 16px; flex-shrink: 0; }
   .home-value .section-heading { margin-bottom: 12px; }
   .home-value .home-principles { gap: 0; }
@@ -1943,4 +1943,15 @@ button, a, input, select, textarea, summary { touch-action: manipulation; }
   .enterprise-features article, .enterprise-features article:first-child { padding-block: 18px; }
   .enterprise-features h3 { margin-block: 8px; font-size: 18px; }
   .enterprise-features p { line-height: 1.8; }
+}
+
+/* Quiet editorial hierarchy: navigation labels need no decorative numbering. */
+.home-cities .city-list button:not(:disabled) { background: #edf0e6; }
+.home-cities .city-list button:not(:disabled):hover { background: #e4e9da; }
+.home-value .home-principles h3 { margin-top: 0; }
+.home-value .home-principles p { font-size: 14px; }
+.enterprise-features h3 { margin-top: 0; }
+@media (max-width: 760px) {
+  .home-value .home-principles p { font-size: 15px; }
+  .enterprise-features h3 { margin-top: 0; }
 }
