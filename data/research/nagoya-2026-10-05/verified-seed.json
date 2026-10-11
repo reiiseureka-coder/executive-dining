@@ -1,0 +1,1652 @@
+{
+  "schema_version": "1.0",
+  "project": "ExecutiveDining Nagoya bounded seed",
+  "prepared_at": "2026-10-05T05:54:55.597094+00:00",
+  "verification_date": "2026-10-05",
+  "venue_local_timezone": "Asia/Tokyo",
+  "count": 10,
+  "scope": "Ten representative venues near Nagoya Station, Fushimi and Sakae. Not exhaustive, not ranked, not a availability search.",
+  "verification_policy": {
+    "verified_official": "A specific factual field was read on a current official venue/operator page; this is not a blanket quality or operating-status certification.",
+    "unknown": "Not established in this bounded pass; never display as false/no.",
+    "coordinates": "No exact coordinate was independently verified. Public UI must not present the provider coordinates as verified navigation pins.",
+    "private_room": "Private, semi-private and movable-partition room categories remain distinct; soundproofing never inferred.",
+    "budgets": "Published course evidence only. Null ceiling means no upper bound verified, not free/unlimited. Room fees, service, tax and drinks must retain their qualifiers."
+  },
+  "openpoi": {
+    "docs_url": "https://api.openpoiapi.com/openapi.json",
+    "attribution_url": "https://openpoiapi.com/attribution.html",
+    "search_requests": [
+      {
+        "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+        "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+        "returned_count": 8
+      },
+      {
+        "request_url": "https://api.openpoiapi.com/v1/search?q=Kawabun+Asada+Genji+Dynasty+Ryujo+Kuretake+Kitcho+%E3%83%92%E3%83%AB%E3%83%88%E3%83%B3+%E8%A6%B3%E5%85%89%E3%83%9B%E3%83%86%E3%83%AB+%E6%9D%B1%E6%80%A5%E3%83%9B%E3%83%86%E3%83%AB&center=136.900%2C35.170&radius=3500&limit=100",
+        "fetched_at": "2026-10-05T05:49:38.790627+00:00",
+        "returned_count": 9
+      }
+    ],
+    "raw_artifacts": [
+      "openpoi-discovery.json",
+      "openpoi-discovery-2.json"
+    ],
+    "stable_provider_id_available": false,
+    "coverage_note": "These are two targeted discovery queries, not an exhaustive local inventory. Five of ten selected venues have candidate OpenPOI matches.",
+    "preserve_arrays": [
+      "licenses",
+      "attributions"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "asada-home",
+      "url": "https://asadayaihei.co.jp/nagoya/",
+      "title": "名古屋浅田",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine",
+        "sunday_dinner_closed"
+      ]
+    },
+    {
+      "source_id": "asada-address",
+      "url": "https://www.asadayaihei.co.jp/map/index.html",
+      "title": "浅田 交通アクセス",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "address"
+      ]
+    },
+    {
+      "source_id": "asada-rooms",
+      "url": "https://www.asadayaihei.co.jp/nagoya/room/",
+      "title": "名古屋浅田 お部屋",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "private_rooms"
+      ]
+    },
+    {
+      "source_id": "asada-dinner",
+      "url": "https://www.asadayaihei.co.jp/nagoya/dinner/",
+      "title": "名古屋浅田 ご夕食",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "dinner_course_prices",
+        "service_charge",
+        "seat_charge"
+      ]
+    },
+    {
+      "source_id": "kagaya",
+      "url": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+      "title": "日本料理 加賀屋 名古屋店",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "address",
+        "cuisine",
+        "private_rooms"
+      ]
+    },
+    {
+      "source_id": "meieki-access",
+      "url": "https://www.nadaman.co.jp/pages/restaurant_meieki_access",
+      "title": "名駅 なだ万茶寮 営業時間・アクセス",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "address"
+      ]
+    },
+    {
+      "source_id": "meieki-rooms",
+      "url": "https://www.nadaman.co.jp/pages/restaurant_meieki_menu_private-room",
+      "title": "名駅 なだ万茶寮 個室",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "private_rooms",
+        "private_room_menu_prices",
+        "room_charge"
+      ]
+    },
+    {
+      "source_id": "meieki-home",
+      "url": "https://www.nadaman.co.jp/en/pages/restaurant_meieki/",
+      "title": "Meieki NADAMAN Saryo",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine"
+      ]
+    },
+    {
+      "source_id": "kanko-access",
+      "url": "https://www.nagoyakankohotel.co.jp/access/",
+      "title": "名古屋観光ホテル アクセス",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "direct_official_http_read",
+      "supports": [
+        "hotel_address"
+      ],
+      "fetched_at": "2026-10-05T05:51:09.303955+00:00"
+    },
+    {
+      "source_id": "kuretake",
+      "url": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+      "title": "日本料理 呉竹",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine",
+        "floor",
+        "private_rooms"
+      ]
+    },
+    {
+      "source_id": "kuretake-rooms",
+      "url": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/kuretake/",
+      "title": "日本料理 呉竹 個室",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "private_rooms",
+        "room_charge"
+      ]
+    },
+    {
+      "source_id": "kanko-room-plans",
+      "url": "https://www.nagoyakankohotel.co.jp/fp/detail/50032",
+      "title": "レストラン 個室プラン",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "kuretake_private_room_course_prices",
+        "ryujo_private_room_course_prices"
+      ]
+    },
+    {
+      "source_id": "ryujo",
+      "url": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+      "title": "中国料理 柳城",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine",
+        "floor",
+        "private_rooms"
+      ]
+    },
+    {
+      "source_id": "hilton-rooms",
+      "url": "https://nagoya.hiltonjapan.co.jp/restaurants/private_list",
+      "title": "ヒルトン名古屋 個室のご案内",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "private_rooms",
+        "hotel_address",
+        "floor",
+        "temporary_closure"
+      ]
+    },
+    {
+      "source_id": "genji",
+      "url": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+      "title": "日本料理 源氏 会席コーナー",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine",
+        "floor",
+        "temporary_closure"
+      ]
+    },
+    {
+      "source_id": "ouchou",
+      "url": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+      "title": "中国料理 王朝",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "cuisine",
+        "floor",
+        "temporary_closure"
+      ]
+    },
+    {
+      "source_id": "nagoya-nadaman-access",
+      "url": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+      "title": "名古屋 なだ万 営業時間・アクセス",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "direct_official_http_read",
+      "supports": [
+        "name",
+        "address"
+      ],
+      "fetched_at": "2026-10-05T05:51:10.754076+00:00"
+    },
+    {
+      "source_id": "nagoya-nadaman-rooms",
+      "url": "https://www.nadaman.co.jp/pages/restaurant_nagoya_table_private-rooms",
+      "title": "名古屋 なだ万 テーブル個室",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "private_rooms",
+        "movable_partitions"
+      ]
+    },
+    {
+      "source_id": "nagoya-nadaman-cuisine",
+      "url": "https://www.tokyuhotels.co.jp/nagoya-h/restaurant/nadaman/index.html",
+      "title": "日本料理 なだ万",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "cuisine"
+      ]
+    },
+    {
+      "source_id": "nangoku",
+      "url": "https://nangokusyuka.co.jp/store/nagoya.html",
+      "title": "南国酒家 名古屋店",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "name",
+        "address",
+        "cuisine",
+        "private_rooms",
+        "room_charge",
+        "closed_dates"
+      ]
+    },
+    {
+      "source_id": "nangoku-dinner",
+      "url": "https://www.tokyuhotels.co.jp/nagoya-h/restaurant/nangoku/dinner/index.html",
+      "title": "南国酒家 ディナー",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "official_page_read",
+      "supports": [
+        "dinner_course_prices",
+        "tax_service_inclusion",
+        "minimum_party_size"
+      ]
+    },
+    {
+      "source_id": "kitcho-rooms",
+      "url": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+      "title": "京都 吉兆 名古屋店 お部屋",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "direct_official_http_read",
+      "supports": [
+        "name",
+        "address",
+        "private_rooms"
+      ],
+      "fetched_at": "2026-10-05T05:51:11.168278+00:00"
+    },
+    {
+      "source_id": "kitcho-menu",
+      "url": "https://kyoto-kitcho.com/nagoya-dishes/",
+      "title": "京都 吉兆 名古屋店 お料理",
+      "source_type": "venue_or_operator_official",
+      "observed_on": "2026-10-05",
+      "retrieval_method": "direct_official_http_read",
+      "supports": [
+        "cuisine",
+        "private_room_course_prices",
+        "tax_service_inclusion"
+      ],
+      "fetched_at": "2026-10-05T05:51:11.488334+00:00"
+    }
+  ],
+  "venues": [
+    {
+      "id": "nagoya-asada",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "名古屋浅田",
+      "area": "名古屋駅",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ・タワーズプラザ12階",
+      "cuisine": "日本料理・加賀料理",
+      "official_url": "https://asadayaihei.co.jp/nagoya/",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "asada-home"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "asada-address"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "asada-home"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "asada-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "掘り炬燵式お座敷",
+            "type": "horigotatsu_private",
+            "party_min": null,
+            "party_max": 12,
+            "count": 2
+          },
+          {
+            "name": "掘り炬燵式お座敷",
+            "type": "horigotatsu_private",
+            "party_min": null,
+            "party_max": 8,
+            "count": 1
+          },
+          {
+            "name": "掘り炬燵式お座敷",
+            "type": "horigotatsu_private",
+            "party_min": null,
+            "party_max": 6,
+            "count": 2
+          },
+          {
+            "name": "掘り炬燵式お座敷",
+            "type": "horigotatsu_private",
+            "party_min": null,
+            "party_max": 4,
+            "count": 1
+          },
+          {
+            "name": "畳床・角テーブル",
+            "type": "tatami_chair_private",
+            "party_min": null,
+            "party_max": 4,
+            "count": 1
+          },
+          {
+            "name": "畳床・丸テーブル",
+            "type": "tatami_chair_private",
+            "party_min": null,
+            "party_max": 3,
+            "count": 1
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 16500,
+        "max": 45100,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "夕食会席 16,500〜45,100円（税込・サービス料15%別、平日席料別）",
+        "tax_included": true,
+        "service_included": false,
+        "source_ids": [
+          "asada-dinner"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "Published prices for six standard dinner courses; drinks excluded.",
+          "Weekday dinner seat charge: inner room 1,650 JPY/person; view room 2,200 JPY/person.",
+          "The 加賀 course is not sold at dinner in December."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Separate room or seat charge; see price label and notes.",
+        "meal_period": "dinner",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unknown",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [],
+      "openpoi_search_status": "not_found_in_two_bounded_queries_not_proof_of_absence",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [
+        "日曜の夕食は休業。",
+        "個室料・席料は時間帯と部屋により異なる。"
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "kagaya-nagoya",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "日本料理 加賀屋 名古屋店",
+      "area": "名古屋駅",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階レストラン街",
+      "cuisine": "日本料理・会席",
+      "official_url": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "kagaya"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "kagaya"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "kagaya"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "kagaya"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "個室8室",
+            "type": "private_unspecified",
+            "party_min": 4,
+            "party_max": 22,
+            "count": 8,
+            "capacity_note": "Operator gives overall range for the eight rooms; not each room capacity."
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "unknown",
+        "currency": "JPY",
+        "min": null,
+        "max": null,
+        "label_ja": "要確認"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified_provider_coordinates",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [
+        {
+          "provider": "OpenPOI",
+          "provider_id": null,
+          "match_status": "candidate_name_and_city_match",
+          "match_note": "Name/city reviewed; provider identity and exact coordinates are not independently corroborated. Do not use as a stable ID.",
+          "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+          "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+          "raw_record": {
+            "name": "加賀屋名古屋店",
+            "name_kana": "",
+            "prefecture": "",
+            "city": "名古屋市中村区",
+            "address": "",
+            "category": "lodging",
+            "business_type": "lodging",
+            "lat": 35.1713266,
+            "lng": 136.88278728,
+            "level": "",
+            "source": "overture",
+            "licenses": [
+              "CDLA-Permissive-2.0"
+            ],
+            "attributions": [
+              "Overture Maps Foundation, overturemaps.org"
+            ]
+          }
+        }
+      ],
+      "openpoi_search_status": "candidate_match_found",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [
+        "OpenPOI category is lodging; official restaurant site confirms this is a restaurant. Do not overwrite verified cuisine with provider category.",
+        "Official dinner menu linked, but no numeric budget imported in this pass."
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "meieki-nadaman-saryo",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "名駅 なだ万茶寮",
+      "area": "名古屋駅",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階",
+      "cuisine": "日本料理・懐石",
+      "official_url": "https://www.nadaman.co.jp/pages/restaurant_meieki_access",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "meieki-access"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "meieki-access"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "meieki-home"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "meieki-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "個室A",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 6,
+            "notes": "土日祝は4〜6名"
+          },
+          {
+            "name": "個室D",
+            "type": "table_chair_private",
+            "party_min": 4,
+            "party_max": 10
+          },
+          {
+            "name": "個室E",
+            "type": "table_chair_private",
+            "party_min": 12,
+            "party_max": 30
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 7260,
+        "max": 8470,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "掲載個室料理：平日 茶寮膳7,260円／土日祝 ミニ懐石8,470円（税サ込、個室料別）",
+        "tax_included": true,
+        "service_included": true,
+        "source_ids": [
+          "meieki-rooms"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "These are named private-room menu options, not total spend or the full dinner menu range.",
+          "Room charge 550 JPY/person; for five people or fewer, 3,300 JPY/room.",
+          "Busy-period use may be limited to two hours."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Separate room or seat charge; see price label and notes.",
+        "meal_period": "private_room_plan_menu_time_unspecified",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified_provider_coordinates",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [
+        {
+          "provider": "OpenPOI",
+          "provider_id": null,
+          "match_status": "candidate_name_and_city_match",
+          "match_note": "Name/city reviewed; provider identity and exact coordinates are not independently corroborated. Do not use as a stable ID.",
+          "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+          "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+          "raw_record": {
+            "name": "なだ万茶寮・名駅店",
+            "name_kana": "",
+            "prefecture": "",
+            "city": "名古屋市中村区",
+            "address": "",
+            "category": "restaurant",
+            "business_type": "restaurant",
+            "lat": 35.17097503,
+            "lng": 136.88276938,
+            "level": "",
+            "source": "overture",
+            "licenses": [
+              "CDLA-Permissive-2.0"
+            ],
+            "attributions": [
+              "Overture Maps Foundation, overturemaps.org"
+            ]
+          }
+        }
+      ],
+      "openpoi_search_status": "candidate_match_found",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "kuretake-nagoya-kanko",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "日本料理 呉竹",
+      "area": "伏見",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル2階",
+      "cuisine": "日本料理・会席",
+      "official_url": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "kuretake"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "kanko-access",
+            "kuretake"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "kuretake"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "kuretake-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "個室",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 6,
+            "room_charge_jpy": 3000
+          },
+          {
+            "name": "個室",
+            "type": "private_unspecified",
+            "party_min": 7,
+            "party_max": 12,
+            "room_charge_jpy": 6000
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 15000,
+        "max": null,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "個室プラン：夜会席15,000円〜、室料3,000円〜",
+        "tax_included": null,
+        "service_included": null,
+        "source_ids": [
+          "kanko-room-plans"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "Private-room plan price chosen deliberately; general restaurant minimum differs and must not be substituted.",
+          "Tax/service inclusion not established from the plan summary; confirm before presenting a total."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Separate room or seat charge; see price label and notes.",
+        "meal_period": "dinner",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unknown",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [],
+      "openpoi_search_status": "not_found_in_two_bounded_queries_not_proof_of_absence",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [
+        "ホール貸切12〜20名は個室とは別枠。昇龍の鉄板焼個室も呉竹個室とは別枠。"
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "ryujo-nagoya-kanko",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "中国料理 柳城",
+      "area": "伏見",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル1階",
+      "cuisine": "中国料理・広東料理",
+      "official_url": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "ryujo"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "kanko-access",
+            "ryujo"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "ryujo"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "ryujo"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "個室",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 4
+          },
+          {
+            "name": "個室",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 6
+          },
+          {
+            "name": "個室",
+            "type": "private_unspecified",
+            "party_min": 7,
+            "party_max": 16
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 12500,
+        "max": null,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "個室プラン：ディナー12,500円〜、室料2,000円〜",
+        "tax_included": null,
+        "service_included": null,
+        "source_ids": [
+          "kanko-room-plans"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "Tax/service inclusion not established from the plan summary; confirm before presenting a total."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Separate room or seat charge; see price label and notes.",
+        "meal_period": "dinner",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unknown",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [],
+      "openpoi_search_status": "not_found_in_two_bounded_queries_not_proof_of_absence",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "genji-hilton-nagoya",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "日本料理「源氏」会席コーナー",
+      "area": "伏見",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+      "cuisine": "日本料理・会席",
+      "official_url": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "genji"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "hilton-rooms"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "genji"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "hilton-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "雅",
+            "type": "private_unspecified",
+            "party_min": 6,
+            "party_max": 10
+          },
+          {
+            "name": "桐楓",
+            "type": "private_unspecified",
+            "party_min": 7,
+            "party_max": 12
+          },
+          {
+            "name": "葵・桐・楓",
+            "type": "horigotatsu_private",
+            "party_min": null,
+            "party_max": 4,
+            "capacity_note": "Each named room lists capacity four."
+          },
+          {
+            "name": "桐・楓",
+            "type": "tatami_private",
+            "party_min": null,
+            "party_max": 6,
+            "capacity_note": "Each named room lists capacity six; alternative layout, not extra rooms."
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "unknown",
+        "currency": "JPY",
+        "min": null,
+        "max": null,
+        "label_ja": "要確認"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified_provider_coordinates",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [
+        {
+          "provider": "OpenPOI",
+          "provider_id": null,
+          "match_status": "candidate_name_and_city_match",
+          "match_note": "Name/city reviewed; provider identity and exact coordinates are not independently corroborated. Do not use as a stable ID.",
+          "request_url": "https://api.openpoiapi.com/v1/search?q=Kawabun+Asada+Genji+Dynasty+Ryujo+Kuretake+Kitcho+%E3%83%92%E3%83%AB%E3%83%88%E3%83%B3+%E8%A6%B3%E5%85%89%E3%83%9B%E3%83%86%E3%83%AB+%E6%9D%B1%E6%80%A5%E3%83%9B%E3%83%86%E3%83%AB&center=136.900%2C35.170&radius=3500&limit=100",
+          "fetched_at": "2026-10-05T05:49:38.790627+00:00",
+          "raw_record": {
+            "name": "GENJI",
+            "name_kana": "",
+            "prefecture": "",
+            "city": "名古屋市中区",
+            "address": "",
+            "category": "restaurant",
+            "business_type": "restaurant",
+            "lat": 35.16758896,
+            "lng": 136.8946919,
+            "level": "",
+            "source": "overture",
+            "licenses": [
+              "CDLA-Permissive-2.0"
+            ],
+            "attributions": [
+              "Overture Maps Foundation, overturemaps.org"
+            ]
+          }
+        }
+      ],
+      "openpoi_search_status": "candidate_match_found",
+      "operating_status": {
+        "status": "temporarily_unavailable",
+        "open_now": false,
+        "booking_availability": "unavailable_during_published_closure",
+        "closure_start": "2026-09-14",
+        "closure_end_local": "2026-10-06T12:00:00+09:00",
+        "time_zone": "Asia/Tokyo",
+        "source_ids": [
+          "hilton-rooms"
+        ],
+        "note": "Official notice excludes bookings and use of hotel rooms, restaurants and facilities for this period. Recheck after reopening."
+      },
+      "warnings": [
+        "Official temporary closure is active on the verification date."
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "ouchou-hilton-nagoya",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "中国料理「王朝」",
+      "area": "伏見",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+      "cuisine": "中国料理・モダンチャイニーズ",
+      "official_url": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "ouchou"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "hilton-rooms"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "ouchou"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "hilton-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "唐",
+            "type": "private_unspecified",
+            "party_min": null,
+            "party_max": 8
+          },
+          {
+            "name": "漢",
+            "type": "private_unspecified",
+            "party_min": null,
+            "party_max": 8
+          },
+          {
+            "name": "宋",
+            "type": "private_unspecified",
+            "party_min": null,
+            "party_max": 9
+          },
+          {
+            "name": "明",
+            "type": "private_unspecified",
+            "party_min": null,
+            "party_max": 15
+          },
+          {
+            "name": "半個室",
+            "type": "semi_private",
+            "party_min": null,
+            "party_max": 14
+          },
+          {
+            "name": "明宋",
+            "type": "connected_private",
+            "party_min": null,
+            "party_max": 24
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "unknown",
+        "currency": "JPY",
+        "min": null,
+        "max": null,
+        "label_ja": "要確認"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unknown",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [],
+      "openpoi_search_status": "not_found_in_two_bounded_queries_not_proof_of_absence",
+      "operating_status": {
+        "status": "temporarily_unavailable",
+        "open_now": false,
+        "booking_availability": "unavailable_during_published_closure",
+        "closure_start": "2026-09-14",
+        "closure_end_local": "2026-10-06T12:00:00+09:00",
+        "time_zone": "Asia/Tokyo",
+        "source_ids": [
+          "hilton-rooms"
+        ],
+        "note": "Official notice excludes bookings and use of hotel rooms, restaurants and facilities for this period. Recheck after reopening."
+      },
+      "warnings": [
+        "14名の部屋は半個室。完全個室と同一の絞り込みに含めない。",
+        "Official temporary closure is active on the verification date."
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "nagoya-nadaman",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "名古屋 なだ万",
+      "area": "栄",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+      "cuisine": "日本料理・懐石",
+      "official_url": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "nagoya-nadaman-access"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "nagoya-nadaman-access"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "nagoya-nadaman-cuisine"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "nagoya-nadaman-rooms"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "桜の間",
+            "type": "table_chair_private",
+            "party_min": 6,
+            "party_max": 8,
+            "notes": "6名、最大8名。バリアフリー対応の記載あり。"
+          },
+          {
+            "name": "小個室",
+            "type": "movable_partition_private",
+            "party_min": 2,
+            "party_max": 12
+          },
+          {
+            "name": "中個室",
+            "type": "movable_partition_private",
+            "party_min": 13,
+            "party_max": 26
+          },
+          {
+            "name": "大型個室",
+            "type": "table_chair_private",
+            "party_min": 27,
+            "party_max": 50
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "unknown",
+        "currency": "JPY",
+        "min": null,
+        "max": null,
+        "label_ja": "要確認"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified_provider_coordinates",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [
+        {
+          "provider": "OpenPOI",
+          "provider_id": null,
+          "match_status": "candidate_name_and_city_match",
+          "match_note": "Name/city reviewed; provider identity and exact coordinates are not independently corroborated. Do not use as a stable ID.",
+          "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+          "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+          "raw_record": {
+            "name": "なだ万 (Nadaman)",
+            "name_kana": "",
+            "prefecture": "愛知県",
+            "city": "名古屋市",
+            "address": "",
+            "category": "restaurant",
+            "business_type": "restaurant",
+            "lat": 35.16894739335591,
+            "lng": 136.91323603401537,
+            "level": "",
+            "source": "overture",
+            "licenses": [
+              "Apache-2.0"
+            ],
+            "attributions": [
+              "Overture Maps Foundation, overturemaps.org / Copyright 2024 Foursquare Labs, Inc. (https://opensource.foursquare.com/places-notice-txt/)"
+            ]
+          }
+        }
+      ],
+      "openpoi_search_status": "candidate_match_found",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [
+        "小・中個室は可動パーティションで区切る形式。防音性は未確認。",
+        "OpenPOI name is generic なだ万 (Nadaman); exact branch identity remains a candidate match."
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "nangokusyuka-nagoya",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "南国酒家 名古屋店",
+      "area": "栄",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+      "cuisine": "中国料理・広東料理",
+      "official_url": "https://nangokusyuka.co.jp/store/nagoya.html",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "nangoku"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "nangoku"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "nangoku"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "nangoku"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "禄",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 3,
+            "dinner_room_charge_jpy": 1500
+          },
+          {
+            "name": "寿",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 5,
+            "dinner_room_charge_jpy": 2000
+          },
+          {
+            "name": "龍",
+            "type": "private_unspecified",
+            "party_min": 2,
+            "party_max": 5,
+            "dinner_room_charge_jpy": 2000
+          },
+          {
+            "name": "福",
+            "type": "private_unspecified",
+            "party_min": 8,
+            "party_max": 10,
+            "dinner_room_charge_jpy": 2500
+          },
+          {
+            "name": "貴賓",
+            "type": "private_unspecified",
+            "party_min": 10,
+            "party_max": 12,
+            "dinner_room_charge_jpy": 3000
+          },
+          {
+            "name": "鳳凰",
+            "type": "private_unspecified",
+            "party_min": 16,
+            "party_max": 20,
+            "dinner_room_charge_jpy": 5000
+          },
+          {
+            "name": "鳳凰＆福",
+            "type": "connected_private",
+            "party_min": 21,
+            "party_max": 30,
+            "dinner_room_charge_jpy": 6000
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 8500,
+        "max": 20000,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "ディナーコース8,500〜20,000円（税・サービス料13%込）、個室料別",
+        "tax_included": true,
+        "service_included": true,
+        "source_ids": [
+          "nangoku-dinner"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "Four listed courses: 8,500 / 12,000 / 15,000 / 20,000 JPY per person.",
+          "Courses for two or more people; excluded dates apply.",
+          "Rooms require reservations, generally about two hours."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Separate room or seat charge; see price label and notes.",
+        "meal_period": "dinner",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified_provider_coordinates",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [
+        {
+          "provider": "OpenPOI",
+          "provider_id": null,
+          "match_status": "candidate_name_and_city_match",
+          "match_note": "Name/city reviewed; provider identity and exact coordinates are not independently corroborated. Do not use as a stable ID.",
+          "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+          "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+          "raw_record": {
+            "name": "南国酒家",
+            "name_kana": "",
+            "prefecture": "",
+            "city": "名古屋市中区",
+            "address": "",
+            "category": "restaurant",
+            "business_type": "restaurant",
+            "lat": 35.16862287,
+            "lng": 136.91366167,
+            "level": "",
+            "source": "overture",
+            "licenses": [
+              "CDLA-Permissive-2.0"
+            ],
+            "attributions": [
+              "Overture Maps Foundation, overturemaps.org"
+            ]
+          }
+        }
+      ],
+      "openpoi_search_status": "candidate_match_found",
+      "operating_status": {
+        "status": "published_closed_dates",
+        "open_now": false,
+        "closed_dates": [
+          "2026-10-05",
+          "2026-10-14",
+          "2026-10-19",
+          "2026-10-26"
+        ],
+        "source_ids": [
+          "nangoku"
+        ],
+        "booking_availability": "not_checked",
+        "note": "Closed on verification date 2026-10-05. Other dates do not imply live availability."
+      },
+      "warnings": [
+        "マーブルルームは「個室感覚ダイニング」。個室として登録していない。"
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    },
+    {
+      "id": "kyoto-kitcho-nagoya",
+      "id_origin": "application_assigned_slug_not_provider_id",
+      "name": "京都 吉兆 名古屋店",
+      "area": "名古屋駅",
+      "area_status": "editorial_neighborhood_label",
+      "address": "愛知県名古屋市中村区名駅4-7-1 ミッドランドスクエア41階",
+      "cuisine": "日本料理・懐石",
+      "official_url": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+      "verification_status": "partially_verified",
+      "verified_on": "2026-10-05",
+      "field_verification": {
+        "name": {
+          "status": "verified_official",
+          "source_ids": [
+            "kitcho-rooms"
+          ]
+        },
+        "address": {
+          "status": "verified_official",
+          "source_ids": [
+            "kitcho-rooms"
+          ]
+        },
+        "cuisine": {
+          "status": "verified_official",
+          "source_ids": [
+            "kitcho-menu"
+          ]
+        },
+        "private_rooms": {
+          "status": "verified_official",
+          "source_ids": [
+            "kitcho-rooms",
+            "kitcho-menu"
+          ]
+        }
+      },
+      "private_rooms": {
+        "status": "verified_official",
+        "rooms": [
+          {
+            "name": "洋個室",
+            "type": "western_style_private",
+            "party_min": null,
+            "party_max": null
+          },
+          {
+            "name": "座敷個室",
+            "type": "tatami_private",
+            "party_min": null,
+            "party_max": null
+          }
+        ],
+        "soundproofing_status": "unknown",
+        "availability_status": "not_checked"
+      },
+      "budget": {
+        "status": "verified_official_published_prices",
+        "currency": "JPY",
+        "min": 25300,
+        "max": 66000,
+        "basis": "published_course_prices_not_average_spend",
+        "label_ja": "個室懐石25,300〜66,000円（税サ込、席種・コースにより異なる）",
+        "tax_included": true,
+        "service_included": true,
+        "source_ids": [
+          "kitcho-menu"
+        ],
+        "checked_on": "2026-10-05",
+        "notes": [
+          "Western private room listed prices: 25,300 / 37,950 / up to 63,250 JPY.",
+          "Tatami private room listed prices: 26,400 / 39,600 / up to 66,000 JPY.",
+          "Special course requires reservation; room capacity remains unverified.",
+          "The cheaper floor-seat weekday lunch is seasonal through September 30 and was excluded as expired."
+        ],
+        "drinks_included": false,
+        "room_charge_treatment": "Published price is specific to private-room seat type; no additional room fee established.",
+        "meal_period": "lunch_or_dinner",
+        "not_total_expected_spend": true
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unknown",
+        "map_pin_eligible": false,
+        "note": "Provider coordinates retained only in provenance. No geocoding from address and no exact pin inferred."
+      },
+      "openpoi_matches": [],
+      "openpoi_search_status": "not_found_in_two_bounded_queries_not_proof_of_absence",
+      "operating_status": {
+        "status": "current_official_listing",
+        "open_now": "unknown",
+        "booking_availability": "not_checked"
+      },
+      "warnings": [
+        "Room type requests may not be fulfilled.",
+        "旧サイトの消費税8%時代のメニューは採用していない。"
+      ],
+      "unverified_fields": [
+        "exact_coordinates",
+        "room_availability",
+        "soundproofing",
+        "business_dining_quality",
+        "current_open_now"
+      ],
+      "score": null,
+      "review_text": null,
+      "photos": []
+    }
+  ],
+  "summary_counts": {
+    "venues": 10,
+    "official_identity_address_cuisine_room_evidence": 10,
+    "venues_with_price_evidence": 6,
+    "candidate_openpoi_matches": 5,
+    "independently_verified_coordinates": 0
+  }
+}

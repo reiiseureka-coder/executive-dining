@@ -1,0 +1,161 @@
+{
+  "request_url": "https://api.openpoiapi.com/v1/search?q=%E6%B5%85%E7%94%B0+%E5%90%89%E5%85%86+%E5%8A%A0%E8%B3%80%E5%B1%8B+%E3%81%AA%E3%81%A0%E4%B8%87+%E6%BA%90%E6%B0%8F+%E7%8E%8B%E6%9C%9D+%E5%91%89%E7%AB%B9+%E6%9F%B3%E5%9F%8E+%E5%BF%97%E6%91%A9+%E5%8D%97%E5%9B%BD%E9%85%92%E5%AE%B6+%E6%B2%B3%E6%96%87+%E5%8F%99%E3%80%85%E8%8B%91&center=136.892%2C35.170&radius=4000&limit=200",
+  "fetched_at": "2026-10-05T05:48:58.787104+00:00",
+  "response": {
+    "count": 8,
+    "results": [
+      {
+        "name": "叙々苑游玄亭",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中村区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.17215666,
+        "lng": 136.88569667,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "なだ万茶寮・名駅店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中村区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.17097503,
+        "lng": 136.88276938,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "加賀屋名古屋店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中村区",
+        "address": "",
+        "category": "lodging",
+        "business_type": "lodging",
+        "lat": 35.1713266,
+        "lng": 136.88278728,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "なだ万厨房 ジェイアール名古屋タカシマヤ店",
+        "name_kana": "",
+        "prefecture": "愛知県",
+        "city": "名古屋市",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.171089,
+        "lng": 136.882409,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "Apache-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org / Copyright 2024 Foursquare Labs, Inc. (https://opensource.foursquare.com/places-notice-txt/)"
+        ]
+      },
+      {
+        "name": "叙々苑名古屋錦三丁目店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.171005311378,
+        "lng": 136.90430205027,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "なだ万 (Nadaman)",
+        "name_kana": "",
+        "prefecture": "愛知県",
+        "city": "名古屋市",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.16894739335591,
+        "lng": 136.91323603401537,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "Apache-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org / Copyright 2024 Foursquare Labs, Inc. (https://opensource.foursquare.com/places-notice-txt/)"
+        ]
+      },
+      {
+        "name": "南国酒家",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市中区",
+        "address": "",
+        "category": "restaurant",
+        "business_type": "restaurant",
+        "lat": 35.16862287,
+        "lng": 136.91366167,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      },
+      {
+        "name": "加賀屋山本留三郎商店",
+        "name_kana": "",
+        "prefecture": "",
+        "city": "名古屋市北区",
+        "address": "",
+        "category": "retail_other",
+        "business_type": "retail_other",
+        "lat": 35.18912352,
+        "lng": 136.9167659,
+        "level": "",
+        "source": "overture",
+        "licenses": [
+          "CDLA-Permissive-2.0"
+        ],
+        "attributions": [
+          "Overture Maps Foundation, overturemaps.org"
+        ]
+      }
+    ]
+  }
+}

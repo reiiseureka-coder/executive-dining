@@ -1,0 +1,712 @@
+[
+  {
+    "id": "e5329b58-55e3-4cc7-aee5-3940483ecced",
+    "name": "中国料理 柳城",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル1階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.750549+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "中国料理・広東料理",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.750549+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "中国料理 柳城",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.750549+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "公式の個室プラン案内はディナーコース12,500円〜、室料2,000円〜。案内内では税・サービス料の扱いを確認できないため、総額は要確認。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.069092+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/fp/detail/50032",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室は2〜4名、2〜6名、7〜16名の区分があります。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.750549+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.750549+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/ryujo/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル1階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "6c713786-d51a-4b58-a265-b326790d848e",
+    "name": "中国料理「王朝」",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "中国料理・モダンチャイニーズ",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "中国料理「王朝」",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "notice",
+        "value": "ヒルトン名古屋は2026年9月14日〜10月6日12:00（日本時間）、レストランを含む施設の予約・利用を受け付けないと案内。10月5日確認。期間終了後の営業・空席は再確認が必要です。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室5室（定員6〜24名）と半個室1室（定員14名）。個室と半個室は別区分で、人数による室料条件があります。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.42367+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/ouchou",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "2fab79a8-ecc5-4c3d-a5c7-205e0d0ce9ee",
+    "name": "京都 吉兆 名古屋店",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中村区名駅4-7-1 ミッドランドスクエア41階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:25.405496+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・懐石",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:26.080377+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/nagoya-dishes/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "京都 吉兆 名古屋店",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:25.405496+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "掲載懐石は洋室個室25,300円・37,950円、座敷個室26,400円・39,600円（税・サービス料込）。特別懐石は要予約で、洋室63,250円まで・座敷66,000円までの掲載。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:26.080377+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/nagoya-dishes/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "洋室個室・座敷個室あり。対応人数はこの資料では未確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:26.080377+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/nagoya-dishes/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:25.405496+00:00",
+        "sourceUrl": "https://kyoto-kitcho.com/restaurant/nagoya/room/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中村区名駅4-7-1 ミッドランドスクエア41階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "dfbe14a7-06e0-4faf-ae35-7114cbe2c7b4",
+    "name": "南国酒家 名古屋店",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "中国料理・広東料理",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "南国酒家 名古屋店",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "notice",
+        "value": "公式案内の2026年10月の休業日は5日・14日・19日・26日。通常の「年中無休」表記より、この日付付き案内を優先してください。短縮営業も案内されています。10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "掲載ディナーコースは1人8,500円・12,000円・15,000円・20,000円（消費税10%・サービス料13%込）。2名以上、除外日あり。個室利用時の総額は要確認。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:25.11334+00:00",
+        "sourceUrl": "https://www.tokyuhotels.co.jp/nagoya-h/restaurant/nangoku/dinner/index.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "予約制の個室あり。禄2〜3名、寿・龍2〜5名、福8〜10名、貴賓10〜12名、鳳凰16〜20名、鳳凰・福の連結21〜30名。利用は原則約2時間、室料別途。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:24.938664+00:00",
+        "sourceUrl": "https://nangokusyuka.co.jp/store/nagoya.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "c7c41cd3-a416-4660-acfb-5153ead6798c",
+    "name": "名古屋 なだ万",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:18.43638+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・懐石",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:22.648692+00:00",
+        "sourceUrl": "https://www.tokyuhotels.co.jp/nagoya-h/restaurant/nadaman/index.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "名古屋 なだ万",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:18.43638+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "テーブル個室あり。桜の間は6名（最大8名）、小個室2〜12名、中個室13〜26名、大型個室27〜50名。小・中個室は可動間仕切りで区切る形式です。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:18.51239+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_nagoya_table_private-rooms",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:18.43638+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_nagoya_access",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区栄4-6-8 名古屋東急ホテル2階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "1c3c96bd-3e94-4b70-a020-053efa2edfca",
+    "name": "名古屋浅田",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ・タワーズプラザ12階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:28:55.085388+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/map/index.html",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・加賀料理",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:42.031272+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "名古屋浅田",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:42.031272+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "notice",
+        "value": "日曜の夕食は休業。2026年10月5日に公式案内を確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:42.031272+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "夕食の「会席料理」欄の6種は16,500〜45,100円（税込）。サービス料15%と平日の席料は別途。平日の席料は1人1,650円または2,200円。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:28:55.424103+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/dinner/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室8室。掘りごたつ式座敷は最大12名、畳床の椅子席は最大4名。部屋ごとに定員が異なります。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:28:55.305391+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/room/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.asadayaihei.co.jp/nagoya/",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:42.031272+00:00",
+        "sourceUrl": "https://www.asadayaihei.co.jp/nagoya/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ・タワーズプラザ12階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "60e904be-e8e2-4016-ab51-6730cc75250f",
+    "name": "名駅 なだ万茶寮",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:47.96391+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "懐石料理",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:00.793524+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki_menu_private-room",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "名駅 なだ万茶寮",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:47.96391+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "掲載個室メニューは平日「茶寮膳」7,260円、土日祝「ミニ懐石」8,470円（税・サービス料込）。個室料は1人550円、5名以下は1室3,300円（税込）。昼夜の適用は要確認。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:00.793524+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki_menu_private-room",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室Aは2〜6名（土日祝4〜6名）、洋個室Dは4〜10名、洋個室Eは12〜30名。混雑時は利用2時間となる場合があります。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:00.793524+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki_menu_private-room",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.nadaman.co.jp/pages/restaurant_meieki",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:30:47.96391+00:00",
+        "sourceUrl": "https://www.nadaman.co.jp/pages/restaurant_meieki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "cf0fade4-6d0b-40f7-aa5a-a2db1593441f",
+    "name": "日本料理 加賀屋 名古屋店",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階レストラン街",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:01.471231+00:00",
+        "sourceUrl": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・会席",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:01.471231+00:00",
+        "sourceUrl": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "日本料理 加賀屋 名古屋店",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:01.471231+00:00",
+        "sourceUrl": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室8室。店舗が案内する対応人数は4〜22名で、部屋ごとに異なります。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:01.471231+00:00",
+        "sourceUrl": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:01.471231+00:00",
+        "sourceUrl": "https://www.kagaya.co.jp/shoku/shop/nagoya.php",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中村区名駅1-1-4 JRセントラルタワーズ13階レストラン街",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "092957f9-0df1-4431-afbf-2c32cb5582fd",
+    "name": "日本料理 呉竹",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル2階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.033026+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・会席",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.033026+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "日本料理 呉竹",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.033026+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "2026年10月1〜16日の「神無月 夜会席」は15,000円（税込・サービス料別）。個室料は別途3,000円または6,000円。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.174377+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室は2〜6名用と7〜12名用。室料はそれぞれ3,000円、6,000円。12〜20名のホール貸切とは別の区分です。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.174377+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:08.033026+00:00",
+        "sourceUrl": "https://www.nagoyakankohotel.co.jp/restaurant_bars/kuretake/",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区錦1-19-30 名古屋観光ホテル2階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  },
+  {
+    "id": "29bbe29a-c6d3-4694-a893-0ad8e48ddf0c",
+    "name": "日本料理「源氏」会席コーナー",
+    "facts": [
+      {
+        "field": "address",
+        "value": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "genre",
+        "value": "日本料理・会席",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "name",
+        "value": "日本料理「源氏」会席コーナー",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "notice",
+        "value": "ヒルトン名古屋は2026年9月14日〜10月6日12:00（日本時間）、レストランを含む施設の予約・利用を受け付けないと案内。10月5日確認。期間終了後の営業・空席は再確認が必要です。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "price",
+        "value": "公式参考料金はランチ3,500円〜、ディナー8,500円〜（税・サービス料込）。個室料は別途、条件により無料。個室コースの最低料金や総額を示すものではありません。2026年10月5日確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "private_room",
+        "value": "個室あり（テーブル・座敷・掘りごたつ）。部屋ごとの定員・最低利用人数・個室料条件は予約時に要確認。",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      },
+      {
+        "field": "website",
+        "value": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "licenses": [],
+        "provider": "official",
+        "fetchedAt": "2026-10-05T12:29:14.303933+00:00",
+        "sourceUrl": "https://nagoya.hiltonjapan.co.jp/restaurants/genji_kaiseki",
+        "verifiedAt": "2026-10-05T12:36:03.817839+00:00",
+        "attributions": []
+      }
+    ],
+    "status": "candidate",
+    "address": "愛知県名古屋市中区栄1-3-3 ヒルトン名古屋3階",
+    "privatePilot": true,
+    "factsCheckedAt": "2026-10-05T12:36:03.817839+00:00"
+  }
+]
