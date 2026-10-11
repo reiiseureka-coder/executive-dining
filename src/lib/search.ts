@@ -2,6 +2,10 @@ import type { Restaurant } from "../types/index.ts";
 
 export interface SearchParams {
   query?: string;
+  information?: string;
+  view?: string;
+  ids?: string;
+  returnTo?: string;
   region?: string;
   area?: string;
   genre?: string;

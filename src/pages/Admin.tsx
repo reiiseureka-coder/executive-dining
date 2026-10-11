@@ -46,7 +46,7 @@ const INITIAL: FormData = {
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 space-y-4">
       <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
         <Icon size={18} className="text-indigo-500" />
         <h3 className="font-semibold text-slate-800">{title}</h3>
@@ -67,7 +67,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
-const inputCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors";
+const inputCls = "min-w-0 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:border-indigo-400 transition-colors";
 
 const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElement>, msg = 'この項目は必須です') => {
   e.currentTarget.setCustomValidity(msg);
@@ -75,7 +75,7 @@ const setJaValidity = (e: React.InvalidEvent<HTMLInputElement | HTMLTextAreaElem
 const clearValidity = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
   e.currentTarget.setCustomValidity('');
 };
-const selectCls = "w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
+const selectCls = "min-w-0 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:border-indigo-400 transition-colors bg-white appearance-none cursor-pointer";
 
 export default function Admin() {
   const [form, setForm] = useState<FormData>(() => readDraft('executive-dining:listing-draft:v1', INITIAL));
@@ -132,7 +132,7 @@ export default function Admin() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 max-w-md w-full text-center">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-12 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5">
             <CheckCircle size={32} className="text-emerald-500" />
           </div>
@@ -170,7 +170,7 @@ export default function Admin() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <p className="sample-notice">保存した情報は検索結果には反映されません。送信・公開には、運営側でのデータベース接続と内容確認が必要です。</p>
+          <p className="sample-notice">保存しても、店舗への申請やサイトへの掲載は行われません。下書きはこのブラウザ内に残ります。共有端末では個人情報を入力しないでください。</p>
           {/* Basic Info */}
           <Section title="基本情報" icon={Building2}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -192,7 +192,7 @@ export default function Admin() {
               </Field>
             </div>
             <Field label="店舗説明">
-              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="店舗の特徴やビジネス利用上の強みを記入してください。" className={`${inputCls} resize-none`} />
+              <textarea rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="料理や席など、お店の特徴を記入してください。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -235,12 +235,12 @@ export default function Admin() {
                   {PRIVATE_ROOM_TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </Field>
-              <Field label="個室収容人数">
+              <Field label="個室の利用人数">
                 <input type="text" value={form.privateRoomCapacity} onChange={(e) => update('privateRoomCapacity', e.target.value)} placeholder="2〜8名 × 3室" className={inputCls} />
               </Field>
             </div>
             <Field label="個室の詳細説明">
-              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="防音性能、広さ、設備、雰囲気などを具体的に。" className={`${inputCls} resize-none`} />
+              <textarea rows={3} value={form.privateRoomDetail} onChange={(e) => update('privateRoomDetail', e.target.value)} placeholder="人数、仕切り、広さ、設備など、確認できたことを記入してください。" className={`${inputCls} resize-y`} />
             </Field>
           </Section>
 
@@ -257,7 +257,7 @@ export default function Admin() {
               </Field>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="総収容人数">
+              <Field label="総席数">
                 <input type="number" value={form.capacity || ''} onChange={(e) => update('capacity', Number(e.target.value))} min={0} className={inputCls} />
               </Field>
               <Field label="1名あたり平均単価（円）">
@@ -285,7 +285,7 @@ export default function Admin() {
                     key={method}
                     type="button"
                     onClick={() => togglePayment(method)}
-                    className={`px-3 py-1.5 rounded-full text-sm border transition-colors cursor-pointer ${
+                    className={`min-h-11 px-3 py-1.5 rounded-full text-sm border transition-colors cursor-pointer ${
                       form.paymentMethods.includes(method)
                         ? 'bg-indigo-500 text-white border-indigo-500'
                         : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'
@@ -315,14 +315,16 @@ export default function Admin() {
 
           {/* Service Level */}
           <Section title="接客レベル" icon={Star}>
-            <p className="text-sm text-slate-500">接客の総合レベルを⭐️で評価してください。</p>
-            <div className="flex items-center gap-2 mt-2">
+            <p className="text-sm text-slate-500">接客の評価例を1〜5で選んでください。</p>
+            <div className="flex flex-wrap items-center gap-1 mt-2">
               {[1, 2, 3, 4, 5].map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => update('serviceLevel', v)}
-                  className="cursor-pointer transition-transform hover:scale-110"
+                  aria-label={`接客レベル ${v}`}
+                  aria-pressed={v === form.serviceLevel}
+                  className="min-w-11 min-h-11 grid place-items-center cursor-pointer transition-transform hover:scale-110"
                 >
                   <Star
                     size={28}
@@ -330,22 +332,22 @@ export default function Admin() {
                   />
                 </button>
               ))}
-              <span className="ml-2 text-sm text-slate-500">
+              <span className="w-full sm:w-auto sm:ml-2 text-sm text-slate-500">
                 {['', '要改善', '普通', '良い', '非常に良い', '最高水準'][form.serviceLevel]}
               </span>
             </div>
           </Section>
 
           {/* Business Specs */}
-          <Section title="ビジネス適性スペック評価" icon={Users}>
-            <p className="text-sm text-slate-500">各項目を1〜5で評価してください（5が最高）。</p>
+          <Section title="会食で気になる点の評価例" icon={Users}>
+            <p className="text-sm text-slate-500">表示の確認用に、各項目を1〜5で選んでください。</p>
             <div className="space-y-4">
               {([
-                ['serviceQuality', '接客の洗練さ', '礼儀、日英対応、所作の丁寧さ'],
+                ['serviceQuality', '接客', '案内や料理の説明、対応できる言語'],
                 ['quietness', '静かさ', '話しやすさ、BGMの音量、隣席との距離'],
                 ['accessEase', 'アクセスのしやすさ', '最寄り駅からの距離、迷いにくさ'],
-                ['confidentiality', '機密性', '個室の防音、視線の遮蔽、声の漏れにくさ'],
-                ['ambiance', '雰囲気・格式', '空間の品格、接待相手への印象'],
+                ['confidentiality', '機密性', '個室の防音、外からの見えにくさ、声の漏れにくさ'],
+                ['ambiance', '雰囲気・格式', '内装や席の雰囲気'],
               ] as const).map(([key, label, desc]) => (
                 <div key={key} className="flex items-start gap-4">
                   <div className="flex-1">
@@ -365,7 +367,7 @@ export default function Admin() {
           </Section>
 
           {/* Tags */}
-          <Section title="タグ・推奨シーン" icon={Phone}>
+          <Section title="タグ・利用場面" icon={Phone}>
             <Field label="タグ">
               <div className="flex gap-2">
                 <input
@@ -373,42 +375,42 @@ export default function Admin() {
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  placeholder="完全個室、接待最適..."
+                  placeholder="例：完全個室、テーブル席"
                   className={inputCls}
                 />
-                <button type="button" onClick={addTag} className="px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
+                <button type="button" onClick={addTag} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
                   追加
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.tags.map((tag) => (
-                  <span key={tag} className="flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full">
+                  <span key={tag} className="max-w-full break-all flex items-center gap-1 text-sm bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full">
                     {tag}
-                    <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${tag}を削除`} onClick={() => removeTag(tag)} className="shrink-0 min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>
             </Field>
 
-            <Field label="推奨利用シーン">
+            <Field label="利用場面の例">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={sceneInput}
                   onChange={(e) => setSceneInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addScene())}
-                  placeholder="役員接待、海外VIP接待..."
+                  placeholder="例：取引先との会食、社内の食事会"
                   className={inputCls}
                 />
-                <button type="button" onClick={addScene} className="px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
+                <button type="button" onClick={addScene} className="shrink-0 px-4 py-2.5 bg-indigo-500 text-white rounded-xl text-sm hover:bg-indigo-400 transition-colors cursor-pointer">
                   追加
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.recommendedFor.map((s) => (
-                  <span key={s} className="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full">
+                  <span key={s} className="max-w-full break-all flex items-center gap-1 text-sm bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full">
                     {s}
-                    <button type="button" onClick={() => removeScene(s)} className="ml-0.5 hover:text-red-500 cursor-pointer">×</button>
+                    <button type="button" aria-label={`${s}を削除`} onClick={() => removeScene(s)} className="shrink-0 min-w-11 min-h-11 ml-0.5 hover:text-red-500 cursor-pointer">×</button>
                   </span>
                 ))}
               </div>
@@ -422,7 +424,7 @@ export default function Admin() {
             </Field>
             {form.imageUrl && (
               <div className="mt-2 rounded-xl overflow-hidden h-40 bg-slate-100">
-                <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                <img src={form.imageUrl} alt="入力した画像のプレビュー" className="w-full h-full object-cover" />
               </div>
             )}
           </Section>
@@ -444,7 +446,7 @@ export default function Admin() {
           )}
 
           {/* Submit */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={() => setForm(INITIAL)}
@@ -455,7 +457,7 @@ export default function Admin() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-8 py-3 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-5 sm:px-8 py-3 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
             >
               <Save size={16} />
               {saving ? '保存中...' : '下書きを保存する'}

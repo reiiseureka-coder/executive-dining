@@ -2,23 +2,47 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Page } from "./types";
 import type { SearchParams } from "./lib/search";
 import { parseRoute, routeHash } from "./lib/routing";
+import { isAdminEmailCallback } from "./lib/authLanding";
+import { AppAccessProvider } from "./contexts/AppAccessProvider";
+import { useAppAccess } from "./contexts/appAccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
+import AdminCallbackLanding from "./components/AdminCallbackLanding";
+import DemoHome from "./pages/DemoHome";
 import Home from "./pages/Home";
+import PartnerPage from "./pages/PartnerPage";
+import Corporate from "./pages/Corporate";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import Nagoya from "./pages/Nagoya";
+import NagoyaDetail from "./pages/NagoyaDetail";
+import Compare from "./pages/Compare";
+import Membership from "./pages/Membership";
+import OwnerTrial from "./pages/OwnerTrial";
+import Curation from "./pages/Curation";
 export type { SearchParams } from "./lib/search";
 function subscribe(callback: () => void) {
-  window.addEventListener("hashchange", callback);
-  window.addEventListener("popstate", callback);
+  let restartingForCallback = false;
+  const changed = () => {
+    // Opening a fresh auth fragment in an already-loaded SPA is a same-document navigation.
+    // Reload once so the standard SDK validates it; the SDK detection hook then clears it.
+    if (isAdminEmailCallback(window.location.hash)) {
+      if (!restartingForCallback) { restartingForCallback = true; window.location.reload(); }
+      return;
+    }
+    callback();
+  };
+  window.addEventListener("hashchange", changed);
+  window.addEventListener("popstate", changed);
   return () => {
-    window.removeEventListener("hashchange", callback);
-    window.removeEventListener("popstate", callback);
+    window.removeEventListener("hashchange", changed);
+    window.removeEventListener("popstate", changed);
   };
 }
-export default function App() {
+function AppShell() {
+  const access = useAppAccess();
   const hash = useSyncExternalStore(
     subscribe,
     () => window.location.hash,
@@ -32,11 +56,11 @@ export default function App() {
   ) => {
     const search =
       params ??
-      (route.page === "search" || route.page === "detail" ? route.params : {});
+      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare", "pilot", "pilot-detail"].includes(route.page) ? route.params : {});
     window.location.hash = routeHash(
       page,
       restaurantId,
-      page === "search" || page === "detail" ? search : {},
+      ["search", "detail", "nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(page) ? search : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -44,22 +68,33 @@ export default function App() {
     window.history.replaceState(
       null,
       "",
-      routeHash("search", undefined, params),
+      routeHash(route.page === "search" ? "search" : "nagoya", undefined, params),
     );
     window.dispatchEvent(new HashChangeEvent("hashchange"));
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "会食の店選びを、丁寧に。",
+      home: "大切な話を、心地よい一席で。",
+      restaurants: "店舗掲載のご案内",
+      corporate: "法人の方へ・福利厚生プラン",
+      demo: "サンプル・デモ",
+      "nagoya-detail": "名古屋の店舗情報",
+      compare: "会食候補を比較",
+      membership: "会員登録のデモ",
+      pilot: "実店舗の非公開テスト",
+      "pilot-detail": "店舗情報の操作確認",
       search: "お店を探す",
       detail: "店舗情報",
       about: "このサービスについて",
       admin: "掲載店登録",
+      nagoya: "名古屋の掲載情報",
+      curation: "店舗情報の確認・審査",
     };
     document.title = `${labels[route.page]} | Executive Dining`;
   }, [route.page]);
   return (
-    <AuthProvider>
+    <>
+      <AdminCallbackLanding />
       <a
         className="skip-link"
         href="#main-content"
@@ -71,12 +106,16 @@ export default function App() {
         本文へ移動
       </a>
       <Header
-        key={route.page}
+        key={hash}
         currentPage={route.page}
         onNavigate={handleNavigate}
       />
+      {access.ownerTrial && ["pilot", "pilot-detail", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
         {route.page === "home" && <Home onNavigate={handleNavigate} />}
+        {route.page === "restaurants" && <PartnerPage audience="restaurants" />}
+        {route.page === "corporate" && <Corporate />}
+        {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
         {route.page === "search" && (
           <Search
             params={route.params}
@@ -91,6 +130,9 @@ export default function App() {
             onNavigate={handleNavigate}
           />
         )}
+        {["nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || ["pilot", "pilot-detail"].includes(route.page) ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
+        {route.page === "curation" && <Curation />}
+        {route.page === "membership" && <Membership />}
         {route.page === "admin" && <Admin />}
         {route.page === "about" && <About onNavigate={handleNavigate} />}
       </main>
@@ -98,11 +140,18 @@ export default function App() {
         <div className="page-width footer-inner">
           <span className="wordmark">EXECUTIVE DINING</span>
           <p>会食の店選びを、丁寧に。</p>
+          <a href="#/nagoya">店舗一覧</a>
+          <a href="#/restaurants">店舗の方へ</a>
+          <a href="#/corporate">法人の方へ</a>
           <a href="#/about">掲載情報について</a>
-          <a href="#/admin">掲載情報の下書き</a>
+          {access.editor && <a href="#/curation">運営管理</a>}
           <span>© {new Date().getFullYear()} Executive Dining</span>
         </div>
       </footer>
-    </AuthProvider>
+    </>
   );
+}
+
+export default function App() {
+  return <AuthProvider><AppAccessProvider><AppShell /></AppAccessProvider></AuthProvider>;
 }

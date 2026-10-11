@@ -1,11 +1,12 @@
 import { createContext, useContext } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import type { UserProfile } from "../types";
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
-  profile: UserProfile | null;
   loading: boolean;
+  emailRetryAt: number;
+  emailSending: boolean;
+  signInWithEmail: (email: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }

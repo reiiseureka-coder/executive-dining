@@ -1,6 +1,5 @@
 import { ArrowRight } from "lucide-react";
 import type { Page } from "../types";
-import SampleNotice from "../components/SampleNotice";
 export default function About({
   onNavigate,
 }: {
@@ -13,38 +12,36 @@ export default function About({
         <h1>会食の店選びを、丁寧に。</h1>
         <p>料理だけでなく、会話をする場所としてお店を考える。</p>
       </div>
-      <SampleNotice />
       <div className="about-copy">
         <section>
-          <h2>一席を選ぶために</h2>
+          <h2>会食に合う一軒を選ぶために</h2>
           <p>
-            予算、個室、アクセス。会食では、おいしい料理と同じくらい大切な条件があります。Executive
-            Dining
-            は、条件を整理しながら候補を探すためのサービスを目指しています。
+            Executive Diningは、会食のお店を探して比較するためのサービスです。
+            個室やコース料金などの公式情報を確認し、情報源と確認日を添えて掲載します。
           </p>
         </section>
         <section>
           <h2>いま使えること</h2>
           <ul>
             <li>
-              店名・エリア・料理からの検索と、個室・予算・時間帯の絞り込み
+              名古屋の公開情報を店名・住所・料理・確認できる情報から検索
             </li>
             <li>
               候補の保存（このブラウザ内に保存。アカウント間の同期はありません）
             </li>
             <li>検索条件を含むURLの共有と、店舗詳細の閲覧</li>
             <li>
-              口コミの下書き保存（このブラウザ内のみ。公開・送信はされません）
+              公式のコース料金・条件・営業のお知らせを出典と確認日付きで閲覧
             </li>
           </ul>
         </section>
         <section>
-          <h2>掲載情報と、準備中の機能</h2>
+          <h2>掲載情報と準備中の機能</h2>
           <p>
-            現在は6店のサンプルデータを使用しています。店舗名が実在していても、写真はイメージであり、価格・個室設備・営業時間・評価・口コミは取材や実体験に基づく情報ではありません。店舗による掲載承認や提携を示すものでもありません。
+            公開一覧には、公式情報を確認して掲載を承認したお店を表示します。確認できない項目は「未確認」と表示します。料金や空席、会食への向き・不向きを推測して掲載することはありません。
           </p>
           <p>
-            実店舗データと口コミの公開、掲載申請の反映、AI分析は、データ確認・バックエンド整備後に提供予定です。空席照会や予約確定はできません。
+            口コミの投稿・掲載申請・AI分析は準備中です。空席の確認や予約もできません。デモ画面では6件のサンプルで検索や下書きの保存を試せます。サンプルの情報は予約には使えません。
           </p>
         </section>
         <section>
@@ -53,7 +50,7 @@ export default function About({
             最新の価格やコース、個室の条件、アレルギー対応、キャンセル規定を公式サイトまたは店舗に直接ご確認ください。個室という表記だけで、防音性や機密性が保証されるものではありません。
           </p>
         </section>
-        <button className="primary-button" onClick={() => onNavigate("search")}>
+        <button className="primary-button" onClick={() => onNavigate("nagoya")}>
           お店を探す
           <ArrowRight size={16} />
         </button>

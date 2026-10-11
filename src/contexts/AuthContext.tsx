@@ -1,63 +1,41 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
 import { AuthContext } from "./auth";
-import type { UserProfile, UserRank } from "../types";
+import { observeAuthSession } from "../lib/authSession";
+import { buildEmailLinkRequest } from "../lib/emailLogin";
+import { rememberLoginDestination } from "../lib/authLanding";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(Boolean(supabase));
+  const [emailRetryAt, setEmailRetryAt] = useState(0);
+  const [emailSending, setEmailSending] = useState(false);
+  const nextEmailRequestAt = useRef(0);
+  const emailInFlight = useRef(false);
   useEffect(() => {
     const client = supabase;
     if (!client) return;
-    let alive = true;
-    let generation = 0;
-    const updateSession = async (next: Session | null) => {
-      const request = ++generation;
-      if (!alive) return;
+    return observeAuthSession(client.auth, (next) => {
       setSession(next);
-      setProfile(null);
-      try {
-        if (next?.user) {
-          const { data } = await client
-            .from("user_profiles")
-            .select("*")
-            .eq("id", next.user.id)
-            .maybeSingle();
-          if (alive && request === generation && data)
-            setProfile({
-              id: data.id,
-              email: data.email,
-              displayName: data.display_name,
-              avatarUrl: data.avatar_url,
-              rank: data.rank as UserRank,
-              createdAt: data.created_at,
-            });
-        }
-      } finally {
-        if (alive && request === generation) setLoading(false);
-      }
-    };
-    client.auth
-      .getSession()
-      .then(({ data }) => updateSession(data.session))
-      .catch(() => {
-        if (alive) setLoading(false);
-      });
-    const {
-      data: { subscription },
-    } = client.auth.onAuthStateChange((_event, next) => {
-      setTimeout(() => {
-        if (alive) void updateSession(next).catch(() => {});
-      }, 0);
+      setLoading(false);
     });
-    return () => {
-      alive = false;
-      subscription.unsubscribe();
-    };
   }, []);
+  const signInWithEmail = async (email: string) => {
+    if (!supabase || !emailSignInEnabled) throw new Error("メールログインは準備中です。");
+    if (emailInFlight.current || Date.now() < nextEmailRequestAt.current) throw new Error("時間をおいてお試しください。");
+    const request = buildEmailLinkRequest(email, window.location.origin);
+    rememberLoginDestination(window.localStorage, window.location.hash);
+    nextEmailRequestAt.current = Date.now() + 60_000;
+    setEmailRetryAt(nextEmailRequestAt.current);
+    emailInFlight.current = true;
+    setEmailSending(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp(request);
+      if (error) throw error;
+    } finally { emailInFlight.current = false; setEmailSending(false); }
+  };
   const signInWithGoogle = async () => {
-    if (!supabase) throw new Error("ログイン機能は準備中です。");
+    if (!supabase || !googleSignInEnabled) throw new Error("ログイン機能は準備中です。");
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin },
@@ -75,8 +53,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         session,
         user: session?.user ?? null,
-        profile,
         loading,
+        emailRetryAt,
+        emailSending,
+        signInWithEmail,
         signInWithGoogle,
         signOut,
       }}

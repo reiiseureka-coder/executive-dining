@@ -2,6 +2,10 @@ import type { Page } from "../types/index.ts";
 import type { SearchParams } from "./search.ts";
 const keys: (keyof SearchParams)[] = [
   "query",
+  "information",
+  "view",
+  "ids",
+  "returnTo",
   "region",
   "area",
   "genre",
@@ -26,9 +30,17 @@ export function parseRoute(hash: string): {
       restaurantId: path.slice("/restaurant/".length),
       params,
     };
+  if (path.startsWith('/pilot/')) {
+    try { return {page:'pilot-detail',restaurantId:decodeURIComponent(path.slice('/pilot/'.length)),params}; }
+    catch { return {page:'pilot',params}; }
+  }
+  if (path.startsWith('/nagoya/')) {
+    try { return { page: 'nagoya-detail', restaurantId: decodeURIComponent(path.slice('/nagoya/'.length)), params }; }
+    catch { return { page: 'nagoya', params }; }
+  }
   const page = path.slice(1);
   return {
-    page: ["search", "about", "admin"].includes(page) ? (page as Page) : "home",
+    page: ["restaurants", "corporate", "search", "about", "admin", "nagoya", "curation", "demo", "compare", "membership", "pilot"].includes(page) ? (page as Page) : "home",
     params,
   };
 }
@@ -40,6 +52,10 @@ export function routeHash(
   const path =
     page === "home"
       ? "/"
+      : page === "pilot-detail"
+        ? `/pilot/${encodeURIComponent(restaurantId ?? "")}`
+      : page === "nagoya-detail"
+        ? `/nagoya/${encodeURIComponent(restaurantId ?? "")}`
       : page === "detail"
         ? `/restaurant/${encodeURIComponent(restaurantId ?? "")}`
         : `/${page}`;

@@ -5,11 +5,11 @@ export default function SampleNotice({
 }) {
   return (
     <aside className="sample-notice">
-      <span className="eyebrow">PREVIEW</span>
+      <span className="eyebrow">DEMO</span>
       <p>
         {compact
           ? "掲載情報・写真・評価はサンプルです。ご予約には利用できません。"
-          : "このサイトはプレビュー版です。掲載している店舗情報・写真・価格・評価・口コミは動作確認用のサンプルで、実際の店舗の最新情報や体験を保証するものではありません。予約前に必ず公式情報をご確認ください。"}
+          : "この画面はデモです。店舗情報・写真・価格・評価・口コミはサンプルで、実際の営業情報や来店記録ではありません。予約には使わず、公式サイトや店舗で最新情報をご確認ください。"}
       </p>
     </aside>
   );

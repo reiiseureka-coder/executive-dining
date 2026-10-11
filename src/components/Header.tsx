@@ -2,24 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { Bookmark, Menu, X } from "lucide-react";
 import type { Page } from "../types";
 import type { SearchParams } from "../lib/search";
+import { useAppAccess } from "../contexts/appAccess";
 import { useAuth } from "../contexts/auth";
-import { useSavedRestaurants } from "../hooks/useSavedRestaurants";
-import { supabase } from "../lib/supabase";
+import { useSavedCatalog } from "../hooks/useSavedCatalog";
+import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
+import EmailLoginForm from "./EmailLoginForm";
 interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
 }
-const items: { label: string; page: Page }[] = [
-  { label: "お店を探す", page: "search" },
-  { label: "このサービスについて", page: "about" },
-];
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
+  const access = useAppAccess();
+  const items: { label: string; page: Page }[] = [
+    { label: "店舗一覧", page: "nagoya" },
+    { label: "店舗の方へ", page: "restaurants" },
+    { label: "法人の方へ", page: "corporate" },
+    ...(access.editor ? [{ label: "運営管理", page: "curation" as Page }] : []),
+  ];
   const [modal, setModal] = useState<"menu" | "login" | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const { user, loading, signInWithGoogle, signOut } = useAuth();
-  const { savedIds } = useSavedRestaurants();
+  const { savedIds } = useSavedCatalog();
   useEffect(() => {
     if (modal) {
       dialog.current?.showModal();
@@ -33,7 +38,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   }, [modal]);
   const navigate = (page: Page, params?: SearchParams) => {
     setModal(null);
-    onNavigate(page, undefined, params ?? {});
+    onNavigate(page, undefined, params);
   };
   const authenticate = async () => {
     setError("");
@@ -45,7 +50,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
       } else await signInWithGoogle();
     } catch {
       setError(
-        "ログイン処理が完了しませんでした。時間をおいてもう一度お試しください。",
+        "操作を完了できませんでした。少し待って、もう一度お試しください。",
       );
     } finally {
       setBusy(false);
@@ -81,12 +86,12 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <div className="header-actions">
             <button
               className="header-saved"
-              onClick={() => navigate("search", { saved: "1" })}
-              aria-label={`保存した候補 ${savedIds.length}件`}
+              onClick={() => navigate(access.ownerTrial ? "compare" : "nagoya", access.ownerTrial ? undefined : { saved: "1" })}
+              aria-label={access.ownerTrial ? "候補の比較を開く" : `保存した候補 ${savedIds.length}件`}
             >
               <Bookmark size={17} />
               <span>候補</span>
-              <small>{savedIds.length}</small>
+              {!access.ownerTrial && <small>{savedIds.length}</small>}
             </button>
             <button
               className="desktop-login"
@@ -139,9 +144,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   {item.label}
                 </button>
               ))}
-              <button onClick={() => navigate("admin")}>
-                掲載情報の下書き
-              </button>
+
               <button
                 onClick={() => {
                   setError("");
@@ -154,13 +157,14 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           ) : (
             <>
               <p>
-                検索と候補保存はログインせずに使えます。候補・下書きはこのブラウザ内に保存されます。
+                {user ? "このブラウザではログインした状態が続きます。共有端末では、使い終わったらログアウトしてください。" : "招待されたアカウントでログインしてください。アカウントに応じた店舗情報や管理メニューを利用できます。"}
               </p>
-              {!supabase ? (
+              {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>
               ) : (
                 <>
-                  <button
+                  {!user && emailSignInEnabled && <EmailLoginForm />}
+                  {(user || googleSignInEnabled) && <><button
                     className="primary-button"
                     disabled={busy}
                     onClick={authenticate}
@@ -173,7 +177,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                   </button>
                   <p className="quiet-label">
                     {user ? user.email : "Googleの認証画面へ移動します。"}
-                  </p>
+                  </p>{user && <button className="button-secondary" onClick={() => navigate("nagoya")}>店舗一覧</button>}{access.editor && <button className="button-secondary" onClick={() => navigate("curation")}>運営管理を開く</button>}</>}
                 </>
               )}
               {error && (

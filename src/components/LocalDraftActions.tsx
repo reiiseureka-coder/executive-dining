@@ -1,0 +1,5 @@
+import { useState } from 'react';
+export default function LocalDraftActions({ save, clear, dirty, message, error }: { save: () => void; clear: () => void; dirty: boolean; message: string; error: string }) {
+  const [confirmClear, setConfirmClear] = useState(false);
+  return <><p className="draft-privacy-note">下書きはこのブラウザにだけ保存されます。ログアウトしても残り、同じ端末を使う人から見える可能性があります。共有端末では保存せず、不要になったら削除してください。</p><div className="curation-actions"><button type="button" className="button-secondary" onClick={save}>このブラウザに下書き保存</button><button type="button" className="catalog-reset" onClick={() => setConfirmClear(true)}>下書きを削除</button></div>{dirty && <p className="draft-privacy-note">未保存の変更があります。サイト内を移動しても入力は残りますが、ページを閉じる前に保存してください。</p>}{confirmClear && <div className="curation-confirm"><p>このブラウザの下書きと入力内容を削除しますか？</p><button type="button" className="button-secondary" onClick={() => { clear(); setConfirmClear(false); }}>下書きの削除を確定</button><button type="button" className="catalog-reset" onClick={() => setConfirmClear(false)}>キャンセル</button></div>}{message && <p role="status">{message}</p>}{error && <p role="alert">{error}</p>}</>;
+}

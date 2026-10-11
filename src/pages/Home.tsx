@@ -1,200 +1,47 @@
-import { useState } from "react";
-import { ArrowRight, Search as SearchIcon } from "lucide-react";
-import type { Page } from "../types";
-import type { SearchParams } from "../lib/search";
-import { restaurants } from "../data/mockData";
-import RestaurantCard from "../components/RestaurantCard";
-import SampleNotice from "../components/SampleNotice";
-interface HomeProps {
-  onNavigate: (
-    page: Page,
-    restaurantId?: string,
-    params?: SearchParams,
-  ) => void;
-}
-export default function Home({ onNavigate }: HomeProps) {
-  const [query, setQuery] = useState("");
-  return (
-    <>
-      <section className="home-hero page-width">
-        <div className="hero-copy">
-          <p className="eyebrow">A PLACE FOR GOOD CONVERSATION</p>
-          <h1>
-            <span>大切な話を、</span>
-            <span>心地よい一席で。</span>
-          </h1>
-          <p className="hero-description">
-            個室、予算、アクセス。
-            <br />
-            会食の条件をひとつずつ確かめて、
-            <br className="mobile-break" />
-            次の一軒を見つける。
-          </p>
-          <form
-            className="hero-search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              onNavigate("search", undefined, { query: query.trim() });
-            }}
-          >
-            <label className="sr-only" htmlFor="home-query">
-              店名・エリア・料理を検索
-            </label>
-            <SearchIcon size={19} aria-hidden="true" />
-            <input
-              id="home-query"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="店名・エリア・料理"
-              type="search"
-            />
-            <button type="submit">
-              探す
-              <ArrowRight size={17} />
-            </button>
-          </form>
-          <div className="quick-links">
-            <span>条件から</span>
-            <button
-              onClick={() =>
-                onNavigate("search", undefined, { privateRoom: "完全個室" })
-              }
-            >
-              完全個室
-            </button>
-            <button
-              onClick={() =>
-                onNavigate("search", undefined, { budget: "20000" })
-              }
-            >
-              2万円以内
-            </button>
-            <button
-              onClick={() => onNavigate("search", undefined, { meal: "lunch" })}
-            >
-              ランチ
-            </button>
-          </div>
-        </div>
-        <figure className="hero-figure">
-          <img
-            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85"
-            alt="落ち着いたレストランのテーブルセッティングのイメージ"
-            fetchPriority="high"
-          />
-          <figcaption>
-            <span>THE DINING NOTE</span>
-            <span>ゆっくり話せる、その場所へ。</span>
-          </figcaption>
-        </figure>
-      </section>
-      <div className="page-width">
-        <SampleNotice compact />
+import { useState } from 'react';
+import { ArrowRight, Search } from 'lucide-react';
+import type { Page } from '../types';
+import type { SearchParams } from '../lib/search';
+import HomeCatalog from '../components/HomeCatalog';
+import { useAppAccess } from '../contexts/appAccess';
+interface Props { onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
+export default function Home({ onNavigate }: Props) {
+  const [query, setQuery] = useState('');
+  const access = useAppAccess();
+  const explore = (value = '') => onNavigate('nagoya', undefined, { query: value });
+  return <>
+    <section className="home-hero page-width">
+      <div className="hero-copy">
+        <p className="eyebrow">EXECUTIVE DINING</p>
+        <h1><span>大切な話を、</span><span>心地よい一席で。</span></h1>
+        <p className="hero-description">個室・予算・アクセスから、<br />会食に合う一軒を見つける。</p>
+        <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
+          <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
+          <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="店名・エリア・料理" type="search" />
+          <button type="submit">探す<ArrowRight size={17} /></button>
+        </form>
+        <div className="quick-links"><span>気になる条件</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
+        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。名古屋の非公開情報を確認できます。' : '現在は名古屋に対応。招待済みの方はログインして店舗情報をご覧ください。'}</p>
+        <nav className="home-audience-links" aria-label="目的別のご案内"><a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}>法人導入のご案内<ArrowRight size={16} /></a><a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}>店舗掲載のご案内<ArrowRight size={16} /></a></nav>
       </div>
-      <section className="page-width section-space">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">EXPLORE BY AREA</p>
-            <h2>集まりやすい街から。</h2>
-          </div>
-          <button
-            className="text-link"
-            onClick={() => onNavigate("search", undefined, {})}
-          >
-            すべてのお店
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="area-list">
-          {[
-            { name: "東京", sub: "銀座・六本木・恵比寿・新宿", q: "東京" },
-            { name: "京都", sub: "南禅寺", q: "京都" },
-            { name: "大阪", sub: "北堀江", q: "大阪" },
-          ].map((area, index) => (
-            <button
-              key={area.name}
-              onClick={() => onNavigate("search", undefined, { query: area.q })}
-            >
-              <span className="area-number">0{index + 1}</span>
-              <span>
-                <strong>{area.name}</strong>
-                <small>{area.sub}</small>
-              </span>
-              <ArrowRight size={20} />
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="page-width section-space selection-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">THE COLLECTION</p>
-            <h2>一席を選ぶ、手がかり。</h2>
-            <p>気になるお店を保存して、条件を見比べる。</p>
-          </div>
-          <span className="quiet-label">
-            掲載サンプル {restaurants.length} 店
-          </span>
-        </div>
-        <div className="restaurant-grid">
-          {restaurants.slice(0, 3).map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              restaurant={restaurant}
-              onClick={(id) => onNavigate("detail", id)}
-            />
-          ))}
-        </div>
-        <div className="section-action">
-          <button
-            className="outline-button"
-            onClick={() => onNavigate("search", undefined, {})}
-          >
-            条件を指定して探す
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </section>
-      <section className="planning-section">
-        <div className="page-width planning-inner">
-          <div>
-            <p className="eyebrow">BEFORE YOU BOOK</p>
-            <h2>
-              いい会食は、
-              <br />
-              小さな確認から。
-            </h2>
-            <button className="text-link" onClick={() => onNavigate("about")}>
-              このサービスについて
-              <ArrowRight size={16} />
-            </button>
-          </div>
-          <ol>
-            {[
-              {
-                title: "話す内容に合った席を",
-                text: "個室の仕切りや音の通り方は、予約時にお店へ確認。",
-              },
-              {
-                title: "総額を先に確かめる",
-                text: "コースに加えて、飲み物・サービス料・個室料も確認。",
-              },
-              {
-                title: "行きも帰りも、無理なく",
-                text: "駅からの道順、集合時間、帰りの交通手段まで。",
-              },
-            ].map((item, index) => (
-              <li key={item.title}>
-                <span>0{index + 1}</span>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-    </>
-  );
+      <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>IMAGE</span><span>写真はイメージです</span></figcaption></figure>
+    </section>
+    <HomeCatalog onNavigate={onNavigate} />
+    <section className="page-width section-space home-cities">
+      <div className="section-heading"><div><p className="eyebrow">AREA</p><h2>エリアから探す</h2></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
+      <div className="area-list city-list">{['東京', '大阪', '名古屋', '福岡'].map(city => <button key={city} disabled={city !== '名古屋'} onClick={() => explore()}><span><strong>{city}</strong><small>{city === '名古屋' ? '店舗情報を見る' : '準備中'}</small></span>{city === '名古屋' && <ArrowRight size={20} />}</button>)}</div>
+    </section>
+    <section className="page-width section-space home-value">
+      <div className="section-heading"><div><h2 className="home-value-title"><span>会食の店選びに、</span><span>確かめたいこと。</span></h2></div></div>
+      <div className="home-principles">{[
+        ['個室と料金のこと','コース料金や個室の条件を、出典・確認日とともに。予約前に確かめたい情報をまとめます。'],
+        ['気になるお店を、候補に。','保存した候補から最大3店の料金や個室の条件を比較できます。候補はこのブラウザ内に保存されます。'],
+        ['予約前に知っておくこと','未確認の項目は、そのまま明記。空席や最新の利用条件は、お店へ直接ご確認ください。'],
+      ].map(([title,text]) => <article key={title}><h3>{title}</h3><p>{text}</p></article>)}</div>
+    </section>
+    <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">FOR RESTAURANTS & COMPANIES</p><h2>店舗掲載と<br />法人プランのご案内</h2><p>どちらも受付に向けて準備中です。</p></div><div className="home-partners">
+      <a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}><h3>店舗の方へ</h3><p>個室やコースの魅力を、会食のお店選びに。</p><span>掲載のご案内<ArrowRight size={16} /></span></a>
+      <a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}><h3>法人の方へ</h3><p>社員のプライベートなお店選びを、福利厚生でサポート。</p><span>法人プランのご案内<ArrowRight size={16} /></span></a>
+    </div></div></section>
+  </>;
 }
