@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/auth";
 import { useSavedCatalog } from "../hooks/useSavedCatalog";
 import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
 import EmailLoginForm from "./EmailLoginForm";
+import { LOGIN_DIALOG_EVENT } from "../lib/loginDialog";
 interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
@@ -36,6 +37,11 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
     }
     dialog.current?.close();
   }, [modal]);
+  useEffect(() => {
+    const open = () => { setError(""); setModal("login"); };
+    window.addEventListener(LOGIN_DIALOG_EVENT, open);
+    return () => window.removeEventListener(LOGIN_DIALOG_EVENT, open);
+  }, []);
   const navigate = (page: Page, params?: SearchParams) => {
     setModal(null);
     onNavigate(page, undefined, params);

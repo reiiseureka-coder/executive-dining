@@ -26,7 +26,7 @@ export default function EmailLoginForm() {
     }
   };
   return <form className="email-login-form" onSubmit={send}>
-    <p className="quiet-label">招待された管理者のメールアドレスを入力してください。</p>
+    <p className="quiet-label">招待されたメールアドレスを入力してください。</p>
     <label htmlFor="admin-login-email">メールアドレス</label>
     <input id="admin-login-email" type="email" inputMode="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} disabled={emailSending} />
     <button className="primary-button" type="submit" disabled={emailSending || remaining > 0}>{emailSending ? '送信中…' : remaining > 0 ? `再送まで${remaining}秒` : 'ログインリンクを送る'}</button>

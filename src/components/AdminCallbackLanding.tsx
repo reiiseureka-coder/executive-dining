@@ -14,7 +14,7 @@ export default function AdminCallbackLanding() {
     let target = consumeLoginDestination(window.localStorage);
     // New navigation always wins. A callback must not pull a user away from their current page.
     if (!isUnclaimedLoginLanding(window.location.hash)) return;
-    if ((target === '#/curation' && !access.editor) || (target === '#/pilot' && !access.ownerTrial)) target = '#/';
+    if ((target === '#/curation' && !access.editor) || (/^#\/pilot(?:[/?]|$)/.test(target) && !access.ownerTrial)) target = '#/';
     window.history.replaceState(window.history.state, '', target);
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }, [user, loading, access.loading, access.editor, access.ownerTrial]);

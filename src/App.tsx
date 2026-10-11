@@ -1,7 +1,8 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import type { Page } from "./types";
 import type { SearchParams } from "./lib/search";
 import { parseRoute, routeHash } from "./lib/routing";
+import { pagePosition, rememberPagePosition } from "./lib/pageScroll";
 import { isAdminEmailCallback } from "./lib/authLanding";
 import { AppAccessProvider } from "./contexts/AppAccessProvider";
 import { useAppAccess } from "./contexts/appAccess";
@@ -49,6 +50,15 @@ function AppShell() {
     () => "#/",
   );
   const route = parseRoute(hash);
+  const previousPath = useRef(hash.split('?')[0]);
+  useLayoutEffect(() => {
+    const path = hash.split('?')[0];
+    if (path === previousPath.current) return;
+    previousPath.current = path;
+    const position = pagePosition(hash);
+    window.scrollTo({top: position?.top ?? 0, behavior: "instant"});
+    (position?.focusId ? document.getElementById(position.focusId) : document.getElementById('main-content'))?.focus({preventScroll:true});
+  }, [hash]);
   const handleNavigate = (
     page: Page,
     restaurantId?: string,
@@ -57,12 +67,13 @@ function AppShell() {
     const search =
       params ??
       (["search", "detail", "nagoya", "nagoya-detail", "home", "compare", "pilot", "pilot-detail"].includes(route.page) ? route.params : {});
+    rememberPagePosition(hash, window.scrollY, ["nagoya", "pilot"].includes(route.page) && ["nagoya-detail", "pilot-detail"].includes(page) && restaurantId ? `verified-${restaurantId}` : undefined);
     window.location.hash = routeHash(
       page,
       restaurantId,
       ["search", "detail", "nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(page) ? search : {},
     );
-    window.scrollTo({ top: 0, behavior: "instant" });
+
   };
   const updateSearch = (params: SearchParams) => {
     window.history.replaceState(

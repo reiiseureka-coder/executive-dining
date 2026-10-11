@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { observeAuthSession } from '../src/lib/authSession.ts';
-import { isAdminEmailCallback, isUnclaimedLoginLanding, rememberLoginDestination, consumeLoginDestination, LOGIN_RETURN_KEY } from '../src/lib/authLanding.ts';
+import { isAdminEmailCallback, isUnclaimedLoginLanding, rememberLoginDestination, consumeLoginDestination, loginDestination, LOGIN_RETURN_KEY } from '../src/lib/authLanding.ts';
 function setup() {
   let emit, resolve, reject, unsubscribed = 0;
   const pending = new Promise((yes, no) => { resolve = yes; reject = no; });
@@ -59,4 +59,13 @@ test('login return keeps only short-lived allowed same-origin routes and consume
   }
   rememberLoginDestination(storage,'#/curation',1000);assert.equal(consumeLoginDestination(storage,1900000),'#/');
   data.set(LOGIN_RETURN_KEY,JSON.stringify({target:'#/curation',expiresAt:999999999}));assert.equal(consumeLoginDestination(storage,2000),'#/');
+});
+
+test('login interruption retains bounded catalog filters while removing auth fields and destinations',()=>{
+ const wanted='#/nagoya?query='+encodeURIComponent('名駅 個室')+'&genre='+encodeURIComponent('日本料理')+'&saved=1';
+ assert.equal(loginDestination(wanted+'&email=private&access_token=secret&redirect=https://evil.test'),wanted.replace('%20','+'));
+ assert.equal(loginDestination('#/nagoya?query='+encodeURIComponent('x'.repeat(161))), '#/nagoya');
+ assert.equal(loginDestination('#/nagoya?view=../../evil&sort=script&ids=private'),'#/nagoya');
+ const data=new Map(); const storage={setItem:(key,value)=>data.set(key,value),getItem:key=>data.get(key)??null,removeItem:key=>data.delete(key)};
+ rememberLoginDestination(storage,wanted,1000);assert.equal(consumeLoginDestination(storage,2000),loginDestination(wanted));
 });

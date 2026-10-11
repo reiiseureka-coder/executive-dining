@@ -129,3 +129,17 @@ test('owner invitation lands at the single entry with ten real stores and restor
   await expect(second.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await second.close();
 });
+
+test('login from an interrupted search restores its keyword after the verified callback',async({page})=>{
+ await ownerMock(page);
+ await page.route('**/auth/v1/user',route=>route.fulfill({json:callbackUser}));
+ await page.route('**/auth/v1/otp**',route=>route.fulfill({json:{}}));
+ await page.goto(`${base}/#/nagoya?query=${encodeURIComponent('名古屋浅田')}`);
+ await page.getByRole('button',{name:'招待済みの方はログイン',exact:true}).click();
+ await page.getByRole('textbox',{name:'メールアドレス'}).fill('fixture@example.test');await page.getByRole('button',{name:'ログインリンクを送る',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('メール送信を受け付けました');
+ await page.goto(callbackUrl());
+ await expect(page.getByRole('textbox',{name:'非公開の実店舗を検索'})).toHaveValue('名古屋浅田');
+ await expect(page.getByText('実店舗 1 / 10件（非公開）',{exact:true})).toBeVisible();
+ await expect(page).not.toHaveURL(/access_token|refresh_token/);
+});

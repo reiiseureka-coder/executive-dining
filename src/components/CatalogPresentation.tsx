@@ -16,7 +16,7 @@ export function CatalogPhoto({ restaurant, detail = false, showWebsite = true }:
   </figure>;
 }
 export function CatalogPresentation({ restaurant, detail = false }: { restaurant: DisplayRestaurant; detail?: boolean }) {
-  return <><CatalogPhoto restaurant={restaurant} detail={detail} /><div className="catalog-presentation-heading"><p className="eyebrow">{factValue(restaurant, 'genre') ?? '料理の情報は確認中'}</p><h2>{restaurant.name}</h2><p>{restaurant.address}</p></div><VerifiedFactList restaurant={restaurant} compact={!detail} />{detail && <><p className="catalog-filter-note">コースの価格と利用条件は、確認した時点の情報です。空席・防音性は未確認です。予約前に最新情報をお店へご確認ください。</p><VerifiedEvidence restaurant={restaurant} /></>}</>;
+  return <><CatalogPhoto restaurant={restaurant} detail={detail} /><div className="catalog-presentation-heading"><p className="eyebrow">{factValue(restaurant, 'genre') ?? '料理の情報は確認中'}</p><h2>{restaurant.name}</h2><p>{restaurant.address}</p></div><VerifiedFactList restaurant={restaurant} compact={!detail} />{detail && <><p className="catalog-filter-note">料金の種類と利用条件は、確認した時点の情報です。空席・防音性は未確認です。予約前に最新情報をお店へご確認ください。</p><VerifiedEvidence restaurant={restaurant} /></>}</>;
 }
 export default function EditorialPreview({ restaurant }: { restaurant: EditorialRestaurant }) {
   const [detail, setDetail] = useState(false);
