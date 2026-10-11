@@ -56,11 +56,11 @@ function AppShell() {
   ) => {
     const search =
       params ??
-      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare", "pilot"].includes(route.page) ? route.params : {});
+      (["search", "detail", "nagoya", "nagoya-detail", "home", "compare", "pilot", "pilot-detail"].includes(route.page) ? route.params : {});
     window.location.hash = routeHash(
       page,
       restaurantId,
-      ["search", "detail", "nagoya", "nagoya-detail", "compare", "pilot"].includes(page) ? search : {},
+      ["search", "detail", "nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(page) ? search : {},
     );
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -82,6 +82,7 @@ function AppShell() {
       compare: "会食候補を比較",
       membership: "会員登録のデモ",
       pilot: "実店舗の非公開テスト",
+      "pilot-detail": "店舗情報の操作確認",
       search: "お店を探す",
       detail: "店舗情報",
       about: "このサービスについて",
@@ -109,7 +110,7 @@ function AppShell() {
         currentPage={route.page}
         onNavigate={handleNavigate}
       />
-      {access.ownerTrial && ["nagoya", "nagoya-detail", "compare", "pilot", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
+      {access.ownerTrial && ["pilot", "pilot-detail", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
         {route.page === "home" && <Home onNavigate={handleNavigate} />}
         {route.page === "restaurants" && <PartnerPage audience="restaurants" />}
@@ -129,7 +130,7 @@ function AppShell() {
             onNavigate={handleNavigate}
           />
         )}
-        {["nagoya", "nagoya-detail", "compare", "pilot"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || route.page === "pilot" ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
+        {["nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(route.page) && (access.loading ? <div className="page-width catalog-page" role="status">利用できる店舗情報を確認しています…</div> : access.ownerTrial || ["pilot", "pilot-detail"].includes(route.page) ? <OwnerTrial route={route} onNavigate={handleNavigate} /> : access.unavailable ? <div className="page-width catalog-page"><p role="alert">利用権限を確認できませんでした。接続を確認して、もう一度お試しください。</p><button className="button-secondary" onClick={access.retry}>利用権限を再確認</button></div> : route.page === "nagoya-detail" ? <NagoyaDetail restaurantId={route.restaurantId ?? ""} params={route.params} onNavigate={handleNavigate} /> : route.page === "compare" ? <Compare params={route.params} onNavigate={handleNavigate} /> : <Nagoya params={route.params} onChange={updateSearch} onNavigate={handleNavigate} />)}
         {route.page === "curation" && <Curation />}
         {route.page === "membership" && <Membership />}
         {route.page === "admin" && <Admin />}

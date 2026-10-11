@@ -35,8 +35,8 @@ test('authorized editor can read the queue and sign out without a legacy profile
   await signedInFixture(page);
   await page.goto('http://127.0.0.1:4181/#/curation');
   await expect(page.getByRole('heading', { name: '確認待ちの候補はありません' })).toBeVisible();
-  await page.locator('.review-readiness summary').click();
-  await expect(page.getByText('口コミの送信・審査・通報は、まだ利用できません。受付の開始には、店舗の掲載承認とは別の準備が必要です。')).toBeVisible();
+  await page.getByText('店舗を追加してから公開するまで',{exact:true}).click();
+  await expect(page.getByText(/一般公開、会員募集、実口コミの受付はそれぞれ別/)).toBeVisible();
   expect(requests.some(url => url.includes('dining_review_queue'))).toBe(false);
   expect(requests.some(url => url.includes('dining_editor_queue'))).toBe(true);
   expect(requests.some(url => url.includes('user_profiles'))).toBe(false);

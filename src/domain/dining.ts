@@ -58,6 +58,7 @@ export interface VerifiedRestaurant {
   reviews: PublishedReview[];
 }
 export interface EditorialRestaurant {
+  publicEnabled?: boolean;
   id: string;
   name: string;
   address: string;

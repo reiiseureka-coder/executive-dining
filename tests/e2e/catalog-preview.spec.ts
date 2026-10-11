@@ -7,6 +7,7 @@ test('actual ten candidate records have read-only card and detail previews with 
     const name = route.request().url().split('/').at(-1);
     if (name === 'dining_editor_access') return route.fulfill({ json: true });
     if (name === 'dining_editor_queue') return route.fulfill({ json: catalog.map((row: object) => ({ ...row, version: 1, verifiedAt: null, sources: [] })) });
+    if (name === 'dining_editor_context') return route.fulfill({json:{contractVersion:1,publicEnabled:false,reviewsEnabled:false,manualIntakeEnabled:true,queueLimit:200}});
     if (name === 'dining_public_catalog') return route.fulfill({ json: [] });
     if (name === 'dining_owner_trial_context') return route.fulfill({ status: 403, json: { code: '42501' } });
     writes.push(name ?? ''); return route.fulfill({ status: 403, json: {} });
@@ -14,7 +15,8 @@ test('actual ten candidate records have read-only card and detail previews with 
   await page.goto(`${base}/#/curation`);
   await expect(page.locator('.curation-card')).toHaveCount(10);
   for (const row of catalog) {
-    const editor = page.locator('.curation-card').filter({ has: page.getByRole('heading', { name: row.name, exact: true }) });
+    await page.getByRole('button',{name:`${row.name}を確認する`,exact:true}).click();
+    const editor = page.locator('.editorial-detail');
     await editor.getByText('掲載時の表示を確認する', { exact: true }).click();
     const preview = editor.getByRole('region');
     await expect(preview.getByText('イメージ', { exact: true })).toBeVisible();
@@ -28,8 +30,10 @@ test('actual ten candidate records have read-only card and detail previews with 
     await editor.getByRole('button', { name: '一覧カード', exact: true }).click();
     await expect(preview.getByText('営業時間', { exact: true })).toHaveCount(0);
     await editor.getByText('掲載時の表示を確認する', { exact: true }).click();
+    await editor.getByRole('button',{name:'店舗一覧に戻る',exact:true}).click();
   }
-  const first = page.locator('.curation-card').first();
+  await page.getByRole('button',{name:`${catalog[0].name}を確認する`,exact:true}).click();
+  const first = page.locator('.editorial-detail');
   await first.getByText('掲載時の表示を確認する', { exact: true }).click();
   await page.setViewportSize({ width: 320, height: 760 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

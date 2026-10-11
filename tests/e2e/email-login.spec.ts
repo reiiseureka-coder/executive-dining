@@ -62,7 +62,7 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(/#\/curation$/);
   await expect(page.locator('.curation-card')).toHaveCount(10);
-  await expect(page.getByText('最新 10件（最大200件） / 口コミの受付は準備中')).toBeVisible();
+  await expect(page.getByText('登録 10件 · 絞り込み 10件')).toBeVisible();
   await page.goBack(); await expect(page).toHaveURL(/#\/about$/);
   await expect(page).not.toHaveURL(/access_token|refresh_token/);
   await page.goForward(); await expect(page).toHaveURL(/#\/curation$/);

@@ -41,6 +41,7 @@ async function mockReadOnlyData(page: Page, editor = false, catalog: VerifiedRes
     reads.push(name);
     if (name === 'dining_public_catalog') return route.fulfill({ json: catalog });
     if (name === 'dining_editor_access') return route.fulfill({ json: editor });
+    if (name === 'dining_editor_context' && editor) return route.fulfill({json:{contractVersion:1,publicEnabled:false,reviewsEnabled:false,manualIntakeEnabled:true,queueLimit:200}});
     if (name === 'dining_editor_queue' && editor) return route.fulfill({ json: [candidate] });
     if (name === 'dining_owner_trial_context') return route.fulfill({ status: 403, json: { code: '42501' } });
     // Fail closed: these tests may read mocked data, but must never call a write RPC.
@@ -143,10 +144,11 @@ test('actual mocked curation editor and confirmation fit 320px without writing',
   await login(page);
   const state = await mockReadOnlyData(page, true);
   await page.goto(`${base}/#/curation`);
-  const editor = page.locator('.curation-card');
+  await page.getByRole('button',{name:`${candidate.name}を確認する`,exact:true}).click();
+  const editor = page.locator('.editorial-detail');
   await expect(editor).toHaveCount(1);
   await editor.getByText('取得元・利用条件（1件）', { exact: true }).click();
-  await editor.getByText('取得時の資料を見る（未審査）', { exact: true }).click();
+  await editor.getByText('取得時の資料を見る', { exact: true }).click();
   await editor.getByText('公式情報を確認して記録する', { exact: true }).click();
   await editor.getByLabel('確認項目', { exact: true }).selectOption('price');
   await editor.getByLabel('確認した内容', { exact: true }).fill('表示確認用の架空コース料金と利用条件です。保存しません。');
@@ -157,7 +159,7 @@ test('actual mocked curation editor and confirmation fit 320px without writing',
   await fits(page);
   await screenshot(page, info, 'curation-editor');
 
-  await editor.getByRole('button', { name: '掲載を承認', exact: true }).click();
+  await editor.getByRole('button', { name: '掲載候補として承認', exact: true }).click();
   await expect(editor.locator('.curation-confirm')).toBeVisible();
   await comfortableTargets(editor.locator('.curation-confirm button'));
   await fits(page);

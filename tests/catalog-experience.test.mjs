@@ -48,3 +48,10 @@ test('public cache clears stale results on error and can retry with an empty unp
   assert.equal(store.getSnapshot().rows.length, 0); assert.ok(store.getSnapshot().error);
   next = 'empty'; await store.load(true); assert.equal(store.getSnapshot().error, ''); assert.deepEqual(store.getSnapshot().rows, []);
 });
+
+test('operator-only test detail routes preserve history independently of customer detail routes',()=>{
+ const id='11111111-1111-4111-8111-111111111111'; const params={query:'名駅'};
+ assert.deepEqual(parseRoute(routeHash('pilot-detail',id,params)),{page:'pilot-detail',restaurantId:id,params});
+ assert.equal(parseRoute('#/pilot/%E0%A4%A').page,'pilot');
+ assert.notEqual(routeHash('pilot-detail',id),routeHash('nagoya-detail',id));
+});

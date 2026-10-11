@@ -11,6 +11,7 @@ export async function mock(page:Page,{denied=false,expired=false,uncertain=false
   const url=route.request().url();if(url.includes('/auth/v1/logout')){await route.fulfill({status:204,body:''});return;}
   const name=url.split('/').at(-1)!;const args=route.request().postDataJSON()??{};calls.push({name,args});
   if(name==='dining_editor_access'){await route.fulfill({json:!denied});return;}
+  if(name==='dining_editor_context'){await route.fulfill({json:{contractVersion:1,publicEnabled:false,reviewsEnabled:false,manualIntakeEnabled:true,queueLimit:200}});return;}
   if(name==='dining_public_catalog'){await route.fulfill({json:[]});return;}
   if(!name.startsWith('dining_owner_trial_')){await route.fulfill({json:[]});return;}
   if(denied){await route.fulfill({status:403,json:{code:'42501',message:'Denied'}});return;}

@@ -5,14 +5,15 @@ async function menu(page:Page,isMobile:boolean){if(isMobile)await page.getByRole
 test('single entry restores owner session, real ten stores, details/back and comparison/reload',async({page,isMobile})=>{
  await login(page);const state=await mock(page);await page.goto(`${base}/#/nagoya`);
  await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
- await expect(page.locator('.private-mode-banner')).toContainText('非公開テスト中');
+ await expect(page.locator('.private-mode-banner')).toHaveCount(0);
+ await expect(page.locator('.pilot-profile')).toHaveCount(0);
  await expect(page.locator('.site-footer')).not.toContainText('サンプル・デモ');
  await page.getByRole('textbox',{name:'非公開の実店舗を検索'}).fill('名古屋浅田');
  const row=catalog.find((r:{name:string})=>r.name==='名古屋浅田');
  await page.locator(`[data-pilot-id="${row.id}"]`).getByRole('button',{name:'店舗の詳細を見る'}).click();
  await expect(page).toHaveURL(new RegExp(`nagoya/${row.id}`));
  await page.goBack();await expect(page.getByRole('textbox',{name:'非公開の実店舗を検索'})).toHaveValue('名古屋浅田');
- await page.goForward();await expect(page.getByRole('heading',{name:'この店舗で投稿テスト'})).toBeVisible();
+ await page.goForward();await expect(page.getByRole('heading',{name:'名古屋浅田',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'この店舗で投稿テスト'})).toHaveCount(0);
  await page.getByRole('button',{name:'実店舗一覧へ戻る'}).click();await page.getByRole('textbox',{name:'非公開の実店舗を検索'}).fill('');
  for(const row of catalog.slice(0,2))await page.locator(`[data-pilot-id="${row.id}"]`).getByRole('button',{name:'比較に追加',exact:true}).click();
  await page.getByRole('button',{name:'候補の比較を開く'}).click();await expect(page.getByRole('table')).toBeVisible();

@@ -30,6 +30,10 @@ export function parseRoute(hash: string): {
       restaurantId: path.slice("/restaurant/".length),
       params,
     };
+  if (path.startsWith('/pilot/')) {
+    try { return {page:'pilot-detail',restaurantId:decodeURIComponent(path.slice('/pilot/'.length)),params}; }
+    catch { return {page:'pilot',params}; }
+  }
   if (path.startsWith('/nagoya/')) {
     try { return { page: 'nagoya-detail', restaurantId: decodeURIComponent(path.slice('/nagoya/'.length)), params }; }
     catch { return { page: 'nagoya', params }; }
@@ -48,6 +52,8 @@ export function routeHash(
   const path =
     page === "home"
       ? "/"
+      : page === "pilot-detail"
+        ? `/pilot/${encodeURIComponent(restaurantId ?? "")}`
       : page === "nagoya-detail"
         ? `/nagoya/${encodeURIComponent(restaurantId ?? "")}`
       : page === "detail"

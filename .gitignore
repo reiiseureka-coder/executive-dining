@@ -31,3 +31,6 @@ dist-ssr
 # Local browser test artifacts
 playwright-report/
 test-results/
+
+# Local Supabase CLI cache
+supabase/.temp/
