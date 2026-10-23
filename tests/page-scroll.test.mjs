@@ -24,3 +24,9 @@ test('saved filters and negative scroll positions retain their existing safeguar
   assert.deepEqual(pagePosition('#/nagoya?query=saved-check&saved=1&ids=first'), { top: 0, focusId: 'verified-saved' });
   assert.equal(pagePosition('#/nagoya?query=saved-check'), undefined);
 });
+
+ test('static demo list restores its row when only selected comparison IDs change', () => {
+  rememberPagePosition('#/preview?query=demo-return', 522, 'verified-demo-row');
+  assert.deepEqual(pagePosition('#/preview?query=demo-return&ids=one,two'), { top:522, focusId:'verified-demo-row' });
+  assert.equal(pagePosition('#/preview?query=other'), undefined);
+ });

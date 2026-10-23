@@ -10,7 +10,7 @@ export function isUnclaimedLoginLanding(hash: string): boolean {
 
 export const LOGIN_RETURN_KEY = 'ed-login-destination:v1';
 const allowed = (value: unknown): value is string => typeof value === 'string' &&
-  (/^#\/(?:curation|about|nagoya|compare|pilot|restaurants|corporate)?$/.test(value) || /^#\/(?:nagoya|pilot)\/[0-9a-f-]{36}$/i.test(value));
+  (/^#\/(?:find|curation|about|nagoya|compare|pilot|restaurants|corporate)?$/.test(value) || /^#\/(?:nagoya|pilot)\/[0-9a-f-]{36}$/i.test(value));
 /** Keep only bounded catalog navigation. Never persist email, callback credentials or external destinations. */
 export function loginDestination(hash: string): string {
   const [path, query = ''] = hash.split('?');

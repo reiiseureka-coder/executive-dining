@@ -41,9 +41,9 @@ test.beforeEach(async ({ isMobile }, info) => {
 });
 
 for (const width of widths) {
-  test(`disconnected home explains its primary state and keeps business links secondary at ${width}px`, async ({ page }, info) => {
+  test(`disconnected discovery explains its primary state and keeps business links secondary at ${width}px`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: viewportHeight });
-    await page.goto('/');
+    await page.goto('/#/find');
     await ready(page);
 
     await expect(page.locator('[data-home-state="disconnected"]')).toBeVisible();
@@ -56,17 +56,17 @@ for (const width of widths) {
     await expect(corporate).toHaveCount(1);
     await expect(page.locator('.home-closing a[href="#/restaurants"]')).toBeVisible();
     await fits(page);
-    await screenshot(page, info, `home-disconnected-${width}`);
+    await screenshot(page, info, `find-disconnected-${width}`);
 
     await corporate.click();
     await expect(page).toHaveURL(/#\/corporate$/);
     await expect(page.getByRole('heading', { name: 'エンタープライズプラン', exact: true })).toBeInViewport();
   });
 
-  test(`mocked available home prioritizes readable search and decision facts at ${width}px`, async ({ page }, info) => {
+  test(`mocked available discovery prioritizes readable search and decision facts at ${width}px`, async ({ page }, info) => {
     // A signed-in RPC fixture, not a production account or live database check.
     await page.setViewportSize({ width, height: viewportHeight });
-    await login(page); await mock(page); await page.goto('http://127.0.0.1:4181');
+    await login(page); await mock(page); await page.goto('http://127.0.0.1:4181/#/find');
     await ready(page);
     await expect(page.locator('[data-home-state="available"]')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('名古屋の会食店を探す');
@@ -94,7 +94,7 @@ for (const width of widths) {
     await expect(first.locator('details, img')).toHaveCount(0);
     await expect(page.locator('.quick-links')).toHaveCount(0);
     await fits(page);
-    await screenshot(page, info, `home-available-private-fixture-${width}`);
+    await screenshot(page, info, `find-available-private-fixture-${width}`);
   });
 
   test(`corporate introduction and consultation stay near the top at ${width}px`, async ({ page }, info) => {

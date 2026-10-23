@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { catalog, login, mock } from './helpers/ownerTrial';
 const base = 'http://127.0.0.1:4181';
 // All connected states below use intercepted RPC fixtures, not a live backend.
-test('mocked anonymous home distinguishes public preparation without private catalog reads', async ({ page, isMobile }, info) => {
-  const state = await mock(page); await page.goto(base);
+test('mocked anonymous discovery distinguishes public preparation without private catalog reads', async ({ page, isMobile }, info) => {
+  const state = await mock(page); await page.goto(`${base}/#/find`);
   await expect(page.locator('[data-home-state="preparing"]')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('名古屋の会食店、公開準備中');
   await expect(page.locator('.home-catalog-preparing')).toHaveCount(1);
@@ -14,12 +14,15 @@ test('mocked anonymous home distinguishes public preparation without private cat
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
-    await page.screenshot({ path: info.outputPath(`home-preparing-fixture-${width}.png`), fullPage: true });
+    await page.screenshot({ path: info.outputPath(`find-preparing-fixture-${width}.png`), fullPage: true });
   }
   await page.setViewportSize({ width: isMobile ? 390 : 1280, height: 900 });
-  if (isMobile) await page.getByRole('button', { name: 'メニューを開く', exact: true }).click();
-  await page.getByRole('button', { name: '店舗一覧', exact: true }).click();
-  await expect(page).toHaveURL(`${base}/#/nagoya`); await page.goBack();
+  const navigation = page.getByRole('navigation', { name: isMobile ? 'サービスナビゲーション' : 'メインナビゲーション', exact: true });
+  await navigation.getByRole('button', { name: 'ホーム', exact: true }).click();
+  await expect(page).toHaveURL(`${base}/#/`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食の候補を、条件で選ぶ。');
+  await page.goBack();
+  await expect(page).toHaveURL(`${base}/#/find`);
   await expect(page.locator('[data-home-state="preparing"]')).toBeVisible();
 });
 
@@ -32,7 +35,7 @@ test('mocked public loading and failure do not expose search, and retry reaches 
     await pending;
     await route.fulfill(fail ? { status: 503, json: { code: 'unavailable', message: 'fixture failure' } } : { json: [] });
   });
-  await page.goto(base);
+  await page.goto(`${base}/#/find`);
   await expect(page.locator('[data-home-state="loading"]')).toBeVisible();
   await expect(page.getByRole('search')).toHaveCount(0);
   release();
@@ -45,11 +48,11 @@ test('mocked public loading and failure do not expose search, and retry reaches 
   expect(state.calls.some(call => call.name.startsWith('dining_owner_trial_'))).toBe(false);
 });
 
-test('mocked available public home previews full decision facts without private reads', async ({ page }) => {
+test('mocked available public discovery previews full decision facts without private reads', async ({ page }) => {
   const state = await mock(page);
   const publicRows = catalog.map(row => ({ id: row.id, name: row.name, address: row.address, status: 'verified', verifiedAt: row.factsCheckedAt, facts: row.facts, reviews: [] }));
   await page.route('**/rest/v1/rpc/dining_public_catalog', route => route.fulfill({ json: publicRows }));
-  await page.goto(base);
+  await page.goto(`${base}/#/find`);
   await expect(page.locator('[data-home-state="available"]')).toBeVisible();
   await expect(page.getByRole('searchbox', { name: '店名・エリアから探す', exact: true })).toBeVisible();
   const first = [...publicRows].sort((a, b) => a.name.localeCompare(b.name, 'ja'))[0];
@@ -62,8 +65,8 @@ test('mocked available public home previews full decision facts without private 
   expect(state.calls.some(call => call.name.startsWith('dining_owner_trial_'))).toBe(false);
 });
 
-test('mocked invited home preserves full conditions, detail history and logout without venue photos', async ({ page, isMobile }, info) => {
-  await login(page); const state = await mock(page); await page.goto(base);
+test('mocked invited discovery preserves full conditions, detail history and logout without venue photos', async ({ page, isMobile }, info) => {
+  await login(page); const state = await mock(page); await page.goto(`${base}/#/find`);
   const cards = page.locator('[data-home-restaurant]'); await expect(cards).toHaveCount(3);
   const expected = [...catalog].sort((a, b) => a.name.localeCompare(b.name, 'ja')).slice(0, 3);
   await expect(cards.locator('h3')).toHaveText(expected.map(row => row.name));
@@ -80,7 +83,7 @@ test('mocked invited home preserves full conditions, detail history and logout w
     await expect(cards.locator('img')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
-    await page.screenshot({ path: info.outputPath(`home-available-private-fixture-${width}.png`), fullPage: true });
+    await page.screenshot({ path: info.outputPath(`find-available-private-fixture-${width}.png`), fullPage: true });
   }
   await cards.first().getByRole('link').click();
   await expect(page.locator('.pilot-detail img')).toHaveCount(0);
@@ -88,7 +91,7 @@ test('mocked invited home preserves full conditions, detail history and logout w
   await page.screenshot({ path: info.outputPath('detail-private-fixture.png'), fullPage: true });
   await page.goBack(); await expect(cards).toHaveCount(3); await page.goForward(); await page.reload();
   await expect(page.locator('.pilot-detail').getByRole('heading', { name: expected[0].name, exact: true })).toBeVisible();
-  await page.goto(base); await expect(cards).toHaveCount(3);
+  await page.goto(`${base}/#/find`); await expect(cards).toHaveCount(3);
   await page.setViewportSize({ width: isMobile ? 390 : 1280, height: 900 });
   if (isMobile) await page.getByRole('button', { name: 'メニューを開く', exact: true }).click();
   await page.getByRole('button', { name: 'アカウント', exact: true }).click();
@@ -98,8 +101,8 @@ test('mocked invited home preserves full conditions, detail history and logout w
   expect(state.calls.some(call => /submit|moderate|prepare_profile|delete|withdraw/.test(call.name))).toBe(false);
 });
 
-test('mocked expired and denied accounts never request private home catalog', async ({ page }) => {
-  await login(page); const state = await mock(page, { expired: true }); await page.goto(base);
+test('mocked expired and denied accounts never request private discovery catalog', async ({ page }) => {
+  await login(page); const state = await mock(page, { expired: true }); await page.goto(`${base}/#/find`);
   await expect(page.locator('[data-home-state="expired"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: '招待アカウントの閲覧期間が終了しました', exact: true })).toBeVisible();
   await expect(page.getByRole('search')).toHaveCount(0);
@@ -113,11 +116,11 @@ test('mocked expired and denied accounts never request private home catalog', as
   expect(denied.calls.some(c => c.name === 'dining_owner_trial_catalog')).toBe(false);
 });
 
-test('home access lookup failure offers recovery without unreachable public destinations', async ({ page }) => {
+test('discovery access lookup failure offers recovery without unreachable public destinations', async ({ page }) => {
   await login(page);const state=await mock(page);
   const failed='**/rpc/dining_owner_trial_context';
   await page.route(failed,route=>route.fulfill({status:503,json:{code:'unavailable'}}));
-  await page.goto(base);
+  await page.goto(`${base}/#/find`);
   await expect(page.locator('[data-home-state="denied"]')).toBeVisible();
   await expect(page.locator('[data-home-restaurant]')).toHaveCount(0);
   await expect(page.getByRole('search')).toHaveCount(0);

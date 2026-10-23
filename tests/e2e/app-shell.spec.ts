@@ -22,8 +22,10 @@ test('single entry restores owner session, real ten stores, details/back and com
  await expect(page.getByRole('heading',{name:'店舗情報の確認・審査'})).toBeVisible();
  await expect(page.locator('.private-mode-banner')).toBeVisible();
  await page.getByRole('button',{name:'Executive Dining ホーム',exact:true}).click();
- await expect(page.getByRole('heading',{name:/名古屋の会食店/})).toBeVisible();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
  await expect(page.locator('.private-mode-banner')).toHaveCount(0);
+ await page.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
+ await expect(page).toHaveURL(`${base}/#/find`);
  await page.getByRole('link',{name:'全10店を見る',exact:true}).click();
  await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
  expect(state.calls.some(c=>c.name==='otp')).toBe(false);

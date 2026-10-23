@@ -13,12 +13,14 @@ async function mockCatalog(page: Page, recordRequest?: () => void, catalog = row
     else await route.fulfill({ json: [] });
   });
 }
-test('homepage and primary search use real catalog, while six-sample demo stays explicit', async ({ page, isMobile }) => {
+test('primary discovery reaches the real catalog, while six-sample demo stays explicit', async ({ page, isMobile }) => {
   await mockCatalog(page); await page.goto(`${base}/#/nagoya`);
   await expect(page.getByText('掲載中のお店 2件')).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
-  if (isMobile) await page.getByRole('button', { name: 'メニューを開く' }).click();
-  await page.getByRole('button', { name: '店舗一覧', exact: true }).click();
+  await page.getByRole('navigation', { name: isMobile ? 'サービスナビゲーション' : 'メインナビゲーション', exact: true }).getByRole('button', { name: '店舗を探す', exact: true }).click();
+  await expect(page).toHaveURL(`${base}/#/find`);
+  await expect(page.locator('[data-home-restaurant]')).toHaveCount(2);
+  await page.getByRole('link', { name: '全2店を見る', exact: true }).click();
   await expect(page).toHaveURL(`${base}/#/nagoya`);
   await expect(page.getByRole('link', { name: 'サンプル・デモ', exact: true })).toHaveCount(0);
   await page.goto(`${base}/#/demo`);

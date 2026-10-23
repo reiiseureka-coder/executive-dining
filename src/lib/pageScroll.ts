@@ -4,7 +4,7 @@ const key = (hash: string) => {
   const route = parseRoute(hash);
   // Choosing comparison candidates does not change the list being returned to.
   // Keep actual search filters distinct, but restore the same row after a detail-page selection.
-  const params = ['nagoya', 'pilot'].includes(route.page) ? { ...route.params, ids: undefined } : route.params;
+  const params = ['nagoya', 'pilot', 'service-demo'].includes(route.page) ? { ...route.params, ids: undefined } : route.params;
   return routeHash(route.page, route.restaurantId, params);
 };
 /** In-memory navigation state only. It contains no account/profile data and is never sent. */

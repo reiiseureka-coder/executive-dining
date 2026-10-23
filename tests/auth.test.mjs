@@ -45,6 +45,7 @@ test('only explicit successful admin email callback shapes can request landing',
 });
 test('callback landing never takes over an explicitly selected route', () => {
   assert.equal(isUnclaimedLoginLanding(''), true); assert.equal(isUnclaimedLoginLanding('#/'), true);
+  assert.equal(isUnclaimedLoginLanding('#/find'), false);
   assert.equal(isUnclaimedLoginLanding('#/nagoya'), false); assert.equal(isUnclaimedLoginLanding('#/about'), false);
 });
 
@@ -59,6 +60,15 @@ test('login return keeps only short-lived allowed same-origin routes and consume
   }
   rememberLoginDestination(storage,'#/curation',1000);assert.equal(consumeLoginDestination(storage,1900000),'#/');
   data.set(LOGIN_RETURN_KEY,JSON.stringify({target:'#/curation',expiresAt:999999999}));assert.equal(consumeLoginDestination(storage,2000),'#/');
+});
+
+test('login return preserves discovery as a separate destination without auth fields', () => {
+  assert.equal(loginDestination('#/find?email=private&access_token=secret'), '#/find');
+  const data = new Map();
+  const storage = { setItem: (key, value) => data.set(key, value), getItem: key => data.get(key) ?? null, removeItem: key => data.delete(key) };
+  rememberLoginDestination(storage, '#/find', 1000);
+  assert.equal(consumeLoginDestination(storage, 2000), '#/find');
+  assert.equal(consumeLoginDestination(storage, 2000), '#/');
 });
 
 test('login interruption retains bounded catalog filters while removing auth fields and destinations',()=>{

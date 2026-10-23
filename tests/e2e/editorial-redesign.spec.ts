@@ -12,9 +12,9 @@ async function capture(page:Page,info:TestInfo,name:string) {
 }
 for (const width of [390,1440]) {
   const height=width===390?844:1000;
-  test(`task-first disconnected state and safe repeated dismissal at ${width}px`,async({page},info)=>{
+  test(`task-first discovery disconnected state and safe repeated dismissal at ${width}px`,async({page},info)=>{
     test.skip(info.project.name!=='desktop','Run each explicit viewport once.');
-    await page.setViewportSize({width,height});await page.goto('/');
+    await page.setViewportSize({width,height});await page.goto('/#/find');
     await expect(page.locator('[data-home-state="disconnected"]')).toBeVisible();
     await expect(page.getByRole('search')).toHaveCount(0);
     await expect(page.locator('.editorial-home img, .quick-links')).toHaveCount(0);
@@ -33,28 +33,28 @@ for (const width of [390,1440]) {
     }
     const sizes=await typography(page.locator('.home-state-description, .home-guide-list summary'));
     for(const value of sizes)expect(value.fontSize).toBeGreaterThanOrEqual(16);
-    await capture(page,info,`redesign-home-disconnected-${width}`);
-    if(width===390)await page.getByRole('button',{name:'メニューを開く',exact:true}).click();
-    await page.getByRole('button',{name:'店舗一覧',exact:true}).click();
+    await capture(page,info,`redesign-find-disconnected-${width}`);
+    // The header now opens discovery. The existing full catalog remains independently routable.
+    await page.goto('/#/nagoya');
     await expect(page.getByRole('heading',{name:'この確認用サイトは、店舗データに未接続です'})).toBeVisible();
     await capture(page,info,`redesign-empty-${width}`);
-    await page.getByRole('button',{name:'ホームへ戻る',exact:true}).click();await expect(page.locator('.home-find')).toBeVisible();
-    await page.goBack();await expect(page.locator('.catalog-connection-state')).toBeVisible();await page.goForward();await expect(page.locator('.home-find')).toBeVisible();
+    await page.getByRole('button',{name:'ホームへ戻る',exact:true}).click();await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
+    await page.goBack();await expect(page.locator('.catalog-connection-state')).toBeVisible();await page.goForward();await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,state:'disconnected',sizes},null,2));
   });
   test(`decision facts are readable without expansion and survive comparison at ${width}px`,async({page,context},info)=>{
     test.skip(info.project.name!=='desktop','Run each explicit viewport once.');
     test.setTimeout(90000);
-    await page.setViewportSize({width,height});await login(page);const state=await mock(page);await page.goto(privateBase);
+    await page.setViewportSize({width,height});await login(page);const state=await mock(page);await page.goto(`${privateBase}/#/find`);
     await expect(page.locator('[data-home-state="available"]')).toBeVisible();
     await expect(page.getByRole('searchbox',{name:'店名・エリアから探す'})).toHaveCSS('font-size','16px');
     await expect(page.getByRole('button',{name:'個室',exact:true})).toHaveCount(0);
     await expect(page.locator('.home-catalog-card .catalog-decision-facts')).toHaveCount(3);
-    const homeType=await typography(page.locator('.home-search-heading h1,.home-search-description,.home-search-form label,.home-search-form input,.home-search-form button'));
-    const homeDecisionType=await typography(page.locator('.home-catalog-card').first().locator('h3,.home-catalog-meta,.catalog-decision-facts dt,.catalog-decision-facts dd'));
+    const discoveryType=await typography(page.locator('.home-search-heading h1,.home-search-description,.home-search-form label,.home-search-form input,.home-search-form button'));
+    const discoveryDecisionType=await typography(page.locator('.home-catalog-card').first().locator('h3,.home-catalog-meta,.catalog-decision-facts dt,.catalog-decision-facts dd'));
     for(const value of await typography(page.locator('.home-catalog-card .catalog-decision-facts dd')))expect(value.fontSize).toBeGreaterThanOrEqual(16);
-    await capture(page,info,`redesign-home-${width}`);
+    await capture(page,info,`redesign-find-${width}`);
     await page.getByRole('link',{name:'全10店を見る',exact:true}).click();
     const first=page.locator(`[data-pilot-id="${catalog[0].id}"]`);
     await expect(page.locator('.verified-list img,.catalog-decision details')).toHaveCount(0);
@@ -90,12 +90,13 @@ for (const width of [390,1440]) {
     let before:unknown=null;
     if(process.env.UX_BASELINE_URL){
       const baseline=await context.newPage();await baseline.setViewportSize({width,height});await login(baseline);await mock(baseline);
+      // The pinned pre-split reference intentionally keeps discovery at the old root URL.
       await baseline.goto(process.env.UX_BASELINE_URL);await expect(baseline.locator('[data-home-restaurant]')).toHaveCount(3);await capture(baseline,info,`before-home-${width}`);
       await baseline.goto(`${process.env.UX_BASELINE_URL}/#/nagoya`);const prior=baseline.locator(`[data-pilot-id="${catalog[0].id}"]`);await expect(prior).toBeVisible();
       before=await typography(prior.locator('h2,.catalog-room-summary,.catalog-conditions dd'));
       await capture(baseline,info,`before-list-${width}`);await prior.getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();await expect(baseline.locator('.pilot-detail')).toBeVisible();await capture(baseline,info,`before-detail-${width}`);await baseline.close();
     }
-    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',homeType,homeDecisionType,listType,detailType,compareType,titleTop,before},null,2));
+    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',discoveryRoute:'#/find',baselineDiscoveryRoute:'#/',discoveryType,discoveryDecisionType,listType,detailType,compareType,titleTop,before},null,2));
   });
 }
 test('customer detail clears private facts on expired access and failed reload, then recovers without writes',async({page})=>{

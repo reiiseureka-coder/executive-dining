@@ -9,12 +9,12 @@ try {
   const markup=renderToStaticMarkup(React.createElement(App));
   await writeFile('qa/rendered-home.html',markup);
   assert.equal((markup.match(/<h1/g)||[]).length,1,'One clear page heading');
-  assert.ok(markup.includes('data-home-state='),'Home exposes its actual availability state');
+  assert.ok(markup.includes('service-home') && markup.includes('会食の候補を、'),'Home explains the service independently of access state');
   assert.equal((markup.match(/<img /g)||[]).length,0,'Decorative hero no longer precedes capability and task');
   assert.ok(!markup.includes('role="search"'),'Unavailable home does not offer a false search');
   assert.ok(!markup.includes('招待済みの方はログイン'),'No unusable invitation CTA when sign-in is not configured');
   assert.ok(!markup.includes('city-list'),'Unavailable city grid removed');
-  assert.equal((markup.match(/<details/g)||[]).length,3,'Ancillary explanations collapsed');
+  assert.ok(markup.includes('/preview.html#/preview') && markup.includes('店舗検索は未接続'),'Home offers an explicitly labelled demo and honest live-data availability');
   const {default:Summary}=await server.ssrLoadModule('/src/components/CatalogSummary.tsx');
   const facts=[{field:'price',value:'コース 12,000円。サービス料10%別。2名以上、3日前までに予約。'},{field:'private_room',value:'個室なし'},{field:'notice',value:'休業予定を公式サイトで確認してください。'}];
   const summary=renderToStaticMarkup(React.createElement(Summary,{restaurant:{facts}}));
