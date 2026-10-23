@@ -21,6 +21,15 @@ function DemoNotice() {
   </div></aside>;
 }
 
+function DemoReviews({ compact = false }: { compact?: boolean }) {
+  const Heading = compact ? 'h3' : 'h2';
+  return <section className="service-demo-reviews" aria-label="会食の口コミ">
+    <Heading>会食の口コミ <span>0件</span></Heading>
+    <p>このデモに掲載された口コミはまだありません。</p>
+    {!compact && <p className="service-demo-review-note">投稿受付は準備中です。下の公式情報は、来店した人の体験とは分けて表示しています。</p>}
+  </section>;
+}
+
 function DemoSearch({ params, onNavigate }: { params: SearchParams; onNavigate: Navigate }) {
   const [query, setQuery] = useState(params.query ?? '');
   const [genre, setGenre] = useState(params.genre ?? '');
@@ -60,15 +69,15 @@ function DemoList({ params, ids, onNavigate, onToggle }: { params: SearchParams;
   const rows = searchServiceDemo(params);
   const filtered = !!(params.query || params.genre || params.information);
   return <>
-    <header className="service-demo-heading"><h1>店舗選びを試す</h1></header>
-    <p className="service-demo-explanation">公式情報を確認した記録の固定表示です。最新の営業状況・空席ではありません。</p>
+    <header className="service-demo-heading"><h1>会食のお店を探す</h1></header>
+    <p className="service-demo-explanation">会食の口コミを読む画面の閲覧デモです。掲載口コミはまだなく、店舗の公式情報を確認できます。</p>
     <DemoSearch key={`${params.query ?? ''}:${params.genre ?? ''}:${params.information ?? ''}`} params={params} onNavigate={onNavigate} />
     {ids.length > 0 && <SelectionTray ids={ids} params={params} onNavigate={onNavigate} onToggle={onToggle} />}
     <div className="service-demo-result-heading"><p role="status">表示中 <strong>{rows.length}店</strong><span> / 記録 {serviceDemoCatalog.length}店</span></p>{filtered && <button type="button" className="service-demo-text-button" onClick={() => onNavigate('service-demo', undefined, { ids: params.ids })}>絞り込みを解除</button>}</div>
     <div className="service-demo-list">{rows.map(row => <article key={row.id} id={`verified-${row.id}`} tabIndex={-1} className="service-demo-card" data-demo-id={row.id} aria-labelledby={`demo-title-${row.id}`}>
       <div className="service-demo-identity"><p>{factValue(row, 'genre') ?? '料理は未確認'}</p><h2 id={`demo-title-${row.id}`}><a href={routeHash('service-demo-detail', row.id, { ...params, returnTo: undefined })} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined }); } }}>{row.name}</a></h2><p>{row.address}</p></div>
-      <CatalogSummary restaurant={row} />
-      <div className="service-demo-card-actions"><button type="button" className="service-demo-button service-demo-primary" onClick={() => onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined })}>店舗の詳細を見る<ArrowRight size={17} aria-hidden="true" /></button><SelectionButton row={row} ids={ids} onToggle={onToggle} /></div>
+      <div className="service-demo-card-content"><DemoReviews compact /><CatalogSummary restaurant={row} /></div>
+      <div className="service-demo-card-actions"><button type="button" className="service-demo-button service-demo-primary" onClick={() => onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined })}>口コミ・店舗詳細<ArrowRight size={17} aria-hidden="true" /></button><SelectionButton row={row} ids={ids} onToggle={onToggle} /></div>
       <div className="service-demo-record-meta"><span>記録の確認日：{serviceDemoDate(row.factsCheckedAt)}</span><span>{serviceDemoStatus(row)}</span><VerifiedEvidence restaurant={row} /></div>
     </article>)}</div>
     {rows.length === 0 && <section className="service-demo-empty"><h2>条件に合う記録がありません</h2><p>店名やエリアを短くするか、絞り込みを解除してください。選んだ比較候補はそのまま残ります。</p><button type="button" className="service-demo-button" onClick={() => onNavigate('service-demo', undefined, { ids: params.ids })}>すべての記録を見る</button></section>}
@@ -87,11 +96,11 @@ function DemoDetail({ id, params, ids, onNavigate, onToggle }: { id?: string; pa
   return <article className="service-demo-detail" aria-labelledby="service-demo-detail-title">
     <DetailNavigation params={params} onNavigate={onNavigate} />
     <header className="service-demo-heading"><p className="service-demo-kicker">{factValue(row, 'genre') ?? '料理は未確認'}</p><h1 id="service-demo-detail-title">{row.name}</h1><p>{row.address}</p></header>
-    <div className="service-demo-detail-layout"><div className="service-demo-detail-main"><CatalogSummary restaurant={row} />
+    <div className="service-demo-detail-layout"><div className="service-demo-detail-main"><DemoReviews /><h2 className="service-demo-facts-title">お店の公式情報</h2><CatalogSummary restaurant={row} />
       <div className="service-demo-detail-actions"><SelectionButton row={row} ids={ids} onToggle={onToggle} />{website && <a className="service-demo-button service-demo-primary" href={website} target="_blank" rel="noreferrer">公式サイトで最新情報を確認<ArrowUpRight size={18} aria-hidden="true" /></a>}</div>
       <p className="service-demo-explanation">料金と利用条件は記録時点の情報です。空席や現在の営業は未確認です。このデモでは予約・投稿はできません。</p>
       <section className="service-demo-detail-basic" aria-labelledby="service-demo-basic-title"><h2 id="service-demo-basic-title">そのほかの確認項目</h2><dl>{(['hours', 'access'] as FactField[]).map(field => <div key={field}><dt>{FACT_LABELS[field]}</dt><dd>{factValue(row, field) ?? 'この記録では未確認'}</dd></div>)}<div><dt>空席・防音性</dt><dd>この記録では未確認</dd></div></dl></section>
-    </div><aside className="service-demo-provenance" aria-label="この店舗の記録について"><h2>この記録について</h2><dl><div><dt>確認日</dt><dd>{serviceDemoDate(row.factsCheckedAt)}</dd></div><div><dt>記録の状態</dt><dd>{serviceDemoStatus(row)}</dd></div></dl><p>公式情報を確認した記録の固定表示です。最新情報や来店体験を示すものではありません。</p><VerifiedEvidence restaurant={row} /><p>口コミ・評価・店舗写真は、このデモに掲載していません。</p></aside></div>
+    </div><aside className="service-demo-provenance" aria-label="この店舗の記録について"><h2>この記録について</h2><dl><div><dt>確認日</dt><dd>{serviceDemoDate(row.factsCheckedAt)}</dd></div><div><dt>記録の状態</dt><dd>{serviceDemoStatus(row)}</dd></div></dl><p>公式情報を確認した記録の固定表示です。最新情報や来店体験を示すものではありません。</p><VerifiedEvidence restaurant={row} /><p>このデモには、実際の口コミ・評価・店舗写真は掲載していません。</p></aside></div>
     {ids.length > 0 && <SelectionTray ids={ids} params={params} onNavigate={onNavigate} onToggle={onToggle} />}
     <DetailNavigation params={params} onNavigate={onNavigate} />
   </article>;

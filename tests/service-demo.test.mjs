@@ -9,6 +9,10 @@ test('read-only demo contains exactly the already-public official fixture', () =
   const demo = JSON.parse(readFileSync(new URL('../src/data/service-demo-catalog.json', import.meta.url)));
   assert.deepEqual(demo, fixture);
   assert.equal(demo.length, 10);
+  for (const row of demo) {
+    assert.equal(Object.hasOwn(row, 'reviews'), false, 'Static official records must not invent review data.');
+    assert.equal(Object.hasOwn(row, 'rating'), false, 'Static official records must not invent ratings.');
+  }
   assert.ok(demo.every(row => row.status === 'candidate' && row.facts.every(fact => fact.sourceUrl && fact.verifiedAt)));
 });
 

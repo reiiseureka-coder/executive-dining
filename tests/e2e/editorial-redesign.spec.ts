@@ -1,6 +1,7 @@
 import { test, expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 import { catalog, login, mock } from './helpers/ownerTrial';
+import { reviewBeforeFacts, readableReviewText } from './helpers/reviewHierarchy';
 const privateBase = 'http://127.0.0.1:4181';
 async function typography(locator: Locator) {
   return locator.evaluateAll(elements=>elements.map(el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {text:el.textContent?.trim(),fontSize:parseFloat(s.fontSize),lineHeight:s.lineHeight,fontWeight:s.fontWeight,top:r.top,width:r.width,height:r.height,visible:r.width>0&&r.height>0};}));
@@ -38,12 +39,12 @@ for (const width of [390,1440]) {
     await page.goto('/#/nagoya');
     await expect(page.getByRole('heading',{name:'この確認用サイトは、店舗データに未接続です'})).toBeVisible();
     await capture(page,info,`redesign-empty-${width}`);
-    await page.getByRole('button',{name:'ホームへ戻る',exact:true}).click();await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
-    await page.goBack();await expect(page.locator('.catalog-connection-state')).toBeVisible();await page.goForward();await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
+    await page.getByRole('button',{name:'ホームへ戻る',exact:true}).click();await expect(page.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
+    await page.goBack();await expect(page.locator('.catalog-connection-state')).toBeVisible();await page.goForward();await expect(page.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,state:'disconnected',sizes},null,2));
   });
-  test(`decision facts are readable without expansion and survive comparison at ${width}px`,async({page,context},info)=>{
+  test(`review context precedes readable facts and preserves comparison at ${width}px`,async({page,context},info)=>{
     test.skip(info.project.name!=='desktop','Run each explicit viewport once.');
     test.setTimeout(90000);
     await page.setViewportSize({width,height});await login(page);const state=await mock(page);await page.goto(`${privateBase}/#/find`);
@@ -51,6 +52,11 @@ for (const width of [390,1440]) {
     await expect(page.getByRole('searchbox',{name:'店名・エリアから探す'})).toHaveCSS('font-size','16px');
     await expect(page.getByRole('button',{name:'個室',exact:true})).toHaveCount(0);
     await expect(page.locator('.home-catalog-card .catalog-decision-facts')).toHaveCount(3);
+    const discoveryReviewOrder = await reviewBeforeFacts(page.locator('.home-catalog-card').first(), '.home-private-reviews');
+    await expect(page.locator('.home-private-reviews')).toHaveCount(3);
+    await expect(page.locator('.home-private-reviews').first()).toContainText('この非公開一覧には、公開口コミを表示していません。');
+    await expect(page.locator('.home-private-reviews .review-count, .home-private-reviews .review-comment')).toHaveCount(0);
+    const discoveryReviewType = await readableReviewText(page.locator('.home-private-reviews h4, .home-private-reviews p'));
     const discoveryType=await typography(page.locator('.home-search-heading h1,.home-search-description,.home-search-form label,.home-search-form input,.home-search-form button'));
     const discoveryDecisionType=await typography(page.locator('.home-catalog-card').first().locator('h3,.home-catalog-meta,.catalog-decision-facts dt,.catalog-decision-facts dd'));
     for(const value of await typography(page.locator('.home-catalog-card .catalog-decision-facts dd')))expect(value.fontSize).toBeGreaterThanOrEqual(16);
@@ -61,6 +67,10 @@ for (const width of [390,1440]) {
     const price=catalog[0].facts.find(f=>f.field==='price')!.value, room=catalog[0].facts.find(f=>f.field==='private_room')!.value;
     await expect(first.getByText(price,{exact:true})).toBeVisible();await expect(first.getByText(room,{exact:true})).toBeVisible();
     await expect(first.locator('.catalog-decision-facts dt')).toHaveText(['掲載コース・料金','個室']);
+    await expect(first.locator('.private-catalog-reviews')).toContainText('この非公開一覧には、公開口コミを表示していません。');
+    await expect(first.locator('.review-count, .review-comment, .review-meta')).toHaveCount(0);
+    const listReviewOrder = await reviewBeforeFacts(first);
+    const listReviewType = await readableReviewText(first.locator('.review-heading, .review-unavailable'));
     const listType=await typography(first.locator('h2,.catalog-row-identity>p,.catalog-decision-facts dt,.catalog-decision-facts dd'));
     for(const value of await typography(page.locator('.catalog-decision-facts dd')))expect(value.fontSize).toBeGreaterThanOrEqual(16);
     for(const row of catalog){const card=page.locator(`[data-pilot-id="${row.id}"]`);for(const field of ['price','private_room'])await expect(card.locator(`[data-fact="${field}"] dd`)).toHaveText(row.facts.find(f=>f.field===field)?.value??'未確認');if(row.facts.some(f=>f.field==='notice'))await expect(card.locator('.operating-notice')).toContainText(row.facts.find(f=>f.field==='notice')!.value);}
@@ -68,6 +78,10 @@ for (const width of [390,1440]) {
     await first.getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();
     await expect(page.getByRole('heading',{level:1})).toHaveText(catalog[0].name);
     await expect(page.locator('.detail-decision').getByText(price,{exact:true})).toBeVisible();await expect(page.locator('.detail-decision').getByText(room,{exact:true})).toBeVisible();
+    await expect(page.locator('.pilot-detail .private-catalog-reviews')).toContainText('この非公開一覧には、公開口コミを表示していません。');
+    await expect(page.locator('.pilot-detail .review-count, .pilot-detail .review-comment, .pilot-detail .review-meta')).toHaveCount(0);
+    const detailReviewOrder = await reviewBeforeFacts(page.locator('.pilot-detail'), '.verified-reviews', '.detail-decision');
+    const detailReviewType = await readableReviewText(page.locator('.pilot-detail .review-heading, .pilot-detail .review-unavailable'));
     const detailType=await typography(page.locator('.detail-identity h1,.detail-address,.detail-decision dt,.detail-decision dd,.detail-official'));
     for(const value of await typography(page.locator('.detail-decision dd')))expect(value.fontSize).toBeGreaterThanOrEqual(16);
     const titleTop=await page.getByRole('heading',{level:1}).evaluate(el=>el.getBoundingClientRect().top);expect(titleTop).toBeLessThanOrEqual(width===390?260:300);
@@ -96,7 +110,7 @@ for (const width of [390,1440]) {
       before=await typography(prior.locator('h2,.catalog-room-summary,.catalog-conditions dd'));
       await capture(baseline,info,`before-list-${width}`);await prior.getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();await expect(baseline.locator('.pilot-detail')).toBeVisible();await capture(baseline,info,`before-detail-${width}`);await baseline.close();
     }
-    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',discoveryRoute:'#/find',baselineDiscoveryRoute:'#/',discoveryType,discoveryDecisionType,listType,detailType,compareType,titleTop,before},null,2));
+    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',discoveryRoute:'#/find',baselineDiscoveryRoute:'#/',discoveryType,discoveryDecisionType,discoveryReviewOrder,discoveryReviewType,listReviewOrder,listReviewType,detailReviewOrder,detailReviewType,listType,detailType,compareType,titleTop,before},null,2));
   });
 }
 test('customer detail clears private facts on expired access and failed reload, then recovers without writes',async({page})=>{

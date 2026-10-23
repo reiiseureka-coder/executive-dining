@@ -9,7 +9,7 @@ export default function Find({ onNavigate }: Props) {
   return <div className="editorial-home">
     <HomeCatalog onNavigate={onNavigate} />
     <section className="page-width home-fieldnotes" aria-labelledby="fieldnotes-title">
-      <div><h2 id="fieldnotes-title">ご利用の前に</h2><p>掲載しているのは、公式情報を確認した時点の記録です。未確認の項目も明示します。</p></div>
+      <div><h2 id="fieldnotes-title">ご利用の前に</h2><p>会食の口コミと、お店の公式情報を分けて掲載します。口コミの投稿受付は準備中です。</p></div>
       <div className="home-guide-list">
         <details><summary>個室・料金の確認について</summary><p>個室の利用条件や料金の種類を、確認した時点の情報として掲載します。最新の空席や営業状況は、予約前にお店へ直接ご確認ください。</p></details>
         <details><summary>候補を比較する</summary><p>気になるお店は最大3店まで比較できます。個室の人数・利用条件と、料金に含まれる内容を並べてご確認ください。</p></details>

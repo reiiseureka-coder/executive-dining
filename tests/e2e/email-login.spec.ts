@@ -71,7 +71,7 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.getByRole('button', { name: 'Executive Dining ホーム', exact: true }).click();
   await page.reload();
   await expect(page).toHaveURL(/#\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食の候補を、条件で選ぶ。');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
   // The heading renders before asynchronous session restoration rechecks server permissions.
   await expect.poll(() => roleChecks).toBeGreaterThan(beforeHome);
 });
@@ -119,7 +119,7 @@ test('owner invitation lands at service home and reaches ten real stores with se
   await page.route('**/auth/v1/user', route => route.fulfill({json:callbackUser}));
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(`${base}/#/`);
-  await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
+  await expect(page.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
   await expect(page.locator('[data-home-restaurant]')).toHaveCount(0);
   await page.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
   await expect(page).toHaveURL(`${base}/#/find`);
@@ -128,7 +128,7 @@ test('owner invitation lands at service home and reaches ten real stores with se
   await expect(page).not.toHaveURL(/access_token|refresh_token/);
   await page.reload();await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   const second=await context.newPage();await ownerMock(second);await second.goto(base);
-  await expect(second.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
+  await expect(second.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
   await second.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
   await expect(second).toHaveURL(`${base}/#/find`);
   await expect(second.getByText('招待アカウント向けの非公開情報を表示しています。',{exact:true})).toBeVisible();

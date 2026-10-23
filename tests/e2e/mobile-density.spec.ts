@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { login, mock } from './helpers/ownerTrial';
+import { reviewBeforeFacts, readableReviewText } from './helpers/reviewHierarchy';
 
 test.setTimeout(120_000);
 const widths = [320, 375, 390, 430];
@@ -63,7 +64,7 @@ for (const width of widths) {
     await expect(page.getByRole('heading', { name: 'エンタープライズプラン', exact: true })).toBeInViewport();
   });
 
-  test(`mocked available discovery prioritizes readable search and decision facts at ${width}px`, async ({ page }, info) => {
+  test(`mocked available discovery prioritizes review context and preserves readable facts at ${width}px`, async ({ page }, info) => {
     // A signed-in RPC fixture, not a production account or live database check.
     await page.setViewportSize({ width, height: viewportHeight });
     await login(page); await mock(page); await page.goto('http://127.0.0.1:4181/#/find');
@@ -80,6 +81,8 @@ for (const width of widths) {
     const first = page.locator('[data-home-restaurant]').first();
     expect((await documentBounds(first.locator('h3'))).top).toBeLessThan(viewportHeight);
     expect(await first.locator('h3 a').evaluate(element => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(22);
+    await reviewBeforeFacts(first, '.home-private-reviews');
+    await readableReviewText(first.locator('.home-private-reviews h4, .home-private-reviews p'));
     for (const label of ['price', 'private_room']) {
       const value = first.locator(`[data-fact="${label}"] dd`);
       await expect(value).toBeVisible();

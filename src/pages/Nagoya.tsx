@@ -14,7 +14,7 @@ import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { useComparison } from '../hooks/useComparison';
 import ComparisonTray from '../components/ComparisonTray';
 import { useSavedCatalog } from '../hooks/useSavedCatalog';
-import { VerifiedEvidence } from '../components/VerifiedFacts';
+import { VerifiedEvidence, VerifiedReviews } from '../components/VerifiedFacts';
 const RestaurantMap = lazy(() => import('../components/map/RestaurantMap'));
 const date = (value: string) => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(value));
 interface Props { params: SearchParams; onChange: (params: SearchParams) => void; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
@@ -37,8 +37,8 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
     const element = document.getElementById(`verified-${id}`);
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' }); element?.focus({ preventScroll: true });
   }, []);
-  return <div className="page-width catalog-page editorial-catalog">
-    <div className="catalog-heading"><div><h1>名古屋の会食店を探す</h1></div><p>場所・料金・個室の条件を見比べて、会食の候補を選べます。</p></div>
+  return <div className="page-width catalog-page editorial-catalog review-catalog">
+    <div className="catalog-heading"><div><h1>名古屋の会食店を探す</h1></div><p>会食での体験・感想から、お店を探す。料金や個室の情報も確認できます。</p></div>
     {searchable && <div className="catalog-toolbar"><label className="catalog-search"><Search size={18} aria-hidden="true" /><input aria-label="名古屋の確認済み店舗を検索" placeholder="店名・エリアから探す" value={params.query ?? ''} onChange={event => update('query', event.target.value)} /></label><button className="button-secondary" onClick={() => update('view', showMap ? '' : 'map')} aria-pressed={showMap}>{showMap ? '地図を閉じる' : '地図を表示'}</button></div>}
     {searchable&&<><details className="catalog-filter-disclosure"><summary><SlidersHorizontal size={16} aria-hidden="true" />絞り込み・並び順{activeFilters > 0 && <span className="filter-count">{activeFilters}件の条件</span>}</summary><div className="catalog-filters">
       <label>料理<select aria-label="料理" value={params.genre ?? ''} onChange={event => update('genre', event.target.value)}><option value="">すべての料理</option>{genres.map(genre => <option key={genre}>{genre}</option>)}</select></label>
@@ -60,7 +60,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
       const saved = savedIds.includes(restaurant.id);
       return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
         <div className="verified-card-heading"><div><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p className="catalog-place">{restaurant.address}</p><p className="catalog-cuisine">{factValue(restaurant, 'genre') ?? '料理ジャンル未確認'}</p></div></div>
-        <CatalogSummary restaurant={restaurant} />
+        <div className="catalog-review-content"><VerifiedReviews restaurant={restaurant} compact /><CatalogSummary restaurant={restaurant} /></div>
         <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>店舗の詳細を見る</button><button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button></div>
         <div className="catalog-row-footnote"><button className="catalog-save" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : 'このブラウザに保存'}</button><span>公式情報の確認日 · {date(restaurant.verifiedAt)}</span><VerifiedEvidence restaurant={restaurant} /></div>
       </article>;

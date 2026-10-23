@@ -38,8 +38,16 @@ jobs:
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-service-before/node_modules"
           cd "$RUNNER_TEMP/dining-service-before"
           VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4185 > "$RUNNER_TEMP/dining-service-before.log" 2>&1 &
+      - name: Prepare review-product visual reference
+        run: |
+          git fetch --depth=1 origin a64856c04ef6749a6015eb3cc62312be75a91579
+          git worktree add --detach "$RUNNER_TEMP/dining-product-before" a64856c04ef6749a6015eb3cc62312be75a91579
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-product-before/node_modules"
+          cd "$RUNNER_TEMP/dining-product-before"
+          VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4186 > "$RUNNER_TEMP/dining-product-before.log" 2>&1 &
       - run: npm run test:e2e
         env:
+          PRODUCT_BASELINE_URL: http://127.0.0.1:4186
           SERVICE_HOME_BASELINE_URL: http://127.0.0.1:4185
           UX_BASELINE_URL: http://127.0.0.1:4184
           MOBILE_BASELINE_URL: http://127.0.0.1:4183
@@ -50,5 +58,6 @@ jobs:
           path: |
             test-results/**/*.png
             test-results/**/density-metrics.json
+            test-results/**/review-product-metrics.json
           retention-days: 14
           if-no-files-found: ignore

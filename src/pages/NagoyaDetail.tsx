@@ -34,7 +34,7 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
   if (!restaurant) return <div className="page-width catalog-page catalog-empty"><h1>この店舗の情報は現在表示できません</h1><p>未公開、掲載の取り下げ、URLの変更などが考えられます。</p><button className="button-secondary" onClick={back}>一覧へ戻る</button></div>;
   const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
   const saved = savedIds.includes(restaurant.id);
-  return <div className="page-width catalog-page catalog-detail">
+  return <div className="page-width catalog-page catalog-detail review-detail">
     <ComparisonTray onNavigate={onNavigate} params={params} />
     <article className="verified-card dining-detail">
       <div className="detail-navigation">
@@ -46,9 +46,10 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
         <p className="detail-genre">料理：{factValue(restaurant, 'genre') ?? '未確認'}</p>
         <p className="detail-address">{restaurant.address}</p>
       </header>
+      <div className="detail-reviews"><VerifiedReviews restaurant={restaurant} allowReportDraft /><ReviewDraftPanel key={`review:${restaurant.id}`} restaurantId={restaurant.id} /></div>
       <div className="detail-layout">
         <div className="detail-main">
-          <section className="detail-decision" aria-label="料金と個室の条件"><DetailFactRows restaurant={restaurant} fields={['price', 'private_room']} /></section>
+          <section className="detail-decision" aria-label="料金と個室の条件"><h2 className="detail-facts-title">店舗情報</h2><DetailFactRows restaurant={restaurant} fields={['price', 'private_room']} /></section>
           <div className="detail-confirmation">
             <p>料金はコース・単品・目安など、種類と利用条件を添えて掲載しています。空席・防音性は保証していません。予約前に最新情報をお店へご確認ください。</p>
             <div className="detail-actions">
@@ -66,7 +67,7 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
           <p>公式情報を確認した記録です。実際に訪問してつけた評価ではありません。</p>
         </aside>
       </div>
-      <div className="detail-community"><FeedbackDraftPanel key={`correction:${restaurant.id}`} restaurantId={restaurant.id} /><VerifiedReviews restaurant={restaurant} allowReportDraft /><ReviewDraftPanel key={`review:${restaurant.id}`} restaurantId={restaurant.id} /></div>
+      <div className="detail-community"><FeedbackDraftPanel key={`correction:${restaurant.id}`} restaurantId={restaurant.id} /></div>
     </article>
     {verifiedCoordinates(restaurant) ? <><p className="map-privacy">地図データを外部の地図配信元から読み込みます。端末の現在地は取得しません。</p><Suspense fallback={<p role="status">地図を準備しています…</p>}><RestaurantMap restaurants={mapRows} onSelect={select} /></Suspense></> : <div className="catalog-explainer">お店の位置を確認できていないため、地図のピンは表示していません。</div>}
   </div>;

@@ -6,15 +6,16 @@ import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { diningRepository } from '../data/diningClient';
 import { ownerTrialRepository } from '../data/ownerTrialClient';
 import { ReviewGatewayError } from '../data/repositories/proposedReviewRepository';
-import { factValue, type PublishedFact } from '../domain/dining';
+import { factValue, type PublishedFact, type PublishedReview } from '../domain/dining';
 import { openLoginDialog } from '../lib/loginDialog';
 import { supabase, emailSignInEnabled, googleSignInEnabled } from '../lib/supabase';
 import { routeHash } from '../lib/routing';
 import CatalogSummary from './CatalogSummary';
+import { VerifiedReviews } from './VerifiedFacts';
 import type { Page } from '../types';
 import type { SearchParams } from '../lib/search';
 
-type Row = { id: string; name: string; address: string; facts: PublishedFact[] };
+type Row = { id: string; name: string; address: string; facts: PublishedFact[]; reviews?: PublishedReview[] };
 type Props = { onNavigate: (page: Page, id?: string, params?: SearchParams) => void };
 type UnavailableState = 'disconnected' | 'loading' | 'error' | 'preparing' | 'private-empty' | 'inactive' | 'expired' | 'denied';
 type PrivateSnapshot = { state: UnavailableState | 'available'; rows: Row[] };
@@ -22,7 +23,7 @@ type PrivateSnapshot = { state: UnavailableState | 'available'; rows: Row[] };
 function HomeHeading({ preparing = false, available = false }: { preparing?: boolean; available?: boolean }) {
   return <header className="home-search-heading">
     <h1 id="home-title">{preparing ? '名古屋の会食店、公開準備中' : '名古屋の会食店を探す'}</h1>
-    {available && <p className="home-search-description">個室・料金・場所を確認して、候補を比較できます。</p>}
+    {available && <p className="home-search-description">会食の口コミとお店の情報から、候補を探せます。</p>}
   </header>;
 }
 
@@ -82,7 +83,10 @@ function Showcase({ rows, privateMode = false, onNavigate }: Props & { rows: Row
           <p className="home-catalog-meta">{factValue(row, 'genre') ?? '料理ジャンルは未確認'}</p>
           <p className="home-catalog-meta">{row.address}</p>
         </div>
-        <CatalogSummary restaurant={row} />
+        <div className="home-catalog-reading">
+          {row.reviews ? <VerifiedReviews restaurant={{ id: row.id, reviews: row.reviews }} compact /> : <section className="home-private-reviews"><h4>会食の口コミ</h4><p>この非公開一覧には、公開口コミを表示していません。</p></section>}
+          <CatalogSummary restaurant={row} />
+        </div>
         <div className="home-catalog-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', row.id)}>詳細を見る<ArrowRight size={16} aria-hidden="true" /></button></div>
       </article>)}</div>
     </section>

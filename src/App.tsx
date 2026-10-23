@@ -86,7 +86,7 @@ function AppShell() {
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "会食の候補を、条件で選ぶ",
+      home: "会食専用口コミサイト",
       find: "名古屋の会食店を探す",
       "service-demo": "閲覧専用デモ",
       "service-demo-detail": "閲覧専用デモ・店舗情報",

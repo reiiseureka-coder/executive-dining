@@ -1,6 +1,7 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
+import { reviewBeforeFacts, readableReviewText } from './helpers/reviewHierarchy';
 
 interface RecordedRestaurant {
   id: string;
@@ -42,18 +43,29 @@ async function noLiveControls(page: Page) {
   await expect(page.locator('.service-demo img, .service-demo textarea, input[type="email"], input[type="password"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
-  await expect(page.locator('.review-draft, .feedback-draft, .pilot-profile, .star-rating')).toHaveCount(0);
+  await expect(page.locator('.review-draft, .feedback-draft, .pilot-profile, .star-rating, .review-entry, .draft-body, [data-review-id]')).toHaveCount(0);
+  await expect(page.locator('.service-demo').getByText(/(?:[0-5](?:\.\d+)?\s*\/\s*5|[★☆])/)).toHaveCount(0);
   await expect(page.getByText('閲覧専用デモ', { exact: true }).first()).toBeVisible();
 }
 
 for (const width of [390, 1440]) {
-  test(`standalone read-only demo preserves facts and completes comparison at ${width}px without Supabase`, async ({ page }, info) => {
+  test(`standalone review-first demo preserves facts and completes comparison at ${width}px without Supabase`, async ({ page, context }, info) => {
     test.skip(info.project.name !== 'desktop', 'Each explicit viewport is covered once.');
     test.setTimeout(90_000);
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     // A stale saved session must not trigger SDK initialization or token refresh in this entry.
     await page.addInitScript(() => {
       localStorage.setItem('sb-test-project-auth-token', JSON.stringify({ access_token: 'synthetic-expired-demo-only', refresh_token: 'synthetic-demo-only', expires_at: 1, expires_in: 0, token_type: 'bearer', user: { id: '11111111-1111-4111-8111-111111111111' } }));
+      // Seed and instrument in one script so test setup itself is not recorded.
+      const audit: string[] = [];
+      Object.defineProperty(window, '__demoStorageWrites', { value: audit });
+      for (const method of ['setItem', 'removeItem', 'clear'] as const) {
+        const original = Storage.prototype[method];
+        Object.defineProperty(Storage.prototype, method, { configurable: true, value: function (...args: string[]) {
+          audit.push(`${method}:${args[0] ?? ''}`);
+          return Reflect.apply(original, this, args);
+        } });
+      }
     });
     const backendRequests: string[] = [];
     const writes: string[] = [];
@@ -63,13 +75,17 @@ for (const width of [390, 1440]) {
     });
     await page.route('https://test-project.supabase.co/**', route => route.abort());
     await page.goto(configuredDemo);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('店舗選びを試す');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食のお店を探す');
     await expect(page.locator('[data-demo-id]')).toHaveCount(catalog.length);
-    await expect(page.getByText(/公式情報を確認した記録の固定表示です。最新の営業状況・空席ではありません/)).toBeVisible();
+    await expect(page.locator('.service-demo-explanation')).toHaveText('会食の口コミを読む画面の閲覧デモです。掲載口コミはまだなく、店舗の公式情報を確認できます。');
     await noLiveControls(page);
+    const listReviewPositions = [];
     for (const row of catalog) {
       const item = page.locator(`[data-demo-id="${row.id}"]`);
       await expect(item.getByRole('heading', { name: row.name, exact: true })).toBeVisible();
+      await expect(item.locator('.service-demo-reviews')).toContainText('口コミ');
+      await expect(item.locator('.service-demo-reviews')).toContainText('まだありません');
+      listReviewPositions.push({ id: row.id, ...await reviewBeforeFacts(item, '.service-demo-reviews') });
       await expect(item.locator('[data-fact="price"] dd')).toHaveText(fact(row, 'price')?.value ?? '未確認');
       await expect(item.locator('[data-fact="private_room"] dd')).toHaveText(fact(row, 'private_room')?.value ?? '未確認');
       await expect(item.getByText('掲載候補（candidate）', { exact: true })).toBeVisible();
@@ -80,8 +96,12 @@ for (const width of [390, 1440]) {
     await readableFacts(page); await noOverflow(page);
     await screenshot(page, info, `service-demo-list-${width}`);
     const listMetrics = await decisionMetrics(page);
-    await card(page, 0).getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
+    const listReviewTypography = await readableReviewText(page.locator('.service-demo-reviews h2, .service-demo-reviews h3, .service-demo-reviews > p'));
+    await card(page, 0).getByRole('button', { name: '口コミ・店舗詳細', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(catalog[0].name);
+    await expect(page.locator('.service-demo-detail .service-demo-reviews')).toContainText('まだありません');
+    const detailReviewPosition = await reviewBeforeFacts(page.locator('.service-demo-detail'), '.service-demo-reviews');
+    const detailReviewTypography = await readableReviewText(page.locator('.service-demo-detail .service-demo-reviews h2, .service-demo-detail .service-demo-reviews h3, .service-demo-detail .service-demo-reviews > p'));
     await expect(page.locator('.service-demo-detail [data-fact="price"] dd')).toHaveText(fact(catalog[0], 'price')!.value);
     await expect(page.locator('.service-demo-provenance')).toContainText('2026年10月5日');
     await expect(page.locator('.service-demo-detail-basic')).toContainText('この記録では未確認');
@@ -114,6 +134,8 @@ for (const width of [390, 1440]) {
     await page.getByRole('button', { name: '詳細を見る', exact: true }).first().click();
     await page.getByRole('button', { name: '比較に戻る', exact: true }).first().click();
     await expect(page).toHaveURL(comparisonUrl);
+    const storageWritesBeforeReload = await page.evaluate(() => (window as unknown as { __demoStorageWrites: string[] }).__demoStorageWrites);
+    expect(storageWritesBeforeReload).toEqual([]);
     await page.reload();
     await expect(page.getByRole('table')).toBeVisible();
     await page.getByRole('button', { name: `${catalog[2].name}を比較から外す`, exact: true }).click();
@@ -124,9 +146,29 @@ for (const width of [390, 1440]) {
     await expect(page.getByRole('table')).toHaveCount(0);
     await page.getByRole('button', { name: 'デモの店舗一覧で選ぶ', exact: true }).click();
     await expect(card(page, 0).getByRole('button', { name: '比較から外す', exact: true })).toBeVisible();
+    const storageWrites = await page.evaluate(() => (window as unknown as { __demoStorageWrites: string[] }).__demoStorageWrites);
+    expect(storageWrites).toEqual([]);
+    expect(await page.evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage) }))).toEqual({ local: ['sb-test-project-auth-token'], session: [] });
     expect(backendRequests).toEqual([]);
     expect(writes).toEqual([]);
-    await writeFile(info.outputPath('density-metrics.json'), JSON.stringify({ width, height: width === 390 ? 844 : 1000, fixture: 'byte-exact already-public official records; no live backend', listMetrics, detailMetrics, compareMetrics, firstPrices, backendRequests, writes }, null, 2));
+    let productBaseline: unknown = null;
+    if (process.env.PRODUCT_BASELINE_URL) {
+      const before = await context.newPage();
+      await before.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+      const origin = process.env.PRODUCT_BASELINE_URL.replace(/\/$/, '');
+      await before.goto(`${origin}/preview.html#/preview`);
+      await expect(before.getByRole('heading', { level: 1 })).toHaveText('店舗選びを試す');
+      await expect(before.locator('[data-demo-id]')).toHaveCount(catalog.length);
+      for (const row of catalog) await expect(before.locator(`[data-demo-id="${row.id}"] [data-fact="price"] dd`)).toHaveText(fact(row, 'price')?.value ?? '未確認');
+      await screenshot(before, info, `before-review-first-demo-list-${width}`);
+      const list = await decisionMetrics(before);
+      await card(before, 0).getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
+      await expect(before.getByRole('heading', { level: 1 })).toHaveText(catalog[0].name);
+      await screenshot(before, info, `before-review-first-demo-detail-${width}`);
+      productBaseline = { source: origin, sameFixture: true, list, detail: await decisionMetrics(before) };
+      await before.close();
+    }
+    await writeFile(info.outputPath('density-metrics.json'), JSON.stringify({ width, height: width === 390 ? 844 : 1000, fixture: 'byte-exact already-public official records; no live backend', listMetrics, listReviewPositions, listReviewTypography, detailMetrics, detailReviewPosition, detailReviewTypography, compareMetrics, firstPrices, backendRequests, writes, storageWritesBeforeReload, storageWrites, productBaseline }, null, 2));
   });
 }
 
@@ -140,7 +182,7 @@ test('demo search, details, history and direct links keep only static candidates
   await page.getByRole('button', { name: '絞り込む', exact: true }).click();
   await expect(page.locator('[data-demo-id]')).toHaveCount(2);
   const filteredUrl = page.url();
-  await card(page, 0).getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
+  await card(page, 0).getByRole('button', { name: '口コミ・店舗詳細', exact: true }).click();
   const detailUrl = page.url();
   await page.goBack(); await expect(page).toHaveURL(filteredUrl);
   await expect(page.getByRole('searchbox', { name: '店名・エリア・条件から探す' })).toHaveValue('名古屋');
@@ -177,6 +219,6 @@ test('standalone demo offers a real Home destination without replacing its list 
   await home.click();
   await expect(page.locator('.service-home')).toBeVisible();
   await page.goBack();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('店舗選びを試す');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食のお店を探す');
   await expect(page.locator('[data-demo-id]')).toHaveCount(catalog.length);
 });

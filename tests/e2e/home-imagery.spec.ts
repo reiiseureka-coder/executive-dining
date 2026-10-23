@@ -20,7 +20,7 @@ test('mocked anonymous discovery distinguishes public preparation without privat
   const navigation = page.getByRole('navigation', { name: isMobile ? 'サービスナビゲーション' : 'メインナビゲーション', exact: true });
   await navigation.getByRole('button', { name: 'ホーム', exact: true }).click();
   await expect(page).toHaveURL(`${base}/#/`);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食の候補を、条件で選ぶ。');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
   await page.goBack();
   await expect(page).toHaveURL(`${base}/#/find`);
   await expect(page.locator('[data-home-state="preparing"]')).toBeVisible();

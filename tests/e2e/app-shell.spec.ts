@@ -22,7 +22,7 @@ test('single entry restores owner session, real ten stores, details/back and com
  await expect(page.getByRole('heading',{name:'店舗情報の確認・審査'})).toBeVisible();
  await expect(page.locator('.private-mode-banner')).toBeVisible();
  await page.getByRole('button',{name:'Executive Dining ホーム',exact:true}).click();
- await expect(page.getByRole('heading',{level:1})).toHaveText('会食の候補を、条件で選ぶ。');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
  await expect(page.locator('.private-mode-banner')).toHaveCount(0);
  await page.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
  await expect(page).toHaveURL(`${base}/#/find`);
