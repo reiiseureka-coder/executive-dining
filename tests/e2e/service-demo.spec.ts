@@ -1,5 +1,6 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 
 interface RecordedRestaurant {
   id: string;
@@ -16,9 +17,18 @@ const fact = (row: RecordedRestaurant, field: string) => row.facts.find(value =>
 const card = (page: Page, index: number) => page.locator(`[data-demo-id="${catalog[index].id}"]`);
 
 async function screenshot(page: Page, info: TestInfo, name: string) {
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  // Allow sticky compositing to catch up after the deliberate screenshot reset.
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.screenshot({ path: info.outputPath(`${name}-viewport.png`), fullPage: false, animations: 'disabled' });
   await page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true, animations: 'disabled' });
+}
+async function decisionMetrics(page: Page) {
+  return page.locator('.service-demo h1, .service-demo .catalog-decision-facts dd, .service-demo-comparison td > p').evaluateAll(elements => elements.slice(0, 8).map(element => {
+    const style = getComputedStyle(element), rect = element.getBoundingClientRect();
+    return { text: element.textContent, fontSize: parseFloat(style.fontSize), lineHeight: style.lineHeight, top: rect.top, bottom: rect.bottom };
+  }));
 }
 async function noOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -69,6 +79,7 @@ for (const width of [390, 1440]) {
     await expect(page.locator('.catalog-decision details')).toHaveCount(0);
     await readableFacts(page); await noOverflow(page);
     await screenshot(page, info, `service-demo-list-${width}`);
+    const listMetrics = await decisionMetrics(page);
     await card(page, 0).getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(catalog[0].name);
     await expect(page.locator('.service-demo-detail [data-fact="price"] dd')).toHaveText(fact(catalog[0], 'price')!.value);
@@ -79,6 +90,7 @@ for (const width of [390, 1440]) {
     await expect(page.getByRole('link', { name: '公式サイトで最新情報を確認', exact: true })).toHaveAttribute('href', fact(catalog[0], 'website')!.value);
     await readableFacts(page); await noOverflow(page); await noLiveControls(page);
     await screenshot(page, info, `service-demo-detail-${width}`);
+    const detailMetrics = await decisionMetrics(page);
     await page.locator('.service-demo-detail-actions').getByRole('button', { name: '比較に追加', exact: true }).click();
     await page.getByRole('button', { name: 'デモの店舗一覧へ', exact: true }).first().click();
     await expect(card(page, 0).getByRole('button', { name: '比較から外す', exact: true })).toHaveAttribute('aria-pressed', 'true');
@@ -97,6 +109,7 @@ for (const width of [390, 1440]) {
     const firstPrices = await page.locator('[data-compare-field="price"] td > p').evaluateAll(elements => elements.slice(0, 2).map(element => { const rect = element.getBoundingClientRect(); return { top: rect.top, bottom: rect.bottom }; }));
     for (const price of firstPrices) { expect(price.top).toBeGreaterThanOrEqual(0); expect(price.bottom).toBeLessThanOrEqual(width === 390 ? 844 : 1000); }
     await screenshot(page, info, `service-demo-compare-${width}`);
+    const compareMetrics = await decisionMetrics(page);
     const comparisonUrl = page.url();
     await page.getByRole('button', { name: '詳細を見る', exact: true }).first().click();
     await page.getByRole('button', { name: '比較に戻る', exact: true }).first().click();
@@ -113,6 +126,7 @@ for (const width of [390, 1440]) {
     await expect(card(page, 0).getByRole('button', { name: '比較から外す', exact: true })).toBeVisible();
     expect(backendRequests).toEqual([]);
     expect(writes).toEqual([]);
+    await writeFile(info.outputPath('density-metrics.json'), JSON.stringify({ width, height: width === 390 ? 844 : 1000, fixture: 'byte-exact already-public official records; no live backend', listMetrics, detailMetrics, compareMetrics, firstPrices, backendRequests, writes }, null, 2));
   });
 }
 
