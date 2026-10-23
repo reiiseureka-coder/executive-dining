@@ -84,6 +84,17 @@ for (const width of [390, 1440]) {
       await before.close();
     }
     await writeFile(info.outputPath('photo-metrics.json'), JSON.stringify({ width, image: size, typography, external, writes, realVenuePhotoCount: 0, material: 'Approved generated illustrations, not actual venue photography' }, null, 2));
+    // Keep visual evidence of the honest fallback at the same explicit viewports.
+    await page.route('**/images/dining-*.webp', route => route.abort());
+    await page.goto(demo);
+    await page.reload();
+    await expect(card.locator('.restaurant-photo-open')).toHaveCount(0);
+    await page.screenshot({ path: info.outputPath(`illustration-fallback-list-${width}.png`), fullPage: false });
+    await card.getByRole('button', { name: '口コミ・店舗詳細', exact: true }).click();
+    await expect(page.locator('.restaurant-photo-unavailable')).toBeVisible();
+    await expect(page.locator('.restaurant-photo-open')).toHaveCount(0);
+    await expect(page.locator('.restaurant-photo-official a')).toBeVisible();
+    await page.screenshot({ path: info.outputPath(`illustration-fallback-detail-${width}.png`), fullPage: false });
   });
 }
 
