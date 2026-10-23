@@ -72,7 +72,8 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.reload();
   await expect(page).toHaveURL(/#\/$/);
   await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
-  expect(roleChecks).toBeGreaterThan(beforeHome);
+  // The heading renders before asynchronous session restoration rechecks server permissions.
+  await expect.poll(() => roleChecks).toBeGreaterThan(beforeHome);
 });
 test('callback intent and metadata never redirect an account denied by the server', async ({ page }) => {
   let checks = 0, queues = 0;
