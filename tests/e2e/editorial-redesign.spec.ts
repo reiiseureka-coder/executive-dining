@@ -27,6 +27,7 @@ for (const width of [390,1440]) {
       if(width===390)await page.getByRole('button',{name:'メニューを開く',exact:true}).click();
       await page.getByRole('button',{name:'ログイン',exact:true}).click();await expect(page.getByRole('dialog')).toBeVisible();
       await expect(page.getByText('ログイン機能は準備中です。',{exact:true})).toBeVisible();
+      await expect(page.getByText(/招待されたアカウントでログインしてください/)).toHaveCount(0);
       if(i===0)await page.getByRole('button',{name:'閉じる',exact:true}).click();else await page.keyboard.press('Escape');
       await expect(page.getByRole('dialog')).not.toBeVisible();expect(await page.evaluate(()=>document.body.style.overflow)).not.toBe('hidden');
     }
@@ -51,6 +52,8 @@ for (const width of [390,1440]) {
     await expect(page.getByRole('button',{name:'個室',exact:true})).toHaveCount(0);
     await expect(page.locator('.home-catalog-card .catalog-decision-facts')).toHaveCount(3);
     const homeType=await typography(page.locator('.home-search-heading h1,.home-search-description,.home-search-form label,.home-search-form input,.home-search-form button'));
+    const homeDecisionType=await typography(page.locator('.home-catalog-card').first().locator('h3,.home-catalog-meta,.catalog-decision-facts dt,.catalog-decision-facts dd'));
+    for(const value of await typography(page.locator('.home-catalog-card .catalog-decision-facts dd')))expect(value.fontSize).toBeGreaterThanOrEqual(16);
     await capture(page,info,`redesign-home-${width}`);
     await page.getByRole('link',{name:'全10店を見る',exact:true}).click();
     const first=page.locator(`[data-pilot-id="${catalog[0].id}"]`);
@@ -87,7 +90,7 @@ for (const width of [390,1440]) {
       before=await typography(prior.locator('h2,.catalog-room-summary,.catalog-conditions dd'));
       await capture(baseline,info,`before-list-${width}`);await prior.getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();await expect(baseline.locator('.pilot-detail')).toBeVisible();await capture(baseline,info,`before-detail-${width}`);await baseline.close();
     }
-    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',homeType,listType,detailType,compareType,titleTop,before},null,2));
+    await writeFile(info.outputPath('density-metrics.json'),JSON.stringify({width,height,fixture:'same ten-store mocked catalog; no live backend',homeType,homeDecisionType,listType,detailType,compareType,titleTop,before},null,2));
   });
 }
 test('customer detail clears private facts on expired access and failed reload, then recovers without writes',async({page})=>{

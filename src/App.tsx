@@ -85,7 +85,7 @@ function AppShell() {
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "大切な話を、心地よい一席で。",
+      home: "名古屋の会食店を探す",
       restaurants: "店舗掲載のご案内",
       corporate: "法人の方へ・福利厚生プラン",
       demo: "サンプル・デモ",

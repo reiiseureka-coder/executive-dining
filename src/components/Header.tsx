@@ -162,9 +162,9 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
             </nav>
           ) : (
             <>
-              <p>
+              {(user || (supabase && (googleSignInEnabled || emailSignInEnabled))) && <p>
                 {user ? "このブラウザではログインした状態が続きます。共有端末では、使い終わったらログアウトしてください。" : "招待されたアカウントでログインしてください。アカウントに応じた店舗情報や管理メニューを利用できます。"}
-              </p>
+              </p>}
               {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>
               ) : (

@@ -75,7 +75,7 @@ function Showcase({ rows, privateMode = false, onNavigate }: Props & { rows: Row
     </form>
     <section className="home-catalog" aria-labelledby="home-catalog-title">
       <div className="section-heading"><h2 id="home-catalog-title">{privateMode ? '閲覧できる店舗' : '掲載中の店舗'}</h2><a className="text-link" href="#/nagoya" onClick={event => { event.preventDefault(); onNavigate('nagoya'); }}>全{rows.length}店を見る<ArrowRight size={16} aria-hidden="true" /></a></div>
-      <p className="home-catalog-note">{privateMode ? '非公開情報です。' : ''}店名順に{sample.length}店を表示。推薦・ランキングではありません。</p>
+      <p className="home-catalog-note">店名順の{sample.length}店を表示・おすすめ順ではありません</p>
       <div className="home-discovery-list">{sample.map(row => <article className="home-catalog-card" key={row.id} data-home-restaurant={row.id}>
         <div className="home-catalog-identity">
           <h3><a href={routeHash('nagoya-detail', row.id)} onClick={event => { event.preventDefault(); onNavigate('nagoya-detail', row.id); }}>{row.name}</a></h3>
