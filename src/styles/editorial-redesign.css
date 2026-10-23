@@ -106,7 +106,7 @@
 .editorial-catalog .operating-notice { border-radius:0; background:#f0e9da; border-left:2px solid #9e8757; padding:13px 17px; margin:16px 0; font-size:12px; }
 .editorial-catalog .operating-notice p { line-height:1.9; }
 .editorial-catalog .catalog-empty { max-width:680px; margin:35px auto 0; padding:50px 35px; border:1px solid var(--ed-line); border-radius:2px; background:#eeefe7; box-shadow:none; text-align:center; }
-.editorial-catalog .catalog-empty h2 { font:400 24px/1.7 'Noto Serif JP',serif; }
+.editorial-catalog .catalog-empty h2 { text-wrap:balance; font:400 24px/1.7 'Noto Serif JP',serif; }
 .editorial-catalog .catalog-empty p { font-size:13px; line-height:2; margin-block:12px; }
 .editorial-catalog .catalog-empty .primary-button { margin-top:15px; border-radius:2px; }
 .editorial-catalog .pilot-toolbar { border-bottom:1px solid var(--ed-line); padding:10px 0 17px; margin:15px 0; }
