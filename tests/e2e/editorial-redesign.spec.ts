@@ -74,10 +74,15 @@ for (const width of [390,1440]) {
     await capture(page,info,`redesign-detail-${width}`);
     await page.locator('.pilot-detail').getByRole('button',{name:'比較に追加',exact:true}).click();await page.getByRole('button',{name:'実店舗一覧へ戻る',exact:true}).click();await expect(first).toBeFocused();
     await expect(first.getByRole('button',{name:'比較から外す',exact:true})).toHaveAttribute('aria-pressed','true');
+    await expect(page.getByText('あと1店選ぶと比較できます',{exact:true})).toBeVisible();
     await page.locator(`[data-pilot-id="${catalog[1].id}"]`).getByRole('button',{name:'比較に追加',exact:true}).click();
     await page.getByRole('button',{name:'候補を比較（2）',exact:true}).click();
     await expect(page.getByRole('table')).toBeVisible();await expect(page.getByRole('table').getByText(price,{exact:true})).toBeVisible();
+    await page.evaluate(()=>window.scrollTo(0,0));
     const compareType=await typography(page.locator('.comparison-by-condition td>p'));for(const value of compareType)expect(value.fontSize).toBeGreaterThanOrEqual(16);
+    const firstPrices=page.locator('.comparison-by-condition tbody tr').first().locator('td>p');
+    for(const value of await typography(firstPrices))expect(value.top+value.height).toBeLessThanOrEqual(height);
+    for(const row of catalog.slice(0,2))await expect(page.locator('.comparison-by-condition tbody').getByText(row.address,{exact:true})).toBeVisible();
     await capture(page,info,`redesign-compare-${width}`);
     const comparisonUrl=page.url();await page.getByRole('button',{name:'詳細を見る',exact:true}).first().click();await page.getByRole('button',{name:'比較に戻る',exact:true}).click();await expect(page.getByRole('table')).toBeVisible();await expect(page).toHaveURL(comparisonUrl);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

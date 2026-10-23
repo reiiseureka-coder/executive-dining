@@ -4,7 +4,7 @@ import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { FACT_LABELS, factValue, safeExternalUrl, type FactField } from '../domain/dining';
 import { parseComparisonIds } from '../lib/comparison';
 import ComparisonShare from '../components/ComparisonShare';
-const fields: FactField[] = ['price', 'private_room', 'genre', 'hours', 'access', 'notice'];
+const fields: FactField[] = ['price', 'private_room', 'address', 'genre', 'hours', 'access', 'notice'];
 export default function Compare({ params, onNavigate }: { params: SearchParams; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }) {
   const { rows, loading, error, reload } = usePublicCatalog();
   const ids = parseComparisonIds(params.ids);
@@ -21,7 +21,7 @@ export default function Compare({ params, onNavigate }: { params: SearchParams; 
           <tbody role="rowgroup">
             {fields.map(field => <tr role="row" key={field}><th scope="row" role="rowheader" id={`comparison-field-${field}`}>{FACT_LABELS[field]}</th>{restaurants.map(restaurant => {
               const fact = restaurant.facts.find(item => item.field === field);
-              return <td role="cell" key={restaurant.id} headers={`comparison-field-${field} comparison-name-${restaurant.id}`}><span className="comparison-restaurant-label" aria-hidden="true">{restaurant.name}</span><p>{fact?.value ?? '未確認'}</p>{fact && <small>確認 {new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(fact.verifiedAt))} · <a href={safeExternalUrl(fact.sourceUrl)!} target="_blank" rel="noreferrer">出典</a></small>}</td>;
+              return <td role="cell" key={restaurant.id} headers={`comparison-field-${field} comparison-name-${restaurant.id}`}><span className="comparison-restaurant-label" aria-hidden="true">{restaurant.name}</span><p>{field === 'address' ? restaurant.address : fact?.value ?? '未確認'}</p>{fact && <small>確認 {new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(fact.verifiedAt))} · <a href={safeExternalUrl(fact.sourceUrl)!} target="_blank" rel="noreferrer">出典</a></small>}</td>;
             })}</tr>)}
             <tr role="row"><th scope="row" role="rowheader" id="comparison-field-reviews">このサービスの口コミ</th>{restaurants.map(restaurant => <td role="cell" key={restaurant.id} headers={`comparison-field-reviews comparison-name-${restaurant.id}`}><span className="comparison-restaurant-label" aria-hidden="true">{restaurant.name}</span><p>{restaurant.reviews.length ? `公開 ${restaurant.reviews.length}件（詳細に掲載）` : '公開口コミはまだありません'}</p></td>)}</tr>
             <tr role="row"><th scope="row" role="rowheader" id="comparison-field-website">公式サイト</th>{restaurants.map(restaurant => <td role="cell" key={restaurant.id} headers={`comparison-field-website comparison-name-${restaurant.id}`}><span className="comparison-restaurant-label" aria-hidden="true">{restaurant.name}</span><a href={safeExternalUrl(factValue(restaurant, 'website')!)!} target="_blank" rel="noreferrer">公式サイトで最新情報を確認</a></td>)}</tr>
