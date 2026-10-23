@@ -7,7 +7,12 @@ test('real ten-venue private flow reaches dummy submission, queue, withdrawal an
  for(const row of catalog)await expect(page.getByRole('heading',{name:row.name,exact:true})).toBeVisible();
  await prepare(page);const row=catalog.find((r:{name:string})=>r.name==='名古屋浅田');
  await page.locator(`[data-pilot-id="${row.id}"]`).getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();
- await expect(page.getByRole('heading',{name:row.name,exact:true})).toBeVisible();await page.getByRole('button',{name:'用意されたテスト投稿を送信する',exact:true}).click();
+ await expect(page.getByRole('heading',{name:row.name,exact:true})).toBeVisible();
+ await expect(page.locator('.detail-decision dt')).toHaveText(['掲載コース・料金','個室']);
+ await expect(page.locator('.detail-decision dd').first()).toHaveCSS('font-size','16px');
+ await expect(page.locator('.detail-decision dt').first()).toHaveCSS('font-size','14px');
+ await expect(page.getByRole('link',{name:'公式サイトで最新情報を確認',exact:true})).toHaveAttribute('href',row.facts.find((fact:{field:string})=>fact.field==='website').value);
+ await page.getByRole('button',{name:'用意されたテスト投稿を送信する',exact:true}).click();
  await expect(page.getByText('非公開のテスト投稿を受け付けました。自分の投稿一覧と審査待ちの一覧で確認できます。',{exact:true})).toBeVisible();
  await page.getByRole('button',{name:'審査待ちの投稿を見る',exact:true}).click();await expect(page.getByText(comment,{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'承認',exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'自分のテスト投稿',exact:true}).click();await page.getByRole('button',{name:'このテスト投稿を取り下げる',exact:true}).click();await expect(page.getByText('PRIVATE TEST / 取り下げ済み',{exact:true})).toBeVisible();
@@ -21,6 +26,11 @@ test('owner can search exact real facts and compare real course/room conditions 
  await page.getByRole('textbox',{name:'非公開の実店舗を検索'}).fill('名古屋浅田');await expect(page.getByText('実店舗 1 / 10件（非公開）',{exact:true})).toBeVisible();await page.getByRole('textbox',{name:'非公開の実店舗を検索'}).fill('');
  for(const name of ['名古屋浅田','日本料理 加賀屋 名古屋店']){const row=catalog.find((r:{name:string})=>r.name===name);await page.locator(`[data-pilot-id="${row.id}"]`).getByRole('button',{name:'比較に追加',exact:true}).click();}
  await page.getByRole('button',{name:'候補を比較（2）',exact:true}).click();const table=page.getByRole('table');await expect(table).toContainText('サービス料15%');await expect(table).toContainText('個室8室');await expect(table).toContainText('未確認');
+ await expect(table.locator('tbody th').first()).toHaveText('掲載コース・料金');
+ await expect(table.locator('tbody td p').first()).toHaveCSS('font-size','16px');
+ await expect(table.locator('tbody td small').first()).toHaveCSS('font-size','14px');
+ const asada=catalog.find((row:{name:string})=>row.name==='名古屋浅田');
+ await expect(table.getByRole('link',{name:'出典',exact:true}).first()).toHaveAttribute('href',asada.facts.find((fact:{field:string})=>fact.field==='price').sourceUrl);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>/profile|pilot|owner.trial/.test(key)))).toEqual([]);
  await page.reload();await expect(page.getByRole('table')).toContainText('サービス料15%');await expect(page.getByRole('table')).toContainText('個室8室');

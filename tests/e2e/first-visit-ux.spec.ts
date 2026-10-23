@@ -1,19 +1,18 @@
 import {test,expect} from '@playwright/test';
 import {catalog,login,mock} from './helpers/ownerTrial';
 const base='http://127.0.0.1:4181';
-test('first search has an adjacent login action and closing it retains the search at every target width',async({page},info)=>{
+test('connected preparation offers invitation login, and cancelling keeps the requested route at every width',async({page},info)=>{
  await page.route('https://test-project.supabase.co/**',route=>route.fulfill({json:[]}));
  for(const width of (info.project.name==='mobile'?[320,390,430]:[1280])){
-  await page.setViewportSize({width,height:844});await page.goto('http://127.0.0.1:4182/#/');
-  await page.getByRole('searchbox',{name:'店名・エリア・料理を検索'}).fill('個室');await page.getByRole('button',{name:'探す',exact:true}).click();
+  await page.setViewportSize({width,height:844});await page.goto('http://127.0.0.1:4182/#/nagoya?query=個室');
   await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています'})).toBeVisible();
-  const search=page.getByRole('textbox',{name:'名古屋の確認済み店舗を検索'});await expect(search).toHaveValue('個室');
-  const button=page.getByRole('button',{name:'招待済みの方はログイン',exact:true});await button.click();
+  await expect(page.getByRole('textbox',{name:'名古屋の確認済み店舗を検索'})).toHaveCount(0);
+  const requested=page.url();const button=page.getByRole('button',{name:'招待済みの方はログイン',exact:true});await button.click();
   await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByRole('textbox',{name:'メールアドレス'})).toBeVisible();
-  await page.getByRole('button',{name:'閉じる',exact:true}).click();await expect(page.getByRole('dialog')).not.toBeVisible();await expect(search).toHaveValue('個室');
-  await button.click();await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.getByRole('button',{name:'閉じる',exact:true}).click();await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page).toHaveURL(requested);
+  await button.click();await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page).toHaveURL(requested);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  const height=await button.evaluate(el=>el.getBoundingClientRect().height);expect(height).toBeGreaterThanOrEqual(44);
+  expect(await button.evaluate(el=>el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   await page.screenshot({path:info.outputPath(`first-search-${width}.png`),fullPage:true});
  }
 });

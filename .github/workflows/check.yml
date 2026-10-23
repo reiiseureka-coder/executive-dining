@@ -24,8 +24,16 @@ jobs:
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-mobile-before/node_modules"
           cd "$RUNNER_TEMP/dining-mobile-before"
           VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4183 > "$RUNNER_TEMP/dining-mobile-before.log" 2>&1 &
+      - name: Prepare task-hierarchy visual reference
+        run: |
+          git fetch --depth=1 origin cbbfc95f5ec24bd6f0775679f195d37e161b96ba
+          git worktree add --detach "$RUNNER_TEMP/dining-ux-before" cbbfc95f5ec24bd6f0775679f195d37e161b96ba
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-ux-before/node_modules"
+          cd "$RUNNER_TEMP/dining-ux-before"
+          VITE_SUPABASE_URL=https://test-project.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=true VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4184 > "$RUNNER_TEMP/dining-ux-before.log" 2>&1 &
       - run: npm run test:e2e
         env:
+          UX_BASELINE_URL: http://127.0.0.1:4184
           MOBILE_BASELINE_URL: http://127.0.0.1:4183
       - uses: actions/upload-artifact@v4
         if: always()

@@ -1,19 +1,32 @@
 import { test, expect } from '@playwright/test';
-import { login, mock } from './helpers/ownerTrial';
-test('real homepage preserves design, searches real catalog and keeps samples separate', async ({ page }) => {
+import { catalog, login, mock } from './helpers/ownerTrial';
+test('disconnected homepage explains availability and keeps design samples separate', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
-  await expect(page.locator('.hero-figure img')).toHaveAttribute('alt', /掲載店舗の写真ではありません/);
-  await expect(page.locator('.restaurant-card')).toHaveCount(0);
-  await page.getByRole('searchbox').fill('名古屋浅田');
-  await page.getByRole('button', { name: '探す', exact: true }).click();
-  await expect(page).toHaveURL(/#\/nagoya\?query=/);
-  await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('名古屋浅田');
-  await page.goBack();
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('名古屋の会食店を探す');
+  await expect(page.locator('[data-home-state="disconnected"]')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '店舗情報は未接続です', exact: true })).toBeVisible();
+  await expect(page.getByRole('search')).toHaveCount(0);
+  await expect(page.locator('.home-catalog-preparing, .editorial-home img, .restaurant-card')).toHaveCount(0);
   await page.goto('/#/demo');
-  await expect(page.getByText('SAMPLE / DESIGN DEMO', {exact: true})).toBeVisible();
+  await expect(page.getByText('SAMPLE / DESIGN DEMO', { exact: true })).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(3);
+});
+
+test('mocked invited homepage passes actual name and cuisine filters to the private catalog', async ({ page }) => {
+  // Intercepted fixtures verify UI routing, not live database availability.
+  await login(page); const state = await mock(page); await page.goto('http://127.0.0.1:4181');
+  const row = catalog[0];
+  const genre = row.facts.find(fact => fact.field === 'genre')!.value;
+  await page.getByRole('searchbox', { name: '店名・エリアから探す', exact: true }).fill(row.name);
+  await page.getByRole('combobox', { name: '料理', exact: true }).selectOption(genre);
+  await page.getByRole('button', { name: '一覧で探す', exact: true }).click();
+  await expect(page).toHaveURL(/#\/nagoya\?query=/);
+  await expect(page.locator('.catalog-search input')).toHaveValue(row.name);
+  await expect(page.getByRole('combobox', { name: '非公開テストの料理', exact: true })).toHaveValue(genre);
+  await expect(page.locator(`[data-pilot-id="${row.id}"]`)).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('[data-home-state="available"]')).toBeVisible();
+  expect(state.calls.some(call => /submit|moderate|prepare_profile|delete|withdraw/.test(call.name))).toBe(false);
 });
 test('both portals work through desktop and mobile navigation, history and reload', async ({ page, isMobile }) => {
   await page.goto('/');
@@ -35,17 +48,17 @@ test('both portals work through desktop and mobile navigation, history and reloa
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.goBack();
-    await expect(page.getByRole('heading', {name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('名古屋の会食店を探す');
     await page.goForward();
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     await page.getByRole('button', {name:'Executive Dining ホーム'}).click();
   }
 });
-test('owner homepage does not mislabel demo or corporate page as real private data', async ({page}) => {
+test('mocked invited homepage keeps demo and corporate pages separate from private data', async ({page}) => {
   await login(page); await mock(page); await page.goto('http://127.0.0.1:4181');
-  await expect(page.getByText('招待アカウントでログイン中。', {exact:false})).toBeVisible();
+  await expect(page.locator('.home-access-note')).toContainText('招待アカウント向けの非公開情報');
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
-  await page.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
+  await page.getByRole('link', { name: '全10店を見る', exact: true }).click();
   await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await page.goto('http://127.0.0.1:4181/#/demo');
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
@@ -53,16 +66,20 @@ test('owner homepage does not mislabel demo or corporate page as real private da
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
 });
 
-test('homepage offers the available Nagoya area without a grid of disabled cities', async ({page}) => {
+test('home keeps area information and audience links secondary without implying search is available', async ({ page }) => {
   await page.goto('/');
+  await expect(page.locator('[data-home-state="disconnected"]')).toBeVisible();
   await expect(page.locator('.city-list')).toHaveCount(0);
   await expect(page.locator('.home-closing')).toContainText('名古屋');
+  await expect(page.locator('.home-find .home-audience-links')).toHaveCount(0);
+  await expect(page.getByRole('search')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.getByRole('button', {name:'店舗一覧へ',exact:true}).click();
-  await expect(page).toHaveURL(/#\/nagoya$/);
-  await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています',exact:true})).toBeVisible();
-  await page.goBack();
-  await expect(page.locator('.home-closing')).toContainText('名古屋');
+  for (const [label, route] of [['法人導入のご案内', 'corporate'], ['店舗掲載のご案内', 'restaurants']]) {
+    await page.locator('.home-closing').getByRole('link', { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`#/${route}$`));
+    await page.goBack();
+    await expect(page.locator('.home-closing')).toContainText('名古屋');
+  }
 });
 
 test('enterprise page is concise, honest and copies an unsent consultation memo', async ({page}) => {

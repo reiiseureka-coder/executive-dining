@@ -44,6 +44,13 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
   await expect(page.getByRole('heading', { name: rows[0].name })).toBeVisible();
   await expect(page.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
   await expect(page.getByText('2026年10月5日は休業。再開後の空席は要確認')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(rows[0].name);
+  const decision = page.locator('.detail-decision');
+  await expect(decision.locator('dt')).toHaveText(['掲載コース・料金', '個室']);
+  await expect(decision.locator('dd').first()).toHaveCSS('font-size', '16px');
+  await expect(decision.locator('dt').first()).toHaveCSS('font-size', '14px');
+  expect(await decision.evaluate(el => el.closest('details'))).toBeNull();
+  await expect(page.getByRole('link', { name: '公式サイトで最新情報を確認', exact: true })).toHaveAttribute('href', 'https://example.com/japanese');
   expect(calls).toBe(1);
   await page.goBack(); await expect(page).toHaveURL(listUrl);
   await expect(page.getByLabel('保存した候補のみ', { exact: true })).toBeChecked();
@@ -83,20 +90,26 @@ test('missing or unpublished detail stays unavailable without substituting sampl
   await expect(page.getByRole('heading', { name: 'この店舗の情報は現在表示できません' })).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(0);
   await page.getByRole('button', { name: '一覧へ戻る', exact: true }).click();
-  await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('栄');
+  expect(new URLSearchParams(page.url().split('?')[1]).get('query')).toBe('栄');
+  await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています'})).toBeVisible();
+  await expect(page.getByRole('textbox',{name:'名古屋の確認済み店舗を検索'})).toHaveCount(0);
 });
 
 test('compare preserves conditions and unknown fields through detail, history and reload', async ({ page }) => {
-  await mockCatalog(page); await page.goto(`${base}/#/nagoya`);
+  await mockCatalog(page); await page.goto(`${base}/#/nagoya?query=%E5%90%8D%E5%8F%A4%E5%B1%8B`);
   for (const row of rows) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
-  await page.getByRole('button', { name: '選んだお店を比較', exact: true }).click();
+  await expect(page.getByRole('button',{name:'2店を比較',exact:true})).toBeInViewport();
+  await page.getByRole('button', { name: '2店を比較', exact: true }).click();
   const comparisonUrl = page.url();
-  await expect(page.getByRole('heading', { name: '会食の候補を、見比べる。' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '候補を比較' })).toBeVisible();
   const table = page.getByRole('table');
+  await expect(table.locator('tbody th').first()).toHaveText('掲載コース・料金');
+  await expect(table.locator('tbody td p').first()).toHaveCSS('font-size', '16px');
+  await expect(table.locator('tbody td small').first()).toHaveCSS('font-size', '14px');
   await expect(table.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
   await expect(table.getByText('2026年10月5日は休業。再開後の空席は要確認')).toBeVisible();
   await expect(table.getByRole('cell', { name: '未確認', exact: true })).toHaveCount(7);
-  await expect(table.getByRole('link', { name: '出典', exact: true }).first()).toHaveAttribute('href', 'https://example.com/genre');
+  await expect(table.getByRole('link', { name: '出典', exact: true }).first()).toHaveAttribute('href', 'https://example.com/price');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).first().click();
   await expect(page.getByRole('heading', { name: rows[0].name })).toBeVisible();
@@ -105,7 +118,8 @@ test('compare preserves conditions and unknown fields through detail, history an
   await page.getByRole('button', { name: '比較に戻る', exact: true }).click();
   await expect(page).toHaveURL(comparisonUrl);
   await page.getByRole('button', { name: '一覧へ戻る', exact: true }).click();
-  await expect(page.getByText('2 / 3店を選択', { exact: true })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('名古屋');
+  await expect(page.getByText('比較候補2店', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '選択を解除', exact: true }).click();
   await expect(page.getByRole('complementary', { name: '比較する候補' })).toHaveCount(0);
 });
@@ -115,10 +129,10 @@ test('comparison selection is capped at three, survives reload and can be change
   for (const row of catalog.slice(0, 3)) await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   const fourth = page.getByRole('button', { name: `比較に追加：${extra[1].name}`, exact: true });
   await expect(fourth).toBeDisabled(); await page.reload();
-  await expect(page.getByText('3 / 3店を選択', { exact: true })).toBeVisible(); await expect(fourth).toBeDisabled();
+  await expect(page.getByText('比較候補3店', { exact: true })).toBeVisible(); await expect(fourth).toBeDisabled();
   await page.getByRole('button', { name: `比較から外す：${rows[0].name}`, exact: true }).click();
   await expect(fourth).toBeEnabled(); await fourth.click();
-  await page.getByRole('button', { name: '選んだお店を比較', exact: true }).click();
+  await page.getByRole('button', { name: '3店を比較', exact: true }).click();
   await expect(page.getByRole('table').getByRole('columnheader')).toHaveCount(4);
 });
 test('manual comparison link excludes private URL text and opens with no local selections', async ({ page, browser }) => {
@@ -161,9 +175,10 @@ test('comparison storage failure is visible and clearing remains possible', asyn
   await page.addInitScript(() => { const original = Storage.prototype.setItem; Storage.prototype.setItem = function(key, value) { if (key === 'executive-dining:comparison:v1') throw new DOMException('Blocked', 'QuotaExceededError'); return original.call(this, key, value); }; });
   await page.goto(`${base}/#/nagoya`); await page.getByRole('button', { name: `比較に追加：${rows[0].name}`, exact: true }).click();
   await expect(page.getByText('比較候補の変更を保存できませんでした。再読み込みで選択が失われる場合があります。')).toBeVisible();
+  await expect(page.getByRole('button', { name: '候補を比較', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: '選択を解除', exact: true }).click();
-  await expect(page.getByText('0 / 3店を選択', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '選んだお店を比較', exact: true })).toBeDisabled();
+  await expect(page.getByRole('complementary', { name: '比較する候補' })).toHaveCount(0);
+  await expect(page.getByText('比較候補の変更を保存できませんでした。再読み込みで選択が失われる場合があります。')).toBeVisible();
   await page.reload(); await expect(page.getByRole('button', { name: `比較に追加：${rows[0].name}`, exact: true })).toHaveAttribute('aria-pressed', 'false');
 });
 

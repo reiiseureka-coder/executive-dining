@@ -33,7 +33,7 @@ for (const width of widths) {
     await expect(page).toHaveURL(/#\/corporate$/);
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await page.goBack();
-    await expect(page.locator('.home-hero')).toBeVisible();
+    await expect(page.locator('.home-find')).toBeVisible();
     await page.getByRole('button',{name:'メニューを開く'}).click();
     await page.getByRole('button',{name:'閉じる',exact:true}).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();
