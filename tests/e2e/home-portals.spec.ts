@@ -53,22 +53,16 @@ test('owner homepage does not mislabel demo or corporate page as real private da
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
 });
 
-test('homepage presents four cities in order with only Nagoya enabled', async ({page}) => {
+test('homepage offers the available Nagoya area without a grid of disabled cities', async ({page}) => {
   await page.goto('/');
-  const cities = page.locator('.city-list button');
-  await expect(cities.locator('strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
-  for (const index of [0, 1, 3]) {
-    await expect(cities.nth(index)).toBeDisabled();
-    await expect(cities.nth(index)).toContainText('準備中');
-  }
-  await expect(cities.nth(2)).toBeEnabled();
-  await expect(page.getByText('まずは、名古屋の一席から。',{exact:true})).toHaveCount(0);
+  await expect(page.locator('.city-list')).toHaveCount(0);
+  await expect(page.locator('.home-closing')).toContainText('名古屋');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await cities.nth(2).click();
+  await page.getByRole('button', {name:'店舗一覧へ',exact:true}).click();
   await expect(page).toHaveURL(/#\/nagoya$/);
   await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています',exact:true})).toBeVisible();
   await page.goBack();
-  await expect(page.locator('.city-list button strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
+  await expect(page.locator('.home-closing')).toContainText('名古屋');
 });
 
 test('enterprise page is concise, honest and copies an unsent consultation memo', async ({page}) => {

@@ -31,6 +31,7 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
   let calls = 0; await mockCatalog(page, () => { calls++; });
   await page.goto(`${base}/#/nagoya`);
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('栄 半個室');
+  await page.locator('.catalog-filter-disclosure > summary').click();
   await page.getByLabel('料理', { exact: true }).selectOption('日本料理');
   await page.getByLabel('確認できる情報', { exact: true }).selectOption('price');
   await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
@@ -39,6 +40,7 @@ test('real filters, saved candidates and detail URLs preserve price/closure evid
   const listUrl = page.url();
   await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/nagoya/${rows[0].id}`));
+  await expect(page.getByText('公開された口コミはまだありません。',{exact:true})).toBeVisible();
   await expect(page.getByRole('heading', { name: rows[0].name })).toBeVisible();
   await expect(page.getByText('夜会席16,500円、税込・サービス料15%別、平日席料別')).toBeVisible();
   await expect(page.getByText('2026年10月5日は休業。再開後の空席は要確認')).toBeVisible();
@@ -60,6 +62,7 @@ test('map pins follow real filters without reloading the base style and missing 
   const beforeFilter = styles;
   await page.getByRole('button', { name: `${rows[0].name}の掲載情報を表示`, exact: true }).click();
   await expect(page.locator(`#verified-${rows[0].id}`)).toHaveClass(/is-selected/);
+  await page.locator('.catalog-filter-disclosure > summary').click();
   await page.getByLabel('料理', { exact: true }).selectOption('中国料理');
   await expect(page.locator('.restaurant-map-pin')).toHaveCount(0);
   await expect(page.getByText('掲載中のお店 1件')).toBeVisible();

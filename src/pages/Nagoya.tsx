@@ -1,18 +1,18 @@
-import { CatalogPhoto } from '../components/CatalogPresentation';
+import CatalogSummary from '../components/CatalogSummary';
 import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, Search } from 'lucide-react';
+import { ArrowUpRight, Bookmark, Search, SlidersHorizontal } from 'lucide-react';
 import type { Page } from '../types';
 import type { SearchParams } from '../lib/search';
 import { catalogGenres, filterCatalog } from '../lib/catalogSearch';
 import { configuredMapProvider } from '../components/map/mapProvider';
-import { factValue, safeExternalUrl, verifiedCoordinates } from '../domain/dining';
+import { factValue, safeExternalUrl } from '../domain/dining';
 import { useAuth } from '../contexts/auth';
 import { openLoginDialog } from '../lib/loginDialog';
 import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { useComparison } from '../hooks/useComparison';
 import ComparisonTray from '../components/ComparisonTray';
 import { useSavedCatalog } from '../hooks/useSavedCatalog';
-import { VerifiedEvidence, VerifiedFactList, VerifiedReviews } from '../components/VerifiedFacts';
+import { VerifiedEvidence } from '../components/VerifiedFacts';
 const RestaurantMap = lazy(() => import('../components/map/RestaurantMap'));
 const date = (value: string) => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo' }).format(new Date(value));
 interface Props { params: SearchParams; onChange: (params: SearchParams) => void; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
@@ -24,6 +24,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
   const [selected, setSelected] = useState('');
   const genres = useMemo(() => catalogGenres(rows), [rows]);
   const filtered = useMemo(() => filterCatalog(rows, params, savedIds), [rows, params, savedIds]);
+  const activeFilters = [params.genre, params.information, params.saved].filter(Boolean).length;
   const showMap = params.view === 'map';
   const update = (key: keyof SearchParams, value: string) => onChange({ ...params, [key]: value });
   const select = useCallback((id: string) => {
@@ -31,16 +32,16 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
     const element = document.getElementById(`verified-${id}`);
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' }); element?.focus({ preventScroll: true });
   }, []);
-  return <div className="page-width catalog-page">
+  return <div className="page-width catalog-page editorial-catalog">
     <div className="catalog-heading"><div><p className="eyebrow">NAGOYA</p><h1>名古屋の会食店を探す</h1></div><p>個室・料金などの確認記録から、候補を探せます。</p></div>
     <div className="catalog-toolbar"><label className="catalog-search"><Search size={18} aria-hidden="true" /><input aria-label="名古屋の確認済み店舗を検索" placeholder="店名・エリア・個室などで検索" value={params.query ?? ''} onChange={event => update('query', event.target.value)} /></label><button className="button-secondary" onClick={() => update('view', showMap ? '' : 'map')} aria-pressed={showMap}>{showMap ? '地図を閉じる' : '地図を表示'}</button></div>
-    {(loading||rows.length>0)&&<><div className="catalog-filters">
+    {(loading||rows.length>0)&&<><details className="catalog-filter-disclosure"><summary><SlidersHorizontal size={16} aria-hidden="true" />絞り込み・並び順{activeFilters > 0 && <span className="filter-count">{activeFilters}件の条件</span>}</summary><div className="catalog-filters">
       <label>料理<select aria-label="料理" value={params.genre ?? ''} onChange={event => update('genre', event.target.value)}><option value="">すべての料理</option>{genres.map(genre => <option key={genre}>{genre}</option>)}</select></label>
       <label>確認できる情報<select aria-label="確認できる情報" value={params.information ?? ''} onChange={event => update('information', event.target.value)}><option value="">指定しない</option><option value="private_room">個室情報あり</option><option value="price">料金情報あり</option><option value="hours">営業時間情報あり</option><option value="notice">営業のお知らせあり</option><option value="coordinates">地図位置確認済み</option></select></label>
       <label>並び順<select aria-label="並び順" value={params.sort ?? 'name'} onChange={event => update('sort', event.target.value)}><option value="name">店名順</option><option value="recent">確認日が新しい順</option></select></label>
       <label className="catalog-saved-filter"><input type="checkbox" checked={params.saved === '1'} onChange={event => update('saved', event.target.checked ? '1' : '')} />保存した候補のみ</label>
       <button className="catalog-reset" onClick={() => onChange({})}>条件をリセット</button>
-    </div>
+    </div></details>
     <details className="catalog-search-guide"><summary>検索と掲載情報について</summary><p>キーワードは確認記録の本文を検索します。「個室」には「個室なし」の記録も含まれます。「情報あり」は記録の有無で、条件の確約ではありません。</p><p>料金はコース・単品・目安など、利用条件とともに記載します。最新の営業・空席は予約前にお店へご確認ください。</p></details></>}
     <div className="catalog-result-heading"><p className="catalog-count" aria-live="polite">{loading ? '店舗情報を読み込んでいます…' : error ? '店舗情報を確認できません' : `掲載中のお店 ${filtered.length}件`}</p><button className="catalog-reset" disabled={loading} onClick={() => void reload()}>最新情報に更新</button></div>
     {params.saved === '1' && <p className="catalog-filter-note">保存した候補のうち、公開中の情報を表示します。保存はこのブラウザ内のみです。</p>}
@@ -52,10 +53,10 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
       const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
       const saved = savedIds.includes(restaurant.id);
       return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
-        <CatalogPhoto restaurant={restaurant} /><div className="verified-card-heading"><div><p className="eyebrow">公式情報の確認日 · {date(restaurant.verifiedAt)}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
-        <VerifiedFactList restaurant={restaurant} compact />
-        <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>店舗の詳細を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button><span>{verifiedCoordinates(restaurant) ? '地図位置確認済み' : '地図位置は確認中'}</span></div>
-        <VerifiedEvidence restaurant={restaurant} /><VerifiedReviews restaurant={restaurant} compact />
+        <div className="verified-card-heading"><div><p className="eyebrow">{factValue(restaurant, 'genre') ?? '名古屋'}</p><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p>{restaurant.address}</p></div><button className="button-secondary" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : '候補に保存'}</button></div>
+        <CatalogSummary restaurant={restaurant} />
+        <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>店舗の詳細を見る</button>{website && <a href={website} target="_blank" rel="noreferrer">公式サイト <ArrowUpRight size={15} /></a>}<button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button></div>
+        <div className="catalog-row-footnote"><span>公式情報の確認日 · {date(restaurant.verifiedAt)}</span><VerifiedEvidence restaurant={restaurant} /></div>
       </article>;
     })}</div>
     <ComparisonTray onNavigate={onNavigate} />

@@ -58,7 +58,7 @@ test('actual ten-store search supports combined facts, normalization, empty resu
   await page.getByRole('button', { name: '検索条件をリセット', exact: true }).click(); await search.fill('名古屋浅田');
   const listUrl = page.url(); await page.getByRole('button', { name: '店舗の詳細を見る', exact: true }).click();
   await expect(page.locator('.pilot-detail').getByText('未確認', { exact: true })).toHaveCount(2);
-  await expect(page.locator('.pilot-detail img')).toHaveCount(1);
+  await expect(page.locator('.pilot-detail img')).toHaveCount(0);
   await page.screenshot({ path: info.outputPath('actual-store-detail.png'), fullPage: true });
   await page.goBack(); await expect(page).toHaveURL(listUrl); await expect(search).toHaveValue('名古屋浅田');
   await page.goForward(); await page.reload(); await expect(page.getByRole('heading', { name: '名古屋浅田', exact: true })).toBeVisible();

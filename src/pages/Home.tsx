@@ -12,39 +12,32 @@ export default function Home({ onNavigate }: Props) {
   const access = useAppAccess();
   const { user } = useAuth();
   const explore = (value = '') => onNavigate('nagoya', undefined, { query: value });
-  return <>
-    <section className="home-hero page-width">
+  return <div className="editorial-home">
+    <section className="home-hero page-width" aria-labelledby="home-title">
       <div className="hero-copy">
-        <p className="eyebrow">EXECUTIVE DINING</p>
-        <h1><span>大切な話を、</span><span>心地よい一席で。</span></h1>
-        <p className="hero-description">個室や料金、アクセスを確かめて、<br />会食に合う一軒を見つける。</p>
-        <form className="hero-search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
+        <p className="eyebrow hero-edition">A GUIDE TO A GOOD TABLE <span>NAGOYA</span></p>
+        <h1 id="home-title"><span>大切な話を、</span><span>心地よい一席で。</span></h1>
+        <p className="hero-description">お店選びに、少しの余白を。<br />個室や料金を確かめて、会食の候補を。</p>
+        <form className="hero-search" role="search" onSubmit={event => { event.preventDefault(); explore(query.trim()); }}>
           <label className="sr-only" htmlFor="home-query">店名・エリア・料理を検索</label><Search size={19} aria-hidden="true" />
           <input id="home-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="店名・エリア・料理" type="search" />
-          <button type="submit">探す<ArrowRight size={17} /></button>
+          <button type="submit">探す<ArrowRight size={18} aria-hidden="true" /></button>
         </form>
-        <div className="quick-links"><span>気になるキーワード</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
-        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。名古屋の非公開情報を確認できます。' : '現在は名古屋の店舗情報を準備しています。'}{!user&&<button className="inline-login" onClick={openLoginDialog}>招待済みの方はログイン</button>}</p>
-        <nav className="home-audience-links" aria-label="目的別のご案内"><a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}>法人導入のご案内<ArrowRight size={16} /></a><a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}>店舗掲載のご案内<ArrowRight size={16} /></a></nav>
+        <div className="quick-links"><span>キーワード</span>{['個室', '日本料理', '名駅'].map(term => <button key={term} onClick={() => explore(term)}>{term}</button>)}</div>
+        <p className="home-availability">{access.ownerTrial ? '招待アカウントでログイン中。名古屋の非公開情報をご覧いただけます。' : '名古屋の店舗情報を準備中です。'}{!user&&<button className="inline-login" onClick={openLoginDialog}>招待済みの方はログイン</button>}</p>
+        <nav className="home-audience-links" aria-label="目的別のご案内"><a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}>法人導入のご案内<ArrowRight size={14} aria-hidden="true" /></a><a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}>店舗掲載のご案内<ArrowRight size={14} aria-hidden="true" /></a></nav>
       </div>
-      <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>IMAGE</span><span>写真はイメージです</span></figcaption></figure>
+      <figure className="hero-figure"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=85" alt="落ち着いたレストランのテーブルセッティングのイメージ。掲載店舗の写真ではありません" fetchPriority="high" /><figcaption><span>THE ART OF DINING</span><span>写真はイメージです</span></figcaption></figure>
     </section>
     <HomeCatalog onNavigate={onNavigate} />
-    <section className="page-width section-space home-cities">
-      <div className="section-heading"><div><p className="eyebrow">AREA</p><h2>エリアから探す</h2></div><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={16} /></button></div>
-      <div className="area-list city-list">{['東京', '大阪', '名古屋', '福岡'].map(city => <button key={city} disabled={city !== '名古屋'} onClick={() => explore()}><span><strong>{city}</strong><small>{city === '名古屋' ? '店舗情報を見る' : '準備中'}</small></span>{city === '名古屋' && <ArrowRight size={20} />}</button>)}</div>
+    <section className="page-width home-fieldnotes" aria-labelledby="fieldnotes-title">
+      <div><p className="eyebrow">OUR APPROACH</p><h2 id="fieldnotes-title">お店を選ぶ前に、<br />確かめたいことを。</h2><p>公式情報とその出典を、ひとつの場所に。<br />未確認のことは、未確認のままお伝えします。</p></div>
+      <div className="home-guide-list">
+        <details><summary><span>01</span>個室・料金の確認について</summary><p>個室の利用条件や料金の種類を、確認した時点の情報として掲載します。最新の空席や営業状況は、予約前にお店へ直接ご確認ください。</p></details>
+        <details><summary><span>02</span>候補を残して、比較する</summary><p>気になるお店は最大3店まで比較できます。保存した候補はこのブラウザ内だけに残り、ほかの端末とは同期されません。</p></details>
+        <details><summary><span>03</span>掲載情報と口コミについて</summary><p>公式情報を確認した記録と、実際の訪問体験は分けて表示します。公開口コミの受付は準備中です。</p></details>
+      </div>
     </section>
-    <section className="page-width section-space home-value">
-      <div className="section-heading"><div><h2 className="home-value-title"><span>会食の店選びに、</span><span>確かめたいこと。</span></h2></div></div>
-      <div className="home-principles">{[
-        ['個室と料金のこと','コース料金や個室の条件を、出典・確認日とともに。予約前に確かめたい情報をまとめます。'],
-        ['気になるお店を、候補に。','保存した候補から最大3店の料金や個室の条件を比較できます。候補はこのブラウザ内に保存されます。'],
-        ['予約前に知っておくこと','未確認の項目は、そのまま明記。空席や最新の利用条件は、お店へ直接ご確認ください。'],
-      ].map(([title,text]) => <article key={title}><h3>{title}</h3><p>{text}</p></article>)}</div>
-    </section>
-    <section className="planning-section"><div className="page-width planning-inner"><div><p className="eyebrow">FOR RESTAURANTS & COMPANIES</p><h2>店舗掲載と<br />法人プランのご案内</h2><p>どちらも受付に向けて準備中です。</p></div><div className="home-partners">
-      <a href="#/restaurants" onClick={event => { event.preventDefault(); onNavigate('restaurants'); }}><h3>店舗の方へ</h3><p>個室やコースの魅力を、会食のお店選びに。</p><span>掲載のご案内<ArrowRight size={16} /></span></a>
-      <a href="#/corporate" onClick={event => { event.preventDefault(); onNavigate('corporate'); }}><h3>法人の方へ</h3><p>社員のプライベートなお店選びを、福利厚生でサポート。</p><span>法人プランのご案内<ArrowRight size={16} /></span></a>
-    </div></div></section>
-  </>;
+    <section className="page-width home-closing" aria-label="エリアとサービスのご案内"><p>現在の対象エリア <strong>名古屋</strong></p><button className="text-link" onClick={() => explore()}>店舗一覧へ<ArrowRight size={18} aria-hidden="true" /></button></section>
+  </div>;
 }
