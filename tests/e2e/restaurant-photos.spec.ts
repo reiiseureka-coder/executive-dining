@@ -27,6 +27,7 @@ for (const width of [390, 1440]) {
     const size = await image.boundingBox();
     expect(size!.width).toBeGreaterThanOrEqual(width === 390 ? 340 : 220);
     expect(size!.height).toBeGreaterThanOrEqual(145);
+    for (const size of await card.locator('.restaurant-photo-disclaimer').evaluateAll(elements => elements.map(element => parseFloat(getComputedStyle(element).fontSize)))) expect(size).toBeGreaterThanOrEqual(14);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: info.outputPath(`illustration-list-${width}-viewport.png`), fullPage: false });
     await card.scrollIntoViewIfNeeded();
@@ -36,6 +37,9 @@ for (const width of [390, 1440]) {
     const dialog = page.getByRole('dialog', { name: /写真を拡大/ });
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText(disclaimer);
+    const modalBounds = await dialog.boundingBox();
+    expect(Math.abs(modalBounds!.x - (width - modalBounds!.width) / 2)).toBeLessThanOrEqual(2);
+    expect(Math.abs(modalBounds!.y - ((width === 390 ? 844 : 1000) - modalBounds!.height) / 2)).toBeLessThanOrEqual(2);
     await expect(dialog.getByRole('button', { name: '写真を閉じる', exact: true })).toBeFocused();
     await page.screenshot({ path: info.outputPath(`illustration-dialog-${width}.png`), fullPage: false });
     await page.keyboard.press('Escape');
@@ -59,7 +63,7 @@ for (const width of [390, 1440]) {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: info.outputPath(`illustration-detail-${width}-viewport.png`), fullPage: false });
     await page.screenshot({ path: info.outputPath(`illustration-detail-${width}.png`), fullPage: true });
-    const typography = await page.locator('.service-demo-reviews h2, .service-demo-reviews p, .restaurant-photos figcaption').evaluateAll(elements => elements.map(element => ({ text: element.textContent, fontSize: getComputedStyle(element).fontSize, top: element.getBoundingClientRect().top })));
+    const typography = await page.locator('.service-demo-reviews h2, .service-demo-reviews p, .restaurant-photo-disclaimer').evaluateAll(elements => elements.map(element => ({ text: element.textContent, fontSize: getComputedStyle(element).fontSize, top: element.getBoundingClientRect().top })));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.getByRole('button', { name: 'デモの店舗一覧へ', exact: true }).first().click();
     await expect(image).toBeVisible();
