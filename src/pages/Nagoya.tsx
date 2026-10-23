@@ -8,6 +8,7 @@ import { configuredMapProvider } from '../components/map/mapProvider';
 import { factValue, safeExternalUrl } from '../domain/dining';
 import { useAuth } from '../contexts/auth';
 import { openLoginDialog } from '../lib/loginDialog';
+import { supabase, emailSignInEnabled, googleSignInEnabled } from '../lib/supabase';
 import { usePublicCatalog } from '../hooks/usePublicCatalog';
 import { useComparison } from '../hooks/useComparison';
 import ComparisonTray from '../components/ComparisonTray';
@@ -18,6 +19,7 @@ const date = (value: string) => new Intl.DateTimeFormat('ja-JP', { timeZone: 'As
 interface Props { params: SearchParams; onChange: (params: SearchParams) => void; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
 export default function Nagoya({ params, onChange, onNavigate }: Props) {
   const { user } = useAuth();
+  const loginAvailable = Boolean(supabase && (emailSignInEnabled || googleSignInEnabled));
   const { rows, loading, error, reload } = usePublicCatalog();
   const { savedIds, toggleSaved, storageWarning } = useSavedCatalog();
   const comparison = useComparison();
@@ -48,7 +50,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
     {storageWarning && <p className="sample-notice" role="status">{storageWarning}</p>}
     {showMap && <><p className="map-privacy">地図を表示すると、地図データを読み込むため{configuredMapProvider(import.meta.env.VITE_MAP_STYLE_URL).name}へ接続します。端末の現在地は取得しません。</p><Suspense fallback={<p role="status">地図を準備しています…</p>}><RestaurantMap restaurants={filtered} onSelect={select} /></Suspense></>}
     {error && <div className="catalog-empty" role="alert"><h2>店舗情報を読み込めませんでした</h2><p>{error}</p><button className="button-secondary" onClick={() => void reload()}>再読み込み</button></div>}
-    {!loading && !error && !filtered.length && <div className="catalog-empty"><p className="eyebrow">{rows.length ? 'NO RESULTS' : 'UNDER REVIEW'}</p><h2>{rows.length ? '条件に合うお店がありません' : '名古屋の掲載情報を準備しています'}</h2><p>{rows.length ? '検索する言葉や条件を変えてお試しください。保存したお店でも、掲載が取り下げられると表示されません。' : '現在、店舗情報を確認しています。招待済みの方はログインしてご覧ください。'}</p>{rows.length ? <button className="button-secondary" onClick={() => onChange({})}>条件をリセット</button> : <div>{!user?<button className="primary-button" onClick={openLoginDialog}>招待済みの方はログイン</button>:<p>このアカウントで閲覧できる情報は、掲載開始後に表示されます。</p>}</div>}</div>}
+    {!loading && !error && !filtered.length && <div className="catalog-empty"><p className="eyebrow">{rows.length ? 'NO RESULTS' : 'UNDER REVIEW'}</p><h2>{rows.length ? '条件に合うお店がありません' : '名古屋の掲載情報を準備しています'}</h2><p>{rows.length ? '検索する言葉や条件を変えてお試しください。保存したお店でも、掲載が取り下げられると表示されません。' : loginAvailable && !user ? '現在、店舗情報を確認しています。招待済みの方はログインしてご覧ください。' : '一般公開に向け、店舗の公式情報を確認しています。確認が済んだ情報から順次掲載します。'}</p>{rows.length ? <button className="button-secondary" onClick={() => onChange({})}>条件をリセット</button> : <div>{!user && loginAvailable ? <button className="primary-button" onClick={openLoginDialog}>招待済みの方はログイン</button> : <>{user && <p>このアカウントで閲覧できる情報は、掲載開始後に表示されます。</p>}<button className="button-secondary" onClick={() => onNavigate('home')}>ホームへ戻る</button></>}</div>}</div>}
     <div className="verified-list">{filtered.map(restaurant => {
       const website = safeExternalUrl(factValue(restaurant, 'website') ?? '');
       const saved = savedIds.includes(restaurant.id);

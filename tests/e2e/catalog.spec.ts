@@ -48,10 +48,12 @@ test('verified RPC facts display, unknown stays unknown, and sources are readabl
   await expect(page.getByText('未確認の候補')).toHaveCount(0);
   await expect(page.getByText('掲載中のお店 1件')).toBeVisible();
   await expect(page.locator('.catalog-conditions[open]')).toHaveCount(0);
-  await expect(page.getByText('半個室 4〜6名',{exact:true})).not.toBeVisible();
+  await expect(page.locator('.catalog-room-summary').getByText('半個室 4〜6名',{exact:true})).toBeVisible();
+  await expect(page.locator('.verified-facts').getByText('半個室 4〜6名',{exact:true})).not.toBeVisible();
   await page.locator('.catalog-conditions > summary').click();
-  await expect(page.getByText('半個室 4〜6名',{exact:true})).toBeVisible();
+  await expect(page.locator('.verified-facts').getByText('半個室 4〜6名',{exact:true})).toBeVisible();
   await expect(page.locator('.verified-facts').getByText('未確認',{exact:true})).toHaveCount(2);
+  expect(await page.locator('.fact-evidence > summary').evaluate(el=>el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   await page.getByText('出典・確認日を見る').click();
   await expect(page.getByRole('link', { name: '個室の出典' })).toHaveAttribute('href', 'https://example.com/rooms');
   await page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' }).fill('半個室 名古屋');
