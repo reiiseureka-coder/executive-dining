@@ -1,4 +1,5 @@
-import { CatalogPhoto } from '../components/CatalogPresentation';
+import RestaurantPhotos from '../components/RestaurantPhotos';
+import CatalogSummary from '../components/CatalogSummary';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../contexts/auth';
 import { ownerTrialRepository as repository } from '../data/ownerTrialClient';
@@ -10,13 +11,22 @@ import type { Page } from '../types';
 import type { SearchParams } from '../lib/search';
 import { routeHash } from '../lib/routing';
 import { isUuid } from '../domain/reviews';
-import { VerifiedEvidence, VerifiedFactList } from '../components/VerifiedFacts';
+import { VerifiedEvidence } from '../components/VerifiedFacts';
 const checked=(value:string)=>new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo'}).format(new Date(value));
 interface TrialRoute { page: Page; restaurantId?: string; params: SearchParams }
 interface TrialProps { route: TrialRoute; onNavigate: (page: Page, id?: string, params?: SearchParams) => void }
+function CatalogHeading({ comparison = false }: { comparison?: boolean }) { return <h1>{comparison ? '候補を比較' : '名古屋の会食店を探す'}</h1>; }
+function DetailFactRows({ restaurant, fields }: { restaurant: PilotRestaurant; fields: FactField[] }) {
+ return <dl className="verified-facts detail-facts">{fields.map(field => <div key={field}><dt>{FACT_LABELS[field]}</dt><dd>{factValue(restaurant, field) ?? '未確認'}</dd></div>)}</dl>;
+}
+function PrivateCatalogReviews({ compact = false }: { compact?: boolean }) {
+ const Heading = compact ? 'h3' : 'h2';
+ return <section className={`verified-reviews review-section private-catalog-reviews${compact ? ' review-section-compact' : ''}`} aria-label="会食の口コミ"><Heading className="review-heading">会食の口コミ</Heading><p className="review-unavailable">この非公開一覧には、公開口コミを表示していません。</p></section>;
+}
 function Workspace({ route, onNavigate }: TrialProps) {
  const params = route.params;
  const showTesting = route.page === 'pilot' || route.page === 'pilot-detail';
+ const compactDetail = route.page === 'nagoya-detail';
  const query = params.query ?? ''; const genre = params.genre ?? '';
  const selected = ['nagoya-detail','pilot-detail'].includes(route.page) ? route.restaurantId ?? '' : '';
  const compared = [...new Set((params.ids ?? '').split(',').filter(isUuid))].slice(0,3);
@@ -25,7 +35,7 @@ function Workspace({ route, onNavigate }: TrialProps) {
    window.history.replaceState(null, '', routeHash(route.page, route.restaurantId, next));
    window.dispatchEvent(new HashChangeEvent('hashchange'));
  };
- const navigate = (next: 'catalog'|'compare'|'mine'|'queue') => onNavigate(next === 'compare' ? 'compare' : showTesting ? 'pilot' : 'nagoya', undefined, { ...params, view: next === 'catalog' || next === 'compare' ? undefined : next });
+ const navigate = (next: 'catalog'|'compare'|'mine'|'queue') => onNavigate(next === 'compare' ? 'compare' : showTesting ? 'pilot' : 'nagoya', undefined, { ...params, returnTo: undefined, view: next === 'catalog' || next === 'compare' ? undefined : next });
  const select = (id: string) => onNavigate(id ? (showTesting ? 'pilot-detail' : 'nagoya-detail') : (showTesting ? 'pilot' : 'nagoya'), id || undefined, { ...params, view: undefined, returnTo: id && view === 'compare' ? 'compare' : undefined });
  const [context,setContext]=useState<OwnerTrialContext|null>(null);
  const [rows,setRows]=useState<PilotRestaurant[]>([]);
@@ -69,25 +79,74 @@ function Workspace({ route, onNavigate }: TrialProps) {
  const toggle=(id:string)=>change({...params,ids:(compared.includes(id)?compared.filter(value=>value!==id):compared.length<3?[...compared,id]:compared).join(',')||undefined});
  const name=(id:string)=>rows.find(row=>row.id===id)?.name??'テスト対象の店舗';
  const notices=<>{error&&<p role="alert" className="sample-notice">{error}</p>}{message&&<p role="status" className="sample-notice">{message}</p>}{uncertain&&<p>自動再送はしていません。「受付状況を再確認」で保存済みの内容を確かめてください。</p>}</>;
- if(loading&&!context)return <p role="status">実店舗とテスト権限を確認しています…</p>;
- if(!context)return <div className="catalog-empty">{notices}<button className="button-secondary" disabled={loading} onClick={()=>void reload()}>再読み込み</button></div>;
+ if(loading&&!context)return <>{compactDetail&&<CatalogHeading/>}<p role="status">実店舗とテスト権限を確認しています…</p></>;
+ if(!context)return <>{compactDetail&&<CatalogHeading/>}<div className="catalog-empty">{notices}<button className="button-secondary" disabled={loading} onClick={()=>void reload()}>再読み込み</button></div></>;
+ const customerCatalog = !showTesting && view === 'catalog' && !detail && context.active;
+ const customerComparison = !showTesting && view === 'compare' && context.active;
  const reviewList=(reviews:TrialReview[],editorial=false)=><div className="curation-list">{!reviews.length?<div className="catalog-empty"><h2>{editorial?'審査待ちのテスト投稿はありません':'テスト投稿はまだありません'}</h2></div>:reviews.map(review=><article className="curation-card" key={review.id}><p className="eyebrow">PRIVATE TEST / {review.status==='withdrawn'?'取り下げ済み':'審査待ち（テスト）'}</p><h3>{name(review.restaurantId)}</h3><p>{review.comment}</p><p className="draft-privacy-note">操作確認月 {review.visitedMonth} · ダミー評価 {review.rating}/5。実際の来店評価ではありません。</p>{editorial?<p>自分のテスト投稿は承認できません。ほかの運営者も、テスト投稿は承認できません。</p>:review.status!=='withdrawn'&&<button className="button-secondary" disabled={busy||uncertain} onClick={()=>void mutate(`withdraw:${review.id}:${review.version}`,id=>repository!.withdraw(review.id,review.version,id),'テスト投稿を取り下げました。')}>このテスト投稿を取り下げる</button>}</article>)}</div>;
  return <>
+   {compactDetail&&!detail&&<CatalogHeading/>}
    {showTesting&&<details className="pilot-guidance"><summary>非公開テストの利用条件</summary><div className="catalog-explainer"><p>登録済みの実在する10店舗で操作を試せます。店舗情報は公式情報を確認した記録で、まだ一般公開していません。プロフィールと口コミには、あらかじめ用意した架空のデータを使います。</p></div></details>}
    {showTesting&&<p className="draft-privacy-note">{context.active?`テスト期限：${new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',dateStyle:'medium',timeStyle:'short'}).format(new Date(context.endsAt))}。`:'テスト受付と店舗閲覧の期間は終了しました。'}一般公開・実際の口コミ投稿・会員募集は開始していません。</p>}
-   <div className="pilot-toolbar"><div className="pilot-tabs">{context.active&&<><button className="button-secondary" aria-pressed={view==='catalog'} onClick={()=>{navigate('catalog');}}>実店舗一覧</button><button className="button-secondary" aria-pressed={view==='compare'} onClick={()=>navigate('compare')}>候補を比較（{compared.length}）</button></>}{showTesting&&<button className="button-secondary" aria-pressed={view==='mine'} onClick={()=>navigate('mine')}>自分のテスト投稿</button>}{showTesting&&context.active&&context.canModerate&&<button className="button-secondary" aria-pressed={view==='queue'} onClick={()=>navigate('queue')}>審査待ちの投稿を見る</button>}</div><button className="catalog-reset" disabled={busy||loading} onClick={()=>void reload()}>{uncertain?'受付状況を再確認':'再読み込み'}</button></div>
+   {(!compactDetail||!detail)&&(!customerCatalog||compared.length>0)&&<div className={`pilot-toolbar${showTesting?'':' customer-catalog-toolbar'}`}><div className="pilot-tabs">{context.active&&<>{(showTesting||view!=='catalog')&&<button className="button-secondary" aria-pressed={view==='catalog'} onClick={()=>{navigate('catalog');}}>実店舗一覧</button>}{(showTesting||(view!=='compare'&&compared.length>0))&&<button className="button-secondary" aria-pressed={view==='compare'} onClick={()=>navigate('compare')}>候補を比較（{compared.length}）</button>}</>}{showTesting&&<button className="button-secondary" aria-pressed={view==='mine'} onClick={()=>navigate('mine')}>自分のテスト投稿</button>}{showTesting&&context.active&&context.canModerate&&<button className="button-secondary" aria-pressed={view==='queue'} onClick={()=>navigate('queue')}>審査待ちの投稿を見る</button>}{customerCatalog&&compared.length===1&&<span className="comparison-next-step">あと1店選ぶと比較できます</span>}</div>{!customerCatalog&&!customerComparison&&<button className="catalog-reset" disabled={busy||loading} onClick={()=>void reload()}>{uncertain?'受付状況を再確認':'再読み込み'}</button>}</div>}
    {!showTesting&&!context.active&&<p role="status">店舗一覧の閲覧期間が終了しました。運営側で利用期間を確認しています。</p>}
    {notices}
    {showTesting&&context.active&&<details className="membership-card pilot-profile"><summary>{profile?.publicConsented?'架空プロフィール（準備済み）':'架空プロフィールの準備'}</summary><p>会社名「架空会社」・氏名「架空の人物」・役職「架空の正式職名」を使います。実際の個人情報は入力できません。</p><p>公開時の表示例：製薬業界・大規模企業 / 部門マネジメント / K・T（自己申告を想定した架空の例）</p>{profile?.publicConsented?<p role="status">テスト用プロフィールは準備済みです。</p>:<><label className="draft-check"><input type="checkbox" checked={consent} onChange={event=>setConsent(event.target.checked)} />架空のプロフィールだけを非公開テスト用に保存します</label><button className="button-secondary" disabled={!consent||busy||uncertain} onClick={()=>void mutate(`profile:${profile?.version??0}`,id=>repository!.prepareProfile(profile?.version??0,id),'架空プロフィールを準備しました。実店舗を選んで投稿テストを進められます。')}>架空プロフィールを準備する</button></>}</details>}
    {context.active&&view==='catalog'&&selected&&!detail&&<p role="status">この店舗は現在確認できません。一覧から掲載情報を選び直してください。</p>}
-   {context.active&&view==='catalog'&&!detail&&<><div className="catalog-toolbar"><label className="catalog-search"><input aria-label="非公開の実店舗を検索" value={query} onChange={event=>change({...params,query:event.target.value||undefined})} placeholder="実店舗名・所在地・個室など" /></label><label>料理<select aria-label="非公開テストの料理" value={genre} onChange={event=>change({...params,genre:event.target.value||undefined})}><option value="">すべて</option>{genres.map(value=><option key={value}>{value}</option>)}</select></label><button className="catalog-reset" onClick={()=>change({...params,query:undefined,genre:undefined})}>検索条件をリセット</button></div><p className="catalog-filter-note">検索では、確認した情報の本文に含まれる言葉を探します。「個室」で検索すると「個室なし」も表示されます。「未確認」は、情報がまだ確認できていない項目です。</p><p className="catalog-count">実店舗 {filtered.length} / {rows.length}件（非公開）</p><div className="verified-list">{filtered.map(row=><article className="verified-card" key={row.id} id={`verified-${row.id}`} tabIndex={-1} data-pilot-id={row.id}><p className="eyebrow">{factValue(row,'genre')??'名古屋の会食店'}</p><CatalogPhoto restaurant={row} /><h2>{row.name}</h2><p>{row.address}</p><p className="draft-privacy-note">公式情報の確認日 {checked(row.factsCheckedAt)}</p><VerifiedFactList restaurant={row} compact /><div className="curation-actions"><button className="button-secondary" onClick={()=>select(row.id)}>店舗の詳細を見る</button><button className="button-secondary" aria-pressed={compared.includes(row.id)} disabled={compared.length>=3&&!compared.includes(row.id)} onClick={()=>toggle(row.id)}>{compared.includes(row.id)?'比較から外す':'比較に追加'}</button></div></article>)}</div>{!filtered.length&&<div className="catalog-empty"><h2>{rows.length?'条件に合う実店舗がありません。':'確認できる店舗はまだありません'}</h2><p>{rows.length?'検索する言葉や料理を変えてお試しください。':'最新の情報を読み直してお試しください。'}</p>{rows.length?<button className="button-secondary" onClick={()=>change({...params,query:undefined,genre:undefined})}>すべての実店舗を見る</button>:<button className="button-secondary" onClick={()=>void reload()}>再読み込み</button>}</div>}</>}
-   {context.active&&view==='catalog'&&detail&&<article className="verified-card pilot-detail"><button className="catalog-back" onClick={()=>params.returnTo==='compare'?navigate('compare'):select('')}>{params.returnTo==='compare'?'比較に戻る':'実店舗一覧へ戻る'}</button><CatalogPhoto restaurant={detail} detail /><h2>{detail.name}</h2><p>{detail.address}</p><p className="draft-privacy-note">一般公開前の情報です。営業案内は確認時点の内容で、予約前に最新情報をお店へご確認ください。</p><VerifiedFactList restaurant={detail}/><VerifiedEvidence restaurant={detail}/>{factValue(detail,'website')&&<a className="button-secondary" href={safeExternalUrl(factValue(detail,'website')!)!} target="_blank" rel="noreferrer">公式サイトを見る</a>}<button className="button-secondary detail-compare" aria-pressed={compared.includes(detail.id)} disabled={compared.length>=3&&!compared.includes(detail.id)} onClick={()=>toggle(detail.id)}>{compared.includes(detail.id)?'比較から外す':'比較に追加'}</button>{showTesting&&<section className="review-draft-preview"><h3>この店舗で投稿テスト</h3><p>{OWNER_TEST_COMMENT}</p><p>本文・評価（テスト用の3点）・操作確認月はあらかじめ決まっています。実際に来店したという申告にはなりません。</p>{mine.some(review=>review.restaurantId===detail.id)?<p>この店舗のテスト投稿があります。「自分のテスト投稿」で確認できます。</p>:<button className="primary-button" disabled={!profile?.publicConsented||busy||uncertain} onClick={()=>void mutate(`submit:${detail.id}:${profile?.version}`,id=>repository!.submit(detail.id,profile!.version,id),'非公開のテスト投稿を受け付けました。自分の投稿一覧と審査待ちの一覧で確認できます。')}>用意されたテスト投稿を送信する</button>}<p className="draft-privacy-note">架空プロフィールの準備が必要です。送信テストは24時間につき5回までです。</p></section>}</article>}
-   {context.active&&view==='compare'&&<><h2>実店舗の候補を比較</h2><p className="comparison-scroll-note">表を左右にスクロールして、各店舗の条件を比較できます。</p>{compared.length<2?<div className="catalog-empty"><h3>{compared.length===0?'比較するお店を選びましょう':'あと1店選ぶと比較できます'}</h3><p>店舗一覧か詳細から、最大3店を選べます。</p><button className="button-secondary" onClick={()=>navigate('catalog')}>店舗一覧から選ぶ</button></div>:<div className="comparison-table-scroll" role="region" aria-label="非公開の実店舗比較" tabIndex={0}><table className="comparison-table"><thead><tr><th>確認項目</th>{compared.map(id=><th key={id}><h3>{name(id)}</h3><button className="catalog-reset" onClick={()=>{select(id);}}>詳細を見る</button></th>)}</tr></thead><tbody>{(['private_room','price','notice'] as FactField[]).map(field=><tr key={field}><th>{FACT_LABELS[field]}</th>{compared.map(id=><td key={id}>{rows.find(row=>row.id===id)?factValue(rows.find(row=>row.id===id)!,field)??'未確認':'現在は確認できません'}</td>)}</tr>)}</tbody></table></div>}<button className="catalog-reset" onClick={()=>change({...params,ids:undefined})}>比較の選択を解除</button></>}
+   {context.active&&view==='catalog'&&!detail&&<><div className="catalog-toolbar"><label className="catalog-search"><input aria-label="非公開の実店舗を検索" value={query} onChange={event=>change({...params,query:event.target.value||undefined})} placeholder="店名・エリアから探す" /></label><label>料理<select aria-label="非公開テストの料理" value={genre} onChange={event=>change({...params,genre:event.target.value||undefined})}><option value="">すべて</option>{genres.map(value=><option key={value}>{value}</option>)}</select></label><button className="catalog-reset" onClick={()=>change({...params,query:undefined,genre:undefined})}>検索条件をリセット</button></div><details className="catalog-search-guide"><summary>検索と掲載情報について</summary><p>検索では、確認した情報の本文に含まれる言葉を探します。「個室」で検索すると「個室なし」も表示されます。「未確認」は、情報がまだ確認できていない項目です。</p></details><div className="catalog-result-heading customer-result-heading"><p className="catalog-count">実店舗 {filtered.length} / {rows.length}件（非公開）</p>{customerCatalog&&<button className="catalog-reset" disabled={busy||loading} onClick={()=>void reload()}>再読み込み</button>}</div><div className="verified-list">{filtered.map(row=><article className="verified-card" key={row.id} id={`verified-${row.id}`} tabIndex={-1} data-pilot-id={row.id}><div className="catalog-row-identity"><h2><button className="verified-title" onClick={()=>select(row.id)}>{row.name}</button></h2><p>{row.address}</p><p className="catalog-row-genre">料理：{factValue(row,'genre')??'未確認'}</p>{!showTesting&&<RestaurantPhotos restaurantId={row.id} restaurantName={row.name} genre={factValue(row, 'genre') ?? undefined} variant="card" />}</div>{showTesting?<CatalogSummary restaurant={row} />:<div className="catalog-review-content"><PrivateCatalogReviews compact /><CatalogSummary restaurant={row} /></div>}<div className="curation-actions"><button className="button-secondary" onClick={()=>select(row.id)}>店舗の詳細を見る</button><button className="button-secondary" aria-pressed={compared.includes(row.id)} disabled={compared.length>=3&&!compared.includes(row.id)} onClick={()=>toggle(row.id)}>{compared.includes(row.id)?'比較から外す':'比較に追加'}</button></div><p className="catalog-row-footnote">公式情報の確認日 {checked(row.factsCheckedAt)}</p></article>)}</div>{!filtered.length&&<div className="catalog-empty"><h2>{rows.length?'条件に合う実店舗がありません。':'確認できる店舗はまだありません'}</h2><p>{rows.length?'検索する言葉や料理を変えてお試しください。':'最新の情報を読み直してお試しください。'}</p>{rows.length?<button className="button-secondary" onClick={()=>change({...params,query:undefined,genre:undefined})}>すべての実店舗を見る</button>:<button className="button-secondary" onClick={()=>void reload()}>再読み込み</button>}</div>}</>}
+   {context.active&&view==='catalog'&&detail&&<article className={`verified-card pilot-detail dining-detail${compactDetail ? ' customer-detail review-detail' : ''}`}>
+     <div className="detail-navigation"><button className="catalog-back" onClick={()=>params.returnTo==='compare'?navigate('compare'):select('')}>{params.returnTo==='compare'?'比較に戻る':'実店舗一覧へ戻る'}</button>{compactDetail&&<button className="catalog-reset" onClick={()=>navigate('compare')}>候補を比較（{compared.length}）</button>}</div>
+     <header className="detail-identity">
+       {compactDetail?<h1>{detail.name}</h1>:<h2>{detail.name}</h2>}
+       <p className="detail-genre">料理：{factValue(detail,'genre')??'未確認'}</p>
+       <p className="detail-address">{detail.address}</p>
+     </header>
+     {!showTesting&&<RestaurantPhotos restaurantId={detail.id} restaurantName={detail.name} genre={factValue(detail, 'genre') ?? undefined} variant="detail" />}
+     {!showTesting&&<div className="detail-reviews"><PrivateCatalogReviews /></div>}
+     <div className="detail-layout">
+       <div className="detail-main">
+         <section className="detail-decision" aria-label="料金と個室の条件">{!showTesting&&<h2 className="detail-facts-title">店舗情報</h2>}<DetailFactRows restaurant={detail} fields={['price','private_room']}/></section>
+         <div className="detail-confirmation">
+           <p>一般公開前の情報です。営業案内は確認時点の内容で、予約前に最新情報をお店へご確認ください。</p>
+           <div className="detail-actions">
+             {safeExternalUrl(factValue(detail,'website')??'')&&<a className="primary-button detail-official" href={safeExternalUrl(factValue(detail,'website')!)!} target="_blank" rel="noreferrer">公式サイトで最新情報を確認</a>}
+             <button className="button-secondary detail-compare" aria-pressed={compared.includes(detail.id)} disabled={compared.length>=3&&!compared.includes(detail.id)} onClick={()=>toggle(detail.id)}>{compared.includes(detail.id)?'比較から外す':'比較に追加'}</button>
+           </div>
+         </div>
+         {factValue(detail,'notice')&&<section className="operating-notice"><h3>営業のお知らせ</h3><p>{factValue(detail,'notice')}</p><p className="notice-checked">確認日 {checked(detail.facts.find(fact=>fact.field==='notice')!.verifiedAt)}</p></section>}
+         <section className="detail-basic"><h3>店舗の基本情報</h3><DetailFactRows restaurant={detail} fields={['hours','access']}/></section>
+       </div>
+       <aside className="detail-provenance" aria-label="掲載情報の確認記録">
+         <p className="detail-checked">公式情報の確認日 {checked(detail.factsCheckedAt)}</p>
+         <VerifiedEvidence restaurant={detail}/>
+         <p>公式情報を確認した記録です。実際に訪問してつけた評価ではありません。</p>
+         {compactDetail&&<div className="detail-refresh"><button className="catalog-reset" disabled={busy||loading} onClick={()=>void reload()}>再読み込み</button></div>}
+       </aside>
+     </div>
+     {showTesting&&<section className="review-draft-preview"><h3>この店舗で投稿テスト</h3><p>{OWNER_TEST_COMMENT}</p><p>本文・評価（テスト用の3点）・操作確認月はあらかじめ決まっています。実際に来店したという申告にはなりません。</p>{mine.some(review=>review.restaurantId===detail.id)?<p>この店舗のテスト投稿があります。「自分のテスト投稿」で確認できます。</p>:<button className="primary-button" disabled={!profile?.publicConsented||busy||uncertain} onClick={()=>void mutate(`submit:${detail.id}:${profile?.version}`,id=>repository!.submit(detail.id,profile!.version,id),'非公開のテスト投稿を受け付けました。自分の投稿一覧と審査待ちの一覧で確認できます。')}>用意されたテスト投稿を送信する</button>}<p className="draft-privacy-note">架空プロフィールの準備が必要です。送信テストは24時間につき5回までです。</p></section>}
+   </article>}
+   {context.active&&view==='compare'&&<section className="dining-comparison">
+     {showTesting&&<h2>実店舗の候補を比較</h2>}
+     {compared.length<2?<div className="catalog-empty"><h3>{compared.length===0?'比較するお店を選びましょう':'あと1店選ぶと比較できます'}</h3><p>店舗一覧か詳細から、最大3店を選べます。</p><button className="button-secondary" onClick={()=>navigate('catalog')}>店舗一覧から選ぶ</button></div>:<>
+       <p className="comparison-scroll-note">料金・個室など、同じ項目で候補を見比べられます。未確認の条件はお店へご確認ください。</p>
+       <div className="comparison-table-scroll" role="region" aria-label="非公開の実店舗比較" tabIndex={0}>
+         <table className="comparison-table comparison-by-condition" role="table">
+           <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">確認項目</th>{compared.map(id=><th scope="col" role="columnheader" key={id} id={`pilot-comparison-name-${id}`}><h3>{name(id)}</h3><p>{rows.find(row=>row.id===id)?.address??'所在地は現在確認できません'}</p><button className="catalog-reset" onClick={()=>select(id)}>詳細を見る</button></th>)}</tr></thead>
+           <tbody role="rowgroup">{(['price','private_room','address','genre','hours','access','notice'] as FactField[]).map(field=><tr role="row" key={field}><th scope="row" role="rowheader" id={`pilot-comparison-field-${field}`}>{FACT_LABELS[field]}</th>{compared.map(id=>{
+             const restaurant=rows.find(row=>row.id===id);
+             const fact=restaurant?.facts.find(item=>item.field===field);
+             return <td role="cell" key={id} headers={`pilot-comparison-field-${field} pilot-comparison-name-${id}`}><span className="comparison-restaurant-label" aria-hidden="true">{name(id)}</span><p>{restaurant?(field==='address'?restaurant.address:fact?.value??'未確認'):'現在は確認できません'}</p>{fact&&<small>確認 {checked(fact.verifiedAt)} · <a href={safeExternalUrl(fact.sourceUrl)!} target="_blank" rel="noreferrer">出典</a></small>}</td>;
+           })}</tr>)}</tbody>
+         </table>
+       </div>
+     </>}
+     <div className="comparison-secondary-actions"><button className="catalog-reset" onClick={()=>change({...params,ids:undefined})}>比較の選択を解除</button>{customerComparison&&<button className="catalog-reset" disabled={busy||loading} onClick={()=>void reload()}>再読み込み</button>}</div>
+   </section>}
    {showTesting&&(view==='mine'||!context.active)&&<><h2>自分の非公開テスト投稿</h2>{reviewList(mine)}{profile&&<div className="membership-card"><h3>テストデータを削除する</h3><p>架空プロフィールと、自分のテスト投稿・関連メモを削除します。店舗情報やログインアカウントは消しません。回数制限の集計は残ります。</p>{confirmDelete?<><button className="button-secondary" disabled={busy||uncertain} onClick={()=>void mutate(`delete:${profile.version}`,id=>repository!.deleteProfile(profile.version,id),'テスト用プロフィールと投稿を削除しました。')}>テストデータの削除を確定</button><button className="catalog-reset" onClick={()=>setConfirmDelete(false)}>キャンセル</button></>:<button className="button-secondary" disabled={busy||uncertain} onClick={()=>setConfirmDelete(true)}>テストデータを削除する</button>}</div>}</>}
    {showTesting&&context.active&&view==='queue'&&<><h2>審査待ちのテスト投稿</h2>{reviewList(queue,true)}</>}
  </>;
 }
 export default function OwnerTrial(props: TrialProps) {
  const {user,loading}=useAuth();
- return <div className="page-width catalog-page owner-trial"><p className="eyebrow">NAGOYA</p><h1>名古屋の会食店を探す</h1>{!repository?<p>データベースへの接続を準備しています。</p>:loading?<p role="status">ログインを確認しています…</p>:!user?<div className="catalog-empty"><h2>オーナーのログインが必要です</h2><p>画面上部からログインしてください。この画面を利用できるのは、指定されたオーナー本人だけです。</p></div>:<Workspace key={user.id} {...props}/>}</div>;
+ return <div className="page-width catalog-page owner-trial editorial-catalog review-catalog">{(props.route.page!=='nagoya-detail'||!repository||loading||!user)&&<CatalogHeading comparison={props.route.page==='compare'}/>}{!repository?<p>データベースへの接続を準備しています。</p>:loading?<p role="status">ログインを確認しています…</p>:!user?<div className="catalog-empty"><h2>オーナーのログインが必要です</h2><p>画面上部からログインしてください。この画面を利用できるのは、指定されたオーナー本人だけです。</p></div>:<Workspace key={user.id} {...props}/>}</div>;
 }

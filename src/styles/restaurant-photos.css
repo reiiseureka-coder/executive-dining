@@ -1,0 +1,44 @@
+/* Self-contained images: no global button, figure, dialog or typography overrides. */
+.restaurant-photos { min-width: 0; color: #25382e; }
+.restaurant-photos--card { width: 240px; max-width: 100%; }
+.restaurant-photos--detail { width: 100%; max-width: 800px; margin-block: 20px 28px; }
+.restaurant-photo-grid { display: grid; gap: 16px; min-width: 0; }
+.restaurant-photos--detail .restaurant-photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.restaurant-photo-tile { min-width: 0; margin: 0; }
+.restaurant-photos .restaurant-photo-open { display: block; position: relative; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: #e6e6dc; color: #fff; cursor: zoom-in; text-align: left; }
+.restaurant-photo-open img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.restaurant-photos--detail .restaurant-photo-open img { aspect-ratio: 3 / 2; max-height: 230px; }
+.restaurant-photo-enlarge { position: absolute; right: 8px; bottom: 8px; padding: 4px 8px; border-radius: 2px; background: #1c2b21ed; color: #fff; font-size: 12px; line-height: 1.5; }
+.restaurant-photo-caption { display: grid; gap: 3px; padding-top: 9px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.restaurant-photo-kind { color: #526154; font-size: 12px; font-weight: 500; }
+.restaurant-photo-disclaimer { display: block; color: #334837; font-size: 14px; line-height: 1.65; font-weight: 500; }
+.restaurant-photo-description, .restaurant-photo-credit { display: block; color: #526154; font-size: 12px; line-height: 1.6; }
+.restaurant-photo-rights { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.restaurant-photo-rights a, .restaurant-photo-official a { color: #304c3c; text-decoration: underline; text-underline-offset: 4px; }
+.restaurant-photos .restaurant-photo-official { display: grid; gap: 4px; margin: 14px 0 0; color: #526154; font-size: 13px; line-height: 1.6; }
+.restaurant-photo-official a { display: inline-flex; align-items: center; gap: 6px; width: fit-content; min-height: 44px; }
+.restaurant-photos .restaurant-photo-unavailable { margin: 0; padding: 0; color: #526154; font-size: 14px; line-height: 1.6; }
+.restaurant-photo-dialog { margin: auto; width: min(900px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); padding: 0; border: 1px solid #b9c3b4; border-radius: 5px; background: #f8f7f2; color: #25382e; overflow: auto; overscroll-behavior: contain; }
+.restaurant-photo-dialog::backdrop { background: #172219bf; }
+.restaurant-photo-dialog-content { padding: 18px 24px; }
+.restaurant-photo-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.restaurant-photo-dialog-header p { margin: 0; min-width: 0; font-size: 16px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.restaurant-photo-dialog .restaurant-photo-close, .restaurant-photo-paging button { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 80px; min-height: 44px; padding: 8px 12px; border: 1px solid #96a391; border-radius: 3px; background: transparent; color: #25382e; font: inherit; font-size: 14px; line-height: 1.5; cursor: pointer; }
+.restaurant-photo-expanded { margin: 0; }
+.restaurant-photo-expanded > img { display: block; width: 100%; height: min(52dvh, 510px); object-fit: contain; background: #e9e9df; }
+.restaurant-photo-expanded .restaurant-photo-caption { padding-top: 12px; }
+.restaurant-photo-expanded .restaurant-photo-disclaimer { font-size: 14px; }
+.restaurant-photo-paging { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.restaurant-photo-paging > span { font-size: 14px; font-variant-numeric: tabular-nums; }
+.restaurant-photo-paging button:disabled { cursor: default; opacity: .45; }
+.restaurant-photos button:focus-visible, .restaurant-photos a:focus-visible { outline: 3px solid #4e6b53; outline-offset: 4px; }
+@media (max-width: 720px) {
+  .restaurant-photos--card { width: 100%; }
+  .restaurant-photos--card .restaurant-photo-open img { aspect-ratio: 16 / 10; max-height: 320px; }
+  .restaurant-photos--detail { margin-block: 16px 24px; }
+  .restaurant-photo-grid { gap: 12px; }
+  .restaurant-photo-dialog { margin: auto; width: calc(100vw - 20px); max-height: calc(100dvh - 20px); }
+  .restaurant-photo-dialog-content { padding: 12px; }
+  .restaurant-photo-dialog-header { gap: 8px; }
+  .restaurant-photo-expanded > img { height: auto; max-height: 48dvh; aspect-ratio: 3 / 2; }
+}

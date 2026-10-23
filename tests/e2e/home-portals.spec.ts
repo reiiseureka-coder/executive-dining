@@ -1,19 +1,43 @@
 import { test, expect } from '@playwright/test';
-import { login, mock } from './helpers/ownerTrial';
-test('real homepage preserves design, searches real catalog and keeps samples separate', async ({ page }) => {
+import { catalog, login, mock } from './helpers/ownerTrial';
+test('disconnected service home explains its purpose and opens availability without mixing design samples', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
-  await expect(page.locator('.hero-figure img')).toHaveAttribute('alt', /掲載店舗の写真ではありません/);
-  await expect(page.locator('.restaurant-card')).toHaveCount(0);
-  await page.getByRole('searchbox').fill('名古屋浅田');
-  await page.getByRole('button', { name: '探す', exact: true }).click();
-  await expect(page).toHaveURL(/#\/nagoya\?query=/);
-  await expect(page.getByRole('textbox', { name: '名古屋の確認済み店舗を検索' })).toHaveValue('名古屋浅田');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+  await expect(page.locator('.service-intro')).toBeVisible();
+  await expect(page.locator('.service-live-entry')).toContainText('店舗検索は未接続です');
+  await expect(page.getByRole('search')).toHaveCount(0);
+  await expect(page.locator('[data-home-state], [data-home-restaurant], .home-catalog-preparing, .editorial-home img, .restaurant-card')).toHaveCount(0);
+  await page.locator('.service-live-entry').getByRole('link', { name: '店舗情報の公開状況を見る', exact: true }).click();
+  await expect(page).toHaveURL(/#\/find$/);
+  await expect(page.locator('[data-home-state="disconnected"]')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '店舗情報は未接続です', exact: true })).toBeVisible();
+  await expect(page.getByRole('search')).toHaveCount(0);
   await page.goBack();
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
   await page.goto('/#/demo');
-  await expect(page.getByText('SAMPLE / DESIGN DEMO', {exact: true})).toBeVisible();
+  await expect(page.getByText('SAMPLE / DESIGN DEMO', { exact: true })).toBeVisible();
   await expect(page.locator('.restaurant-card')).toHaveCount(3);
+});
+
+test('mocked invited service home opens discovery and passes actual name and cuisine filters to the private catalog', async ({ page }) => {
+  // Intercepted fixtures verify UI routing, not live database availability.
+  await login(page); const state = await mock(page); await page.goto('http://127.0.0.1:4181');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+  await page.locator('.service-live-entry').getByRole('link', { name: '店舗情報の公開状況を見る', exact: true }).click();
+  await expect(page).toHaveURL(/#\/find$/);
+  const row = catalog[0];
+  const genre = row.facts.find(fact => fact.field === 'genre')!.value;
+  await page.getByRole('searchbox', { name: '店名・エリアから探す', exact: true }).fill(row.name);
+  await page.getByRole('combobox', { name: '料理', exact: true }).selectOption(genre);
+  await page.getByRole('button', { name: '一覧で探す', exact: true }).click();
+  await expect(page).toHaveURL(/#\/nagoya\?query=/);
+  await expect(page.locator('.catalog-search input')).toHaveValue(row.name);
+  await expect(page.getByRole('combobox', { name: '非公開テストの料理', exact: true })).toHaveValue(genre);
+  await expect(page.locator(`[data-pilot-id="${row.id}"]`)).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/#\/find$/);
+  await expect(page.locator('[data-home-state="available"]')).toBeVisible();
+  expect(state.calls.some(call => /submit|moderate|prepare_profile|delete|withdraw/.test(call.name))).toBe(false);
 });
 test('both portals work through desktop and mobile navigation, history and reload', async ({ page, isMobile }) => {
   await page.goto('/');
@@ -35,17 +59,21 @@ test('both portals work through desktop and mobile navigation, history and reloa
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.goBack();
-    await expect(page.getByRole('heading', {name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
     await page.goForward();
     await expect(page.getByRole('heading', {name:heading, exact:true})).toBeVisible();
     await page.getByRole('button', {name:'Executive Dining ホーム'}).click();
   }
 });
-test('owner homepage does not mislabel demo or corporate page as real private data', async ({page}) => {
+test('mocked invited service home keeps discovery, demo and corporate pages separate from private data', async ({page}) => {
   await login(page); await mock(page); await page.goto('http://127.0.0.1:4181');
-  await expect(page.getByText('招待アカウントでログイン中。', {exact:false})).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+  await expect(page.locator('.home-access-note, [data-home-restaurant], .private-mode-banner')).toHaveCount(0);
+  await page.locator('.service-live-entry').getByRole('link', { name: '店舗情報の公開状況を見る', exact: true }).click();
+  await expect(page).toHaveURL(/#\/find$/);
+  await expect(page.locator('.home-access-note')).toContainText('招待アカウント向けの非公開情報');
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
-  await page.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
+  await page.getByRole('link', { name: '全10店を見る', exact: true }).click();
   await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await page.goto('http://127.0.0.1:4181/#/demo');
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
@@ -53,22 +81,29 @@ test('owner homepage does not mislabel demo or corporate page as real private da
   await expect(page.locator('.private-mode-banner')).toHaveCount(0);
 });
 
-test('homepage presents four cities in order with only Nagoya enabled', async ({page}) => {
+test('home keeps area information and audience links secondary without implying search is available', async ({ page }) => {
   await page.goto('/');
-  const cities = page.locator('.city-list button');
-  await expect(cities.locator('strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
-  for (const index of [0, 1, 3]) {
-    await expect(cities.nth(index)).toBeDisabled();
-    await expect(cities.nth(index)).toContainText('準備中');
-  }
-  await expect(cities.nth(2)).toBeEnabled();
-  await expect(page.getByText('まずは、名古屋の一席から。',{exact:true})).toHaveCount(0);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await cities.nth(2).click();
-  await expect(page).toHaveURL(/#\/nagoya$/);
-  await expect(page.getByRole('heading',{name:'名古屋の掲載情報を準備しています',exact:true})).toBeVisible();
+  await expect(page.locator('.service-intro')).toContainText('名古屋');
+  await expect(page.locator('.service-live-entry')).toContainText('店舗検索は未接続です');
+  await expect(page.locator('.city-list, [data-home-state], .service-intro nav')).toHaveCount(0);
+  await expect(page.getByRole('search')).toHaveCount(0);
+  const businessLinks = page.locator('.site-footer');
+  await expect(businessLinks).toBeVisible();
+  await expect(page.locator('.service-intro a[href="#/corporate"], .service-intro a[href="#/restaurants"]')).toHaveCount(0);
+  await page.locator('.service-reading').getByRole('link', { name: 'このサービスについて', exact: true }).click();
+  await expect(page).toHaveURL(/#\/about$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+  await expect(page.locator('.about-copy')).toContainText('口コミの一般投稿受付と会員登録は準備中です。');
   await page.goBack();
-  await expect(page.locator('.city-list button strong')).toHaveText(['東京', '大阪', '名古屋', '福岡']);
+  expect(await businessLinks.evaluate(element => !!(document.querySelector('.service-intro')!.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  for (const [label, route] of [['法人の方へ', 'corporate'], ['店舗の方へ', 'restaurants']]) {
+    await businessLinks.getByRole('link', { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`#/${route}$`));
+    await page.goBack();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+    await expect(page.locator('.service-intro')).toContainText('名古屋');
+  }
 });
 
 test('enterprise page is concise, honest and copies an unsent consultation memo', async ({page}) => {

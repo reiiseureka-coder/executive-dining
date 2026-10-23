@@ -94,4 +94,4 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export type Page = 'restaurants' | 'corporate' | 'home' | 'search' | 'detail' | 'admin' | 'about' | 'nagoya' | 'curation' | 'demo' | 'nagoya-detail' | 'compare' | 'membership' | 'pilot' | 'pilot-detail';
+export type Page = 'restaurants' | 'corporate' | 'home' | 'find' | 'service-demo' | 'service-demo-detail' | 'service-demo-compare' | 'search' | 'detail' | 'admin' | 'about' | 'nagoya' | 'curation' | 'demo' | 'nagoya-detail' | 'compare' | 'membership' | 'pilot' | 'pilot-detail';

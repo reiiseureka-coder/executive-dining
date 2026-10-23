@@ -24,6 +24,12 @@ export function parseRoute(hash: string): {
   const params: SearchParams = {};
   const search = new URLSearchParams(query);
   for (const key of keys) if (search.get(key)) params[key] = search.get(key)!;
+  if (path === '/preview-compare') return { page: 'service-demo-compare', params };
+  if (path.startsWith('/preview/')) {
+    try { return { page: 'service-demo-detail', restaurantId: decodeURIComponent(path.slice('/preview/'.length)), params }; }
+    catch { return { page: 'service-demo', params }; }
+  }
+  if (path === '/preview') return { page: 'service-demo', params };
   if (path.startsWith("/restaurant/"))
     return {
       page: "detail",
@@ -40,7 +46,7 @@ export function parseRoute(hash: string): {
   }
   const page = path.slice(1);
   return {
-    page: ["restaurants", "corporate", "search", "about", "admin", "nagoya", "curation", "demo", "compare", "membership", "pilot"].includes(page) ? (page as Page) : "home",
+    page: ["find", "restaurants", "corporate", "search", "about", "admin", "nagoya", "curation", "demo", "compare", "membership", "pilot"].includes(page) ? (page as Page) : "home",
     params,
   };
 }
@@ -52,6 +58,9 @@ export function routeHash(
   const path =
     page === "home"
       ? "/"
+      : page === "service-demo" ? "/preview"
+      : page === "service-demo-compare" ? "/preview-compare"
+      : page === "service-demo-detail" ? `/preview/${encodeURIComponent(restaurantId ?? "")}`
       : page === "pilot-detail"
         ? `/pilot/${encodeURIComponent(restaurantId ?? "")}`
       : page === "nagoya-detail"

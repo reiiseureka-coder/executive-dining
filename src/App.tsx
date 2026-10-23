@@ -11,6 +11,7 @@ import Header from "./components/Header";
 import AdminCallbackLanding from "./components/AdminCallbackLanding";
 import DemoHome from "./pages/DemoHome";
 import Home from "./pages/Home";
+import Find from "./pages/Find";
 import PartnerPage from "./pages/PartnerPage";
 import Corporate from "./pages/Corporate";
 import Search from "./pages/Search";
@@ -85,7 +86,11 @@ function AppShell() {
   };
   useEffect(() => {
     const labels: Record<Page, string> = {
-      home: "大切な話を、心地よい一席で。",
+      home: "会食専用口コミサイト",
+      find: "名古屋の会食店を探す",
+      "service-demo": "閲覧専用デモ",
+      "service-demo-detail": "閲覧専用デモ・店舗情報",
+      "service-demo-compare": "閲覧専用デモ・比較",
       restaurants: "店舗掲載のご案内",
       corporate: "法人の方へ・福利厚生プラン",
       demo: "サンプル・デモ",
@@ -124,6 +129,8 @@ function AppShell() {
       {access.ownerTrial && ["pilot", "pilot-detail", "curation"].includes(route.page) && <div className="private-mode-banner"><div className="page-width">非公開テスト中 · 店舗は実在、プロフィール・投稿は固定の架空データです。<button onClick={() => handleNavigate("nagoya")}>店舗一覧へ</button></div></div>}
       <main id="main-content" tabIndex={-1}>
         {route.page === "home" && <Home onNavigate={handleNavigate} />}
+        {route.page === "find" && <Find onNavigate={handleNavigate} />}
+        {route.page.startsWith("service-demo") && <div className="page-width catalog-page"><h1>閲覧専用デモ</h1><p>デモは本サービスの認証・データ接続から分離しています。</p><a className="primary-button" href={`/preview.html${hash}`}>閲覧専用デモを開く</a></div>}
         {route.page === "restaurants" && <PartnerPage audience="restaurants" />}
         {route.page === "corporate" && <Corporate />}
         {route.page === "demo" && <DemoHome onNavigate={handleNavigate} />}
@@ -151,7 +158,8 @@ function AppShell() {
         <div className="page-width footer-inner">
           <span className="wordmark">EXECUTIVE DINING</span>
           <p>会食の店選びを、丁寧に。</p>
-          <a href="#/nagoya">店舗一覧</a>
+          <a href="#/">ホーム</a>
+          <a href="#/find">店舗を探す</a>
           <a href="#/restaurants">店舗の方へ</a>
           <a href="#/corporate">法人の方へ</a>
           <a href="#/about">掲載情報について</a>

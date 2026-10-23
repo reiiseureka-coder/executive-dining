@@ -1,0 +1,125 @@
+/* Detail pages put decision facts first. Evidence is readable, but secondary. */
+.catalog-detail,
+.editorial-catalog:has(.dining-detail) { max-width: 1120px; }
+.editorial-catalog .dining-detail,
+.catalog-detail .dining-detail { max-width: none; margin-inline: 0; padding: 0; border:0; border-radius:0; background:none; box-shadow:none; }
+.dining-detail .detail-navigation { display:flex; align-items:center; justify-content:space-between; gap: 12px 24px; flex-wrap: wrap; padding-bottom: 8px; }
+.dining-detail .detail-navigation button { min-height: 44px; font-size: 14px; line-height: 1.5; }
+.dining-detail .detail-identity { margin: 24px 0; max-width: 700px; }
+.dining-detail .detail-identity h1,
+.editorial-catalog .dining-detail .detail-identity h2 { margin: 0 0 12px; font-family: inherit; font-size: 32px; font-weight: 600; line-height: 1.4; letter-spacing: 0; overflow-wrap: anywhere; }
+.dining-detail .detail-identity p { margin: 6px 0 0; color: var(--ed-ink, #263b30); font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.dining-detail .detail-layout { display: grid; grid-template-columns: minmax(0, 700px) minmax(220px, 280px); align-items: start; gap: 48px; }
+.dining-detail .detail-main,
+.dining-detail .detail-provenance { min-width: 0; }
+.dining-detail .detail-facts { margin: 0; gap: 0; }
+.dining-detail .detail-facts > div { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 20px 0; border: 0; border-bottom: 1px solid var(--ed-line, #dedfd4); }
+.dining-detail .detail-facts > div:first-child { padding-top: 0; }
+.dining-detail .detail-facts dt { color: var(--ed-ink, #263b30); font-size: 14px; line-height: 1.5; font-weight: 600; }
+.dining-detail .detail-facts dd { color: var(--ed-ink, #263b30); font-size: 16px; line-height: 1.65; font-weight: 400; letter-spacing: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dining-detail .detail-confirmation { margin: 24px 0 32px; }
+.dining-detail .detail-confirmation > p { font-size: 16px; line-height: 1.65; color: var(--ed-ink, #263b30); margin: 0 0 16px; }
+.dining-detail .detail-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
+.dining-detail .detail-actions .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 12px 18px; min-height: 48px; border-radius: 2px; font-size: 16px; line-height: 1.5; font-weight: 600; letter-spacing: 0; text-align: center; white-space: normal; }
+.dining-detail .detail-actions .button-secondary,
+.dining-detail .detail-actions .catalog-reset { min-height: 44px; font-size: 14px; line-height: 1.5; }
+.dining-detail .detail-save { display: inline-flex; align-items: center; gap: 6px; }
+.dining-detail .detail-basic { margin: 32px 0 0; }
+.dining-detail .detail-basic h2,
+.dining-detail .detail-basic h3,
+.dining-detail .operating-notice h2,
+.dining-detail .operating-notice h3 { margin: 0 0 16px; font-family: inherit; font-size: 20px; font-weight: 600; line-height: 1.45; }
+.dining-detail .operating-notice { margin: 28px 0; padding: 18px 20px; border-radius: 0; border-left: 2px solid #94733b; background: #f0e9da; }
+.dining-detail .operating-notice p { color: var(--ed-ink, #263b30); font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dining-detail .operating-notice .notice-checked { margin-top: 12px; color: #565e50; font-size: 14px; line-height: 1.5; }
+.dining-detail .detail-provenance { padding-left: 24px; border-left: 1px solid var(--ed-line, #dedfd4); }
+.dining-detail .detail-provenance > p,
+.dining-detail .fact-evidence,
+.dining-detail .fact-evidence small,
+.dining-detail .fact-evidence span { font-size: 14px; line-height: 1.65; color: #565e50; overflow-wrap: anywhere; }
+.dining-detail .detail-provenance .detail-checked { margin: 0 0 12px; }
+.dining-detail .fact-evidence { margin: 0 0 16px; padding: 0; border: 0; }
+.dining-detail .fact-evidence summary { min-height: 44px; display: list-item; align-content: center; cursor: pointer; }
+.dining-detail .fact-evidence li { display: grid; gap: 5px; margin-top: 16px; }
+.dining-detail .detail-refresh { margin-top: 16px; }
+.dining-detail .detail-refresh button { min-height: 44px; font-size: 14px; }
+.dining-detail .detail-community { max-width: 700px; margin-top: 36px; }
+.dining-detail .verified-reviews { font-size: 16px; line-height: 1.65; padding-top: 24px; }
+.dining-detail .verified-reviews > h3 { font-size: 20px; line-height: 1.45; font-weight: 600; margin-bottom: 12px; }
+.dining-detail .verified-reviews p { color: var(--ed-ink, #263b30); }
+.dining-detail .verified-reviews .draft-privacy-note { font-size: 14px; }
+.catalog-detail > .map-privacy,
+.catalog-detail > .catalog-explainer { font-size: 14px; line-height: 1.65; }
+
+/* The same conditions stay together on phones without tiny horizontal cells. */
+.dining-comparison { max-width: 1120px; }
+.dining-comparison .catalog-heading h1 { margin: 0; font-family: inherit; font-size: 28px; font-weight: 600; line-height: 1.4; }
+.dining-comparison > h2 { font-family: inherit; font-size: 24px; font-weight: 600; line-height: 1.4; margin: 24px 0 16px; }
+.dining-comparison > .catalog-explainer { max-width: 700px; font-size: 16px; line-height: 1.65; }
+.dining-comparison .catalog-count,
+.dining-comparison .comparison-scroll-note,
+.dining-comparison .catalog-reset { font-size: 14px; line-height: 1.5; }
+.dining-comparison .catalog-reset { min-height: 44px; }
+.dining-comparison .comparison-scroll-note { margin: 16px 0; color: #565e50; }
+.comparison-by-condition th,
+.comparison-by-condition td { width: auto; padding: 20px; font-size: 16px; line-height: 1.65; color: var(--ed-ink, #263b30); white-space: normal; }
+.comparison-by-condition th:first-child { width: 150px; font-size: 14px; line-height: 1.5; font-weight: 600; }
+.comparison-by-condition h2,
+.comparison-by-condition h3 { margin: 0; font-family: inherit; font-size: 20px; font-weight: 600; line-height: 1.45; }
+.comparison-by-condition td > p { margin: 0; white-space: pre-wrap; }
+.comparison-by-condition thead p,
+.comparison-by-condition small { font-size: 14px; line-height: 1.5; color: #565e50; }
+.comparison-by-condition small { margin-top: 12px; }
+.comparison-by-condition td > a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; line-height: 1.5; }
+.comparison-restaurant-label { display: none; }
+.comparison-secondary-actions { display:flex; flex-wrap:wrap; gap:16px 24px; margin-top:24px; }
+.comparison-next-step { font-size:14px; line-height:1.5; color:var(--ed-muted,#526154); }
+.editorial-catalog .customer-catalog-toolbar .pilot-tabs { display:flex; width:auto; margin:0; }
+.dining-comparison .comparison-share { font-size: 14px; line-height: 1.65; }
+.dining-comparison .comparison-share button { font-size: 14px; min-height: 44px; }
+.dining-comparison .comparison-share input { font-size: 16px; }
+.comparison-tray { position:sticky; top:76px; bottom:auto; z-index:20; box-shadow:none; border-radius:2px; background:var(--ed-paper,#f8f7f2); margin:16px 0; border:1px solid var(--ed-line,#cbd1c6); }
+.comparison-tray strong { font-size: 16px; line-height: 1.5; font-weight: 600; }
+.comparison-tray p,
+.comparison-tray .catalog-reset,
+.comparison-storage-warning { font-size: 14px; line-height: 1.5; }
+.comparison-tray .primary-button { font-size: 16px; min-height: 48px; line-height: 1.5; }
+.comparison-tray .catalog-reset { min-height: 44px; }
+.comparison-storage-warning { margin-top: 20px; color: #565e50; }
+
+@media (max-width: 900px) {
+  .dining-detail .detail-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .dining-detail .detail-main { max-width: 700px; }
+  .dining-detail .detail-provenance { padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--ed-line, #dedfd4); max-width: 700px; }
+  .dining-comparison .comparison-table-scroll { border: 0; background: none; overflow: visible; }
+  .comparison-by-condition,
+  .comparison-by-condition thead,
+  .comparison-by-condition tbody,
+  .comparison-by-condition tr { display: block; width: 100%; }
+  .comparison-by-condition thead tr { display: grid; gap: 0; margin-bottom: 16px; border-top: 1px solid var(--ed-line, #dedfd4); }
+  .comparison-by-condition th,
+  .comparison-by-condition td { display: block; width: 100%; padding: 16px 0; border: 0; border-bottom: 1px solid var(--ed-line, #dedfd4); }
+  .comparison-by-condition thead th:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; border: 0; }
+  .comparison-by-condition tbody tr { margin-bottom: 28px; }
+  .comparison-by-condition tbody th:first-child { display: block; width: 100%; padding: 12px 16px; font-size: 20px; line-height: 1.45; color: var(--ed-ink, #263b30); background: #eeefe7; }
+  .comparison-restaurant-label { display: block; color: #565e50; font-size: 14px; line-height: 1.5; font-weight: 600; margin-bottom: 8px; }
+  .comparison-by-condition thead th:not(:first-child) { display:flex; align-items:center; gap:16px; padding:8px 0; }
+  .comparison-by-condition thead h2,
+  .comparison-by-condition thead h3 { flex:1; min-width:0; font-size:16px; line-height:1.5; }
+  .comparison-by-condition thead .catalog-reset { flex-shrink:0; }
+  /* Address remains in its own comparison row; no duplicated identity blocks above decisions. */
+  .comparison-by-condition thead p { display:none; }
+}
+@media (max-width: 720px) {
+  .dining-detail .detail-identity { margin: 20px 0 24px; }
+  .dining-detail .detail-identity h1,
+  .editorial-catalog .dining-detail .detail-identity h2 { font-size: 28px; line-height: 1.4; }
+  .dining-detail .detail-navigation { display:flex; align-items:center; justify-content:space-between; gap: 8px 16px; }
+  .dining-detail .detail-actions { align-items: flex-start; }
+  .dining-detail .detail-actions .detail-official { width: 100%; }
+  .dining-detail .detail-confirmation { margin-bottom: 28px; }
+  .dining-comparison .catalog-heading h1 { font-size: 24px; }
+  .comparison-tray { top:64px; padding:12px 16px; gap:8px 16px; }
+  .comparison-tray > div { flex-basis: 100%; }
+  .comparison-tray .primary-button { flex: 1; margin: 0; }
+}

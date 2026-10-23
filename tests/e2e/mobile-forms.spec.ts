@@ -208,15 +208,23 @@ test('public comparison stays reachable above a long catalog at 320px', async ({
     await page.getByRole('button', { name: `比較に追加：${row.name}`, exact: true }).click();
   }
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  const compare = page.getByRole('button', { name: '選んだお店を比較', exact: true });
+  const compare = page.getByRole('button', { name: '2店を比較', exact: true });
   await expect(compare).toBeEnabled();
   await expect(compare).toBeInViewport();
   await comfortableTargets(page.locator('.comparison-tray button'));
   await fits(page);
   await screenshot(page, info, 'public-comparison-tray');
   await compare.click();
-  await expect(page.getByRole('heading', { name: '会食の候補を、見比べる。', exact: true })).toBeVisible();
-  await expect(page.getByRole('table').getByRole('columnheader')).toHaveCount(3);
+  await expect(page.getByRole('heading', { name: '候補を比較', exact: true })).toBeVisible();
+  const table = page.getByRole('table');
+  await expect(table.getByRole('columnheader')).toHaveCount(3);
+  await expect(table).toHaveCSS('display', 'block');
+  await expect(table.locator('tbody th').first()).toHaveText('掲載コース・料金');
+  await expect(table.locator('tbody td p').first()).toHaveText('夜会席16,500円、税込・サービス料15%別、平日席料別');
+  await expect(table.locator('tbody td p').first()).toHaveCSS('font-size', '16px');
+  await expect(table.locator('.comparison-restaurant-label').first()).toBeVisible();
+  await expect(table.locator('.comparison-restaurant-label').first()).toHaveCSS('font-size', '14px');
+  expect(await page.locator('.comparison-table-scroll').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
   await fits(page);
   await screenshot(page, info, 'public-comparison-table');
   expect(state.unexpected).toEqual([]);

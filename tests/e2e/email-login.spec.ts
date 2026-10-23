@@ -22,7 +22,7 @@ test('email link request forbids enrollment, uses fixed origin and survives clos
   expect(requests[0].body.create_user).toBe(false);
   expect(new URL(requests[0].url).searchParams.get('redirect_to')).toBe(base);
   await page.getByRole('button', { name: '閉じる', exact: true }).click();
-  await page.getByRole('link', { name: '掲載情報について', exact: true }).click();
+  await page.locator('.site-footer').getByRole('link', { name: '掲載情報について', exact: true }).click();
   await openLogin(page, isMobile);
   await expect(page.getByRole('button', { name: /再送まで/ })).toBeDisabled();
   expect(requests).toHaveLength(1);
@@ -71,8 +71,9 @@ test('remembered management callback returns to ten editorial rows with safe his
   await page.getByRole('button', { name: 'Executive Dining ホーム', exact: true }).click();
   await page.reload();
   await expect(page).toHaveURL(/#\/$/);
-  await expect(page.getByRole('heading', { name: /大切な話を、\s*心地よい一席で。/ })).toBeVisible();
-  expect(roleChecks).toBeGreaterThan(beforeHome);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
+  // The heading renders before asynchronous session restoration rechecks server permissions.
+  await expect.poll(() => roleChecks).toBeGreaterThan(beforeHome);
 });
 test('callback intent and metadata never redirect an account denied by the server', async ({ page }) => {
   let checks = 0, queues = 0;
@@ -98,7 +99,7 @@ test('new navigation during the callback permission check is never pulled back t
   });
   await page.goto(callbackUrl());
   await expect.poll(() => checks).toBeGreaterThan(0);
-  await page.getByRole('link', { name: '掲載情報について', exact: true }).click();
+  await page.locator('.site-footer').getByRole('link', { name: '掲載情報について', exact: true }).click();
   release();
   await expect(page).toHaveURL(/#\/about$/);
   await page.reload(); await expect(page).toHaveURL(/#\/about$/);
@@ -113,19 +114,25 @@ test('expired callback reports a generic error and never sends mail without a cl
   expect(requests.some(url => url.includes('/auth/v1/otp'))).toBe(false);
 });
 
-test('owner invitation lands at the single entry with ten real stores and restores in a new tab', async ({ page, context }) => {
+test('owner invitation lands at service home and reaches ten real stores with session restoration in a new tab', async ({ page, context, isMobile }) => {
   await ownerMock(page);
   await page.route('**/auth/v1/user', route => route.fulfill({json:callbackUser}));
   await page.goto(callbackUrl('invite'));
   await expect(page).toHaveURL(`${base}/#/`);
-  await expect(page.getByRole('heading',{name:/大切な話を、\s*心地よい一席で。/})).toBeVisible();
-  await page.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
+  await expect(page.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
+  await expect(page.locator('[data-home-restaurant]')).toHaveCount(0);
+  await page.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
+  await expect(page).toHaveURL(`${base}/#/find`);
+  await page.getByRole('link',{name:'全10店を見る',exact:true}).click();
   await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await expect(page).not.toHaveURL(/access_token|refresh_token/);
   await page.reload();await expect(page.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   const second=await context.newPage();await ownerMock(second);await second.goto(base);
-  await expect(second.getByText('招待アカウントでログイン中。',{exact:false})).toBeVisible();
-  await second.getByRole('button',{name:'店舗一覧へ',exact:true}).click();
+  await expect(second.getByRole('heading',{level:1})).toHaveText('会食専用口コミサイト');
+  await second.getByRole('navigation',{name:isMobile?'サービスナビゲーション':'メインナビゲーション',exact:true}).getByRole('button',{name:'店舗を探す',exact:true}).click();
+  await expect(second).toHaveURL(`${base}/#/find`);
+  await expect(second.getByText('招待アカウント向けの非公開情報を表示しています。',{exact:true})).toBeVisible();
+  await second.getByRole('link',{name:'全10店を見る',exact:true}).click();
   await expect(second.getByText('実店舗 10 / 10件（非公開）',{exact:true})).toBeVisible();
   await second.close();
 });

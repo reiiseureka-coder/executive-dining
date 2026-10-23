@@ -12,7 +12,7 @@ for (const width of widths) {
   test(`mobile layout is readable at ${width}px`, async ({page}, info) => {
     test.skip(info.project.name !== 'mobile', 'Viewport coverage runs once in the mobile project.');
     await page.setViewportSize({width, height:844});
-    for (const [route, name] of [['/', 'home'], ['/#/corporate','corporate'], ['/#/restaurants','restaurants'], ['/#/membership','membership'], ['/#/admin','admin'], ['/#/curation','curation']]) {
+    for (const [route, name] of [['/', 'home'], ['/#/find', 'find'], ['/#/corporate','corporate'], ['/#/restaurants','restaurants'], ['/#/membership','membership'], ['/#/admin','admin'], ['/#/curation','curation']]) {
       await page.goto(route);
       await expect(page.locator('main h1, main h2').first()).toBeVisible();
       await fits(page);
@@ -33,7 +33,7 @@ for (const width of widths) {
     await expect(page).toHaveURL(/#\/corporate$/);
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await page.goBack();
-    await expect(page.locator('.home-hero')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('会食専用口コミサイト');
     await page.getByRole('button',{name:'メニューを開く'}).click();
     await page.getByRole('button',{name:'閉じる',exact:true}).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();

@@ -1,0 +1,55 @@
+{
+  "base_commit": "ae9aad234eed022128edeb9b552749b25dfb7d98",
+  "base_branch": "feat/nagoya-foundation",
+  "upstream_blob_verification": {
+    "files": 158,
+    "mismatches": 0
+  },
+  "changed_files": [
+    "src/components/HomeCatalog.tsx",
+    "src/components/VerifiedFacts.tsx",
+    "src/main.tsx",
+    "src/pages/Corporate.tsx",
+    "src/pages/Home.tsx",
+    "src/pages/Nagoya.tsx",
+    "src/pages/NagoyaDetail.tsx",
+    "src/pages/OwnerTrial.tsx",
+    "src/pages/PartnerPage.tsx",
+    "tests/e2e/catalog-preview.spec.ts",
+    "tests/e2e/catalog.spec.ts",
+    "tests/e2e/home-imagery.spec.ts",
+    "tests/e2e/home-portals.spec.ts",
+    "tests/e2e/real-catalog.spec.ts"
+  ],
+  "new_files": [
+    "src/components/CatalogSummary.tsx",
+    "src/styles/editorial-redesign.css",
+    "src/styles/partners-redesign.css",
+    "tests/e2e/editorial-redesign.spec.ts",
+    "docs/ui-redesign-20261022.md",
+    "qa/structure-check.mjs"
+  ],
+  "checks": {
+    "unit_and_database_tests": {
+      "passed": 146,
+      "failed": 0
+    },
+    "eslint": "passed",
+    "typescript": "passed",
+    "production_build": "passed",
+    "server_render_assertions": {
+      "passed": 12
+    },
+    "e2e_discovery": {
+      "tests": 182,
+      "files": 16
+    },
+    "e2e_execution": "blocked before browser launch",
+    "visual_390": "not run",
+    "visual_1440": "not run"
+  },
+  "screenshots": [],
+  "remote_mutations": false,
+  "database_mutations": false,
+  "snapshot": "2026-10-22 local pre-publication validation"
+}

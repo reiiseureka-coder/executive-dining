@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bookmark, Menu, X } from "lucide-react";
+import { Bookmark, House, Menu, Search, X } from "lucide-react";
 import type { Page } from "../types";
 import type { SearchParams } from "../lib/search";
 import { useAppAccess } from "../contexts/appAccess";
@@ -8,18 +8,26 @@ import { useSavedCatalog } from "../hooks/useSavedCatalog";
 import { emailSignInEnabled, googleSignInEnabled, supabase } from "../lib/supabase";
 import EmailLoginForm from "./EmailLoginForm";
 import { LOGIN_DIALOG_EVENT } from "../lib/loginDialog";
+import "../styles/service-navigation.css";
 interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page, id?: string, params?: SearchParams) => void;
 }
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const access = useAppAccess();
+  const primaryItems: { label: string; page: Page }[] = [
+    { label: "ホーム", page: "home" },
+    { label: "店舗を探す", page: "find" },
+  ];
   const items: { label: string; page: Page }[] = [
-    { label: "店舗一覧", page: "nagoya" },
+    ...primaryItems,
     { label: "店舗の方へ", page: "restaurants" },
     { label: "法人の方へ", page: "corporate" },
     ...(access.editor ? [{ label: "運営管理", page: "curation" as Page }] : []),
   ];
+  const findingSection = ["find", "search", "detail", "nagoya", "nagoya-detail", "compare", "pilot", "pilot-detail"].includes(currentPage);
+  const currentLocation = (page: Page) =>
+    currentPage === page ? "page" : page === "find" && findingSection ? "location" : undefined;
   const [modal, setModal] = useState<"menu" | "login" | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -64,7 +72,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   };
   return (
     <>
-      <header className="site-header">
+      <header className="site-header service-header">
         <div className="page-width header-inner">
           <button
             className="brand"
@@ -82,7 +90,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
             {items.map((item) => (
               <button
                 key={item.page}
-                aria-current={currentPage === item.page ? "page" : undefined}
+                aria-current={currentLocation(item.page)}
                 onClick={() => navigate(item.page)}
               >
                 {item.label}
@@ -114,11 +122,25 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               onClick={() => setModal("menu")}
               aria-label="メニューを開く"
               aria-haspopup="dialog"
+              aria-expanded={modal === "menu"}
             >
               <Menu size={22} />
             </button>
           </div>
         </div>
+        <nav className="mobile-primary-nav page-width" aria-label="サービスナビゲーション">
+          {primaryItems.map((item) => (
+            <button
+              key={item.page}
+              type="button"
+              aria-current={currentLocation(item.page)}
+              onClick={() => navigate(item.page)}
+            >
+              {item.page === "home" ? <House size={17} aria-hidden="true" /> : <Search size={17} aria-hidden="true" />}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
       </header>
       <dialog
         ref={dialog}
@@ -144,9 +166,8 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           </h2>
           {modal === "menu" ? (
             <nav className="dialog-nav" aria-label="モバイルナビゲーション">
-              <button onClick={() => navigate("home")}>ホーム</button>
               {items.map((item) => (
-                <button key={item.page} onClick={() => navigate(item.page)}>
+                <button key={item.page} aria-current={currentLocation(item.page)} onClick={() => navigate(item.page)}>
                   {item.label}
                 </button>
               ))}
@@ -162,9 +183,9 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
             </nav>
           ) : (
             <>
-              <p>
+              {(user || (supabase && (googleSignInEnabled || emailSignInEnabled))) && <p>
                 {user ? "このブラウザではログインした状態が続きます。共有端末では、使い終わったらログアウトしてください。" : "招待されたアカウントでログインしてください。アカウントに応じた店舗情報や管理メニューを利用できます。"}
-              </p>
+              </p>}
               {!supabase || (!user && !googleSignInEnabled && !emailSignInEnabled) ? (
                 <p className="sample-notice">ログイン機能は準備中です。</p>
               ) : (

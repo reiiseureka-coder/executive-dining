@@ -84,6 +84,13 @@ test("search route round trips Japanese and URL characters", () => {
     params,
   });
 });
+test("service home, discovery and the existing catalog have distinct round-trip routes", () => {
+  for (const [page, hash] of [["home", "#/"], ["find", "#/find"], ["nagoya", "#/nagoya"]]) {
+    assert.equal(routeHash(page), hash);
+    assert.deepEqual(parseRoute(hash), { page, params: {} });
+  }
+  assert.deepEqual(parseRoute(""), { page: "home", params: {} });
+});
 test("detail URL retains all return search conditions", () => {
   const params = { region: "関東", sort: "price_asc" };
   assert.deepEqual(parseRoute(routeHash("detail", "1", params)), {

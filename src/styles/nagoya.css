@@ -1,0 +1,20 @@
+/* Review-first public catalog. Facts remain complete, readable supporting information. */
+.review-catalog .catalog-review-content { grid-column: 2; grid-row: 1; min-width: 0; }
+.review-catalog .catalog-review-content > .catalog-decision { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--ed-line); }
+.review-section.verified-reviews { border: 0; padding: 0; font-size: 16px; line-height: 1.65; }
+.verified-reviews.review-section .review-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 12px; margin: 0 0 12px; font-family: inherit; font-size: 20px; line-height: 1.45; font-weight: 600; }
+.review-section .review-count { color: var(--ed-muted); font-size: 16px; font-weight: 400; white-space: nowrap; }
+.review-section p { margin: 0; color: var(--ed-ink); }
+.review-section .review-comment { font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-section .review-excerpt { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.review-section .review-meta, .review-section .review-note { margin-top: 8px; color: var(--ed-muted); font-size: 16px; line-height: 1.65; }
+.review-section .review-meta { font-size: 14px; }
+.review-section .published-review + .published-review { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--ed-line); }
+.review-detail .detail-reviews { max-width: 700px; margin: 0 0 32px; }
+.review-detail .detail-reviews > .visit-draft { margin-top: 20px; padding: 0; border: 0; border-bottom: 1px solid var(--ed-line); background: none; }
+.review-detail .detail-reviews > .visit-draft > summary { min-height: 44px; padding-block: 10px; font-size: 16px; line-height: 1.5; }
+.review-detail .detail-reviews > .visit-draft[open] { padding-bottom: 20px; }
+.review-detail .detail-decision .detail-facts-title { margin: 0 0 20px; font-family: inherit; font-size: 20px; line-height: 1.45; font-weight: 600; }
+@media (max-width: 720px) {
+  .review-catalog .catalog-review-content { margin-top: 20px; }
+}

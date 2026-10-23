@@ -24,8 +24,40 @@ jobs:
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-mobile-before/node_modules"
           cd "$RUNNER_TEMP/dining-mobile-before"
           VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4183 > "$RUNNER_TEMP/dining-mobile-before.log" 2>&1 &
+      - name: Prepare task-hierarchy visual reference
+        run: |
+          git fetch --depth=1 origin cbbfc95f5ec24bd6f0775679f195d37e161b96ba
+          git worktree add --detach "$RUNNER_TEMP/dining-ux-before" cbbfc95f5ec24bd6f0775679f195d37e161b96ba
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-ux-before/node_modules"
+          cd "$RUNNER_TEMP/dining-ux-before"
+          VITE_SUPABASE_URL=https://test-project.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=true VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4184 > "$RUNNER_TEMP/dining-ux-before.log" 2>&1 &
+      - name: Prepare service-home visual reference
+        run: |
+          git fetch --depth=1 origin 9ada7e2a2a7d1b2dd3a001f01e9396651c4852fc
+          git worktree add --detach "$RUNNER_TEMP/dining-service-before" 9ada7e2a2a7d1b2dd3a001f01e9396651c4852fc
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-service-before/node_modules"
+          cd "$RUNNER_TEMP/dining-service-before"
+          VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4185 > "$RUNNER_TEMP/dining-service-before.log" 2>&1 &
+      - name: Prepare review-product visual reference
+        run: |
+          git fetch --depth=1 origin a64856c04ef6749a6015eb3cc62312be75a91579
+          git worktree add --detach "$RUNNER_TEMP/dining-product-before" a64856c04ef6749a6015eb3cc62312be75a91579
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-product-before/node_modules"
+          cd "$RUNNER_TEMP/dining-product-before"
+          VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4186 > "$RUNNER_TEMP/dining-product-before.log" 2>&1 &
+      - name: Prepare photo-layout visual reference
+        run: |
+          git fetch --depth=1 origin 7472a853f1f8c1e79d48ed4a1fc8b02aa78fda8d
+          git worktree add --detach "$RUNNER_TEMP/dining-photo-before" 7472a853f1f8c1e79d48ed4a1fc8b02aa78fda8d
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/dining-photo-before/node_modules"
+          cd "$RUNNER_TEMP/dining-photo-before"
+          VITE_SUPABASE_URL= VITE_SUPABASE_PUBLISHABLE_KEY= VITE_SUPABASE_ANON_KEY= VITE_DINING_DATABASE_ENABLED=false VITE_SUPABASE_EMAIL_LOGIN_ENABLED=false VITE_SUPABASE_GOOGLE_LOGIN_ENABLED=false nohup npm run dev -- --host 127.0.0.1 --port 4187 > "$RUNNER_TEMP/dining-photo-before.log" 2>&1 &
       - run: npm run test:e2e
         env:
+          PHOTO_BASELINE_URL: http://127.0.0.1:4187
+          PRODUCT_BASELINE_URL: http://127.0.0.1:4186
+          SERVICE_HOME_BASELINE_URL: http://127.0.0.1:4185
+          UX_BASELINE_URL: http://127.0.0.1:4184
           MOBILE_BASELINE_URL: http://127.0.0.1:4183
       - uses: actions/upload-artifact@v4
         if: always()
@@ -34,5 +66,7 @@ jobs:
           path: |
             test-results/**/*.png
             test-results/**/density-metrics.json
+            test-results/**/review-product-metrics.json
+            test-results/**/photo-metrics.json
           retention-days: 14
           if-no-files-found: ignore
