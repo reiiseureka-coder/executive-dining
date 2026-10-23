@@ -1,6 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { catalog, login, mock } from './helpers/ownerTrial';
 const base = 'http://127.0.0.1:4181';
+
+// The approved samples are UI illustrations, never evidence about a specific venue.
+async function illustrativeImages(scope: Locator, count: number) {
+  await expect(scope.locator('img:visible')).toHaveCount(count);
+  const figures = scope.locator('figure:visible:has(img)');
+  await expect(figures).toHaveCount(count);
+  for (const figure of await figures.all()) {
+    await expect(figure.locator('img')).toHaveCount(1);
+    await expect(figure.locator('img')).toHaveAttribute('src', /^\/images\/dining-(japanese|chinese|room)\.webp$/);
+    await expect(figure.locator('img')).toHaveAttribute('alt', /実店舗|実際の店舗/);
+    const caption = figure.locator('figcaption');
+    await expect(caption).toBeVisible();
+    await expect(caption.getByText('実店舗の写真ではないイメージ画像', { exact: true })).toBeVisible();
+    await expect(caption.getByText('生成 / UI確認用', { exact: true })).toBeVisible();
+  }
+}
 // All connected states below use intercepted RPC fixtures, not a live backend.
 test('mocked anonymous discovery distinguishes public preparation without private catalog reads', async ({ page, isMobile }, info) => {
   const state = await mock(page); await page.goto(`${base}/#/find`);
@@ -60,12 +76,13 @@ test('mocked available public discovery previews full decision facts without pri
   await expect(card.locator('[data-fact="price"] dd')).toHaveText(first.facts.find(fact => fact.field === 'price')!.value);
   await expect(card.locator('[data-fact="private_room"] dd')).toHaveText(first.facts.find(fact => fact.field === 'private_room')!.value);
   await expect(card.locator('[data-fact="price"] dd, [data-fact="private_room"] dd')).toHaveCount(2);
-  await expect(card.locator('details, img')).toHaveCount(0);
+  await expect(card.locator('details')).toHaveCount(0);
+  await illustrativeImages(card, 1);
   await expect(page.locator('.home-access-note')).toHaveCount(0);
   expect(state.calls.some(call => call.name.startsWith('dining_owner_trial_'))).toBe(false);
 });
 
-test('mocked invited discovery preserves full conditions, detail history and logout without venue photos', async ({ page, isMobile }, info) => {
+test('mocked invited discovery preserves full conditions, detail history and logout with labeled illustrative images', async ({ page, isMobile }, info) => {
   await login(page); const state = await mock(page); await page.goto(`${base}/#/find`);
   const cards = page.locator('[data-home-restaurant]'); await expect(cards).toHaveCount(3);
   const expected = [...catalog].sort((a, b) => a.name.localeCompare(b.name, 'ja')).slice(0, 3);
@@ -80,13 +97,13 @@ test('mocked invited discovery preserves full conditions, detail history and log
   }
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
-    await expect(cards.locator('img')).toHaveCount(0);
+    await illustrativeImages(page.locator('.home-discovery-list'), expected.length);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
     await page.screenshot({ path: info.outputPath(`find-available-private-fixture-${width}.png`), fullPage: true });
   }
   await cards.first().getByRole('link').click();
-  await expect(page.locator('.pilot-detail img')).toHaveCount(0);
+  await illustrativeImages(page.locator('.pilot-detail'), 2);
   await expect(page.locator('.pilot-detail').getByRole('heading', { name: expected[0].name, exact: true })).toBeVisible();
   await page.screenshot({ path: info.outputPath('detail-private-fixture.png'), fullPage: true });
   await page.goBack(); await expect(cards).toHaveCount(3); await page.goForward(); await page.reload();

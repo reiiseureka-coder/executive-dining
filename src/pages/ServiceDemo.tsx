@@ -1,3 +1,4 @@
+import RestaurantPhotos from '../components/RestaurantPhotos';
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Plus, Search, X } from 'lucide-react';
 import CatalogSummary from '../components/CatalogSummary';
@@ -75,7 +76,7 @@ function DemoList({ params, ids, onNavigate, onToggle }: { params: SearchParams;
     {ids.length > 0 && <SelectionTray ids={ids} params={params} onNavigate={onNavigate} onToggle={onToggle} />}
     <div className="service-demo-result-heading"><p role="status">表示中 <strong>{rows.length}店</strong><span> / 記録 {serviceDemoCatalog.length}店</span></p>{filtered && <button type="button" className="service-demo-text-button" onClick={() => onNavigate('service-demo', undefined, { ids: params.ids })}>絞り込みを解除</button>}</div>
     <div className="service-demo-list">{rows.map(row => <article key={row.id} id={`verified-${row.id}`} tabIndex={-1} className="service-demo-card" data-demo-id={row.id} aria-labelledby={`demo-title-${row.id}`}>
-      <div className="service-demo-identity"><p>{factValue(row, 'genre') ?? '料理は未確認'}</p><h2 id={`demo-title-${row.id}`}><a href={routeHash('service-demo-detail', row.id, { ...params, returnTo: undefined })} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined }); } }}>{row.name}</a></h2><p>{row.address}</p></div>
+      <div className="service-demo-identity"><p>{factValue(row, 'genre') ?? '料理は未確認'}</p><h2 id={`demo-title-${row.id}`}><a href={routeHash('service-demo-detail', row.id, { ...params, returnTo: undefined })} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined }); } }}>{row.name}</a></h2><p>{row.address}</p><RestaurantPhotos restaurantId={row.id} restaurantName={row.name} genre={factValue(row, 'genre') ?? undefined} variant="card" /></div>
       <div className="service-demo-card-content"><DemoReviews compact /><CatalogSummary restaurant={row} /></div>
       <div className="service-demo-card-actions"><button type="button" className="service-demo-button service-demo-primary" onClick={() => onNavigate('service-demo-detail', row.id, { ...params, returnTo: undefined })}>口コミ・店舗詳細<ArrowRight size={17} aria-hidden="true" /></button><SelectionButton row={row} ids={ids} onToggle={onToggle} /></div>
       <div className="service-demo-record-meta"><span>記録の確認日：{serviceDemoDate(row.factsCheckedAt)}</span><span>{serviceDemoStatus(row)}</span><VerifiedEvidence restaurant={row} /></div>
@@ -96,11 +97,12 @@ function DemoDetail({ id, params, ids, onNavigate, onToggle }: { id?: string; pa
   return <article className="service-demo-detail" aria-labelledby="service-demo-detail-title">
     <DetailNavigation params={params} onNavigate={onNavigate} />
     <header className="service-demo-heading"><p className="service-demo-kicker">{factValue(row, 'genre') ?? '料理は未確認'}</p><h1 id="service-demo-detail-title">{row.name}</h1><p>{row.address}</p></header>
+    <RestaurantPhotos restaurantId={row.id} restaurantName={row.name} genre={factValue(row, 'genre') ?? undefined} variant="detail" />
     <div className="service-demo-detail-layout"><div className="service-demo-detail-main"><DemoReviews /><h2 className="service-demo-facts-title">お店の公式情報</h2><CatalogSummary restaurant={row} />
       <div className="service-demo-detail-actions"><SelectionButton row={row} ids={ids} onToggle={onToggle} />{website && <a className="service-demo-button service-demo-primary" href={website} target="_blank" rel="noreferrer">公式サイトで最新情報を確認<ArrowUpRight size={18} aria-hidden="true" /></a>}</div>
       <p className="service-demo-explanation">料金と利用条件は記録時点の情報です。空席や現在の営業は未確認です。このデモでは予約・投稿はできません。</p>
       <section className="service-demo-detail-basic" aria-labelledby="service-demo-basic-title"><h2 id="service-demo-basic-title">そのほかの確認項目</h2><dl>{(['hours', 'access'] as FactField[]).map(field => <div key={field}><dt>{FACT_LABELS[field]}</dt><dd>{factValue(row, field) ?? 'この記録では未確認'}</dd></div>)}<div><dt>空席・防音性</dt><dd>この記録では未確認</dd></div></dl></section>
-    </div><aside className="service-demo-provenance" aria-label="この店舗の記録について"><h2>この記録について</h2><dl><div><dt>確認日</dt><dd>{serviceDemoDate(row.factsCheckedAt)}</dd></div><div><dt>記録の状態</dt><dd>{serviceDemoStatus(row)}</dd></div></dl><p>公式情報を確認した記録の固定表示です。最新情報や来店体験を示すものではありません。</p><VerifiedEvidence restaurant={row} /><p>このデモには、実際の口コミ・評価・店舗写真は掲載していません。</p></aside></div>
+    </div><aside className="service-demo-provenance" aria-label="この店舗の記録について"><h2>この記録について</h2><dl><div><dt>確認日</dt><dd>{serviceDemoDate(row.factsCheckedAt)}</dd></div><div><dt>記録の状態</dt><dd>{serviceDemoStatus(row)}</dd></div></dl><p>公式情報を確認した記録の固定表示です。最新情報や来店体験を示すものではありません。</p><VerifiedEvidence restaurant={row} /><p>このデモには、実際の口コミ・評価は掲載していません。</p></aside></div>
     {ids.length > 0 && <SelectionTray ids={ids} params={params} onNavigate={onNavigate} onToggle={onToggle} />}
     <DetailNavigation params={params} onNavigate={onNavigate} />
   </article>;

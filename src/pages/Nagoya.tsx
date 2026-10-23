@@ -1,3 +1,4 @@
+import RestaurantPhotos from '../components/RestaurantPhotos';
 import CatalogSummary from '../components/CatalogSummary';
 import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import { Bookmark, Search, SlidersHorizontal } from 'lucide-react';
@@ -59,7 +60,7 @@ export default function Nagoya({ params, onChange, onNavigate }: Props) {
     <div className="verified-list">{filtered.map(restaurant => {
       const saved = savedIds.includes(restaurant.id);
       return <article className={`verified-card${selected === restaurant.id ? ' is-selected' : ''}`} key={restaurant.id} id={`verified-${restaurant.id}`} tabIndex={-1}>
-        <div className="verified-card-heading"><div><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p className="catalog-place">{restaurant.address}</p><p className="catalog-cuisine">{factValue(restaurant, 'genre') ?? '料理ジャンル未確認'}</p></div></div>
+        <div className="verified-card-heading"><div><h2><button className="verified-title" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>{restaurant.name}</button></h2><p className="catalog-place">{restaurant.address}</p><p className="catalog-cuisine">{factValue(restaurant, 'genre') ?? '料理ジャンル未確認'}</p><RestaurantPhotos restaurantId={restaurant.id} restaurantName={restaurant.name} genre={factValue(restaurant, 'genre') ?? undefined} variant="card" /></div></div>
         <div className="catalog-review-content"><VerifiedReviews restaurant={restaurant} compact /><CatalogSummary restaurant={restaurant} /></div>
         <div className="verified-card-actions"><button className="button-secondary" onClick={() => onNavigate('nagoya-detail', restaurant.id, params)}>店舗の詳細を見る</button><button className="button-secondary" disabled={comparison.ids.length >= 3 && !comparison.ids.includes(restaurant.id)} aria-pressed={comparison.ids.includes(restaurant.id)} aria-label={`${comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}：${restaurant.name}`} onClick={() => comparison.toggle(restaurant.id)}>{comparison.ids.includes(restaurant.id) ? '比較から外す' : '比較に追加'}</button></div>
         <div className="catalog-row-footnote"><button className="catalog-save" onClick={() => toggleSaved(restaurant.id)} aria-pressed={saved} aria-label={`${saved ? '候補から外す' : '候補に保存'}：${restaurant.name}`}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />{saved ? '保存済み' : 'このブラウザに保存'}</button><span>公式情報の確認日 · {date(restaurant.verifiedAt)}</span><VerifiedEvidence restaurant={restaurant} /></div>

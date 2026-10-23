@@ -1,3 +1,4 @@
+import RestaurantPhotos from '../components/RestaurantPhotos';
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { ArrowLeft, ArrowUpRight, Bookmark } from 'lucide-react';
 import type { Page } from '../types';
@@ -46,6 +47,7 @@ export default function NagoyaDetail({ restaurantId, params, onNavigate }: Props
         <p className="detail-genre">料理：{factValue(restaurant, 'genre') ?? '未確認'}</p>
         <p className="detail-address">{restaurant.address}</p>
       </header>
+      <RestaurantPhotos restaurantId={restaurant.id} restaurantName={restaurant.name} genre={factValue(restaurant, 'genre') ?? undefined} variant="detail" />
       <div className="detail-reviews"><VerifiedReviews restaurant={restaurant} allowReportDraft /><ReviewDraftPanel key={`review:${restaurant.id}`} restaurantId={restaurant.id} /></div>
       <div className="detail-layout">
         <div className="detail-main">

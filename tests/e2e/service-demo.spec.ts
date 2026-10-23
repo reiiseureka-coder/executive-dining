@@ -1,4 +1,4 @@
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { reviewBeforeFacts, readableReviewText } from './helpers/reviewHierarchy';
@@ -16,6 +16,22 @@ const demo = '/preview.html#/preview';
 const configuredDemo = 'http://127.0.0.1:4182/preview.html#/preview';
 const fact = (row: RecordedRestaurant, field: string) => row.facts.find(value => value.field === field);
 const card = (page: Page, index: number) => page.locator(`[data-demo-id="${catalog[index].id}"]`);
+
+// The approved samples are UI illustrations, never evidence about a specific venue.
+async function illustrativeImages(scope: Locator, count: number) {
+  await expect(scope.locator('img:visible')).toHaveCount(count);
+  const figures = scope.locator('figure:visible:has(img)');
+  await expect(figures).toHaveCount(count);
+  for (const figure of await figures.all()) {
+    await expect(figure.locator('img')).toHaveCount(1);
+    await expect(figure.locator('img')).toHaveAttribute('src', /^\/images\/dining-(japanese|chinese|room)\.webp$/);
+    await expect(figure.locator('img')).toHaveAttribute('alt', /実店舗|実際の店舗/);
+    const caption = figure.locator('figcaption');
+    await expect(caption).toBeVisible();
+    await expect(caption.getByText('実店舗の写真ではないイメージ画像', { exact: true })).toBeVisible();
+    await expect(caption.getByText('生成 / UI確認用', { exact: true })).toBeVisible();
+  }
+}
 
 async function screenshot(page: Page, info: TestInfo, name: string) {
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
@@ -40,7 +56,7 @@ async function readableFacts(page: Page) {
   for (const size of sizes) expect(size).toBeGreaterThanOrEqual(16);
 }
 async function noLiveControls(page: Page) {
-  await expect(page.locator('.service-demo img, .service-demo textarea, input[type="email"], input[type="password"]')).toHaveCount(0);
+  await expect(page.locator('.service-demo textarea, input[type="email"], input[type="password"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
   await expect(page.locator('.review-draft, .feedback-draft, .pilot-profile, .star-rating, .review-entry, .draft-body, [data-review-id]')).toHaveCount(0);
@@ -85,6 +101,7 @@ for (const width of [390, 1440]) {
     for (const row of catalog) {
       const item = page.locator(`[data-demo-id="${row.id}"]`);
       await expect(item.getByRole('heading', { name: row.name, exact: true })).toBeVisible();
+      await illustrativeImages(item, 1);
       await expect(item.locator('.service-demo-reviews')).toContainText('口コミ');
       await expect(item.locator('.service-demo-reviews')).toContainText('まだありません');
       listReviewPositions.push({ id: row.id, ...await reviewBeforeFacts(item, '.service-demo-reviews') });
@@ -101,6 +118,7 @@ for (const width of [390, 1440]) {
     const listReviewTypography = await readableReviewText(page.locator('.service-demo-reviews h2, .service-demo-reviews h3, .service-demo-reviews > p'));
     await card(page, 0).getByRole('button', { name: '口コミ・店舗詳細', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(catalog[0].name);
+    await illustrativeImages(page.locator('.service-demo-detail'), 2);
     await expect(page.locator('.service-demo-detail .service-demo-reviews')).toContainText('まだありません');
     const detailReviewPosition = await reviewBeforeFacts(page.locator('.service-demo-detail'), '.service-demo-reviews');
     const detailReviewTypography = await readableReviewText(page.locator('.service-demo-detail .service-demo-reviews h2, .service-demo-detail .service-demo-reviews h3, .service-demo-detail .service-demo-reviews > p'));
@@ -123,6 +141,7 @@ for (const width of [390, 1440]) {
     await expect(card(page, 3).getByRole('button', { name: '比較に追加', exact: true })).toBeDisabled();
     await page.getByRole('button', { name: '選んだ3店を比較', exact: true }).click();
     await expect(page.getByRole('table')).toBeVisible();
+    await expect(page.locator('.service-demo img')).toHaveCount(0);
     await expect(page.locator('[data-compare-field="price"] td').first()).toContainText(fact(catalog[0], 'price')!.value);
     await expect(page.locator('[data-compare-field="price"] td').nth(1)).toContainText('この記録では未確認');
     await expect(page.locator('[data-compare-field="notice"] td').nth(1)).toContainText(fact(catalog[1], 'notice')!.value);

@@ -1,3 +1,4 @@
+import RestaurantPhotos from './RestaurantPhotos';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 import { useAppAccess } from '../contexts/appAccess';
@@ -82,6 +83,7 @@ function Showcase({ rows, privateMode = false, onNavigate }: Props & { rows: Row
           <h3><a href={routeHash('nagoya-detail', row.id)} onClick={event => { event.preventDefault(); onNavigate('nagoya-detail', row.id); }}>{row.name}</a></h3>
           <p className="home-catalog-meta">{factValue(row, 'genre') ?? '料理ジャンルは未確認'}</p>
           <p className="home-catalog-meta">{row.address}</p>
+          <RestaurantPhotos restaurantId={row.id} restaurantName={row.name} genre={factValue(row, 'genre') ?? undefined} variant="card" />
         </div>
         <div className="home-catalog-reading">
           {row.reviews ? <VerifiedReviews restaurant={{ id: row.id, reviews: row.reviews }} compact /> : <section className="home-private-reviews"><h4>会食の口コミ</h4><p>この非公開一覧には、公開口コミを表示していません。</p></section>}

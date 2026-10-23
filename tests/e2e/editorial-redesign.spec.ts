@@ -3,6 +3,22 @@ import { writeFile } from 'node:fs/promises';
 import { catalog, login, mock } from './helpers/ownerTrial';
 import { reviewBeforeFacts, readableReviewText } from './helpers/reviewHierarchy';
 const privateBase = 'http://127.0.0.1:4181';
+
+// The approved samples are UI illustrations, never evidence about a specific venue.
+async function illustrativeImages(scope: Locator, count: number) {
+  await expect(scope.locator('img:visible')).toHaveCount(count);
+  const figures = scope.locator('figure:visible:has(img)');
+  await expect(figures).toHaveCount(count);
+  for (const figure of await figures.all()) {
+    await expect(figure.locator('img')).toHaveCount(1);
+    await expect(figure.locator('img')).toHaveAttribute('src', /^\/images\/dining-(japanese|chinese|room)\.webp$/);
+    await expect(figure.locator('img')).toHaveAttribute('alt', /実店舗|実際の店舗/);
+    const caption = figure.locator('figcaption');
+    await expect(caption).toBeVisible();
+    await expect(caption.getByText('実店舗の写真ではないイメージ画像', { exact: true })).toBeVisible();
+    await expect(caption.getByText('生成 / UI確認用', { exact: true })).toBeVisible();
+  }
+}
 async function typography(locator: Locator) {
   return locator.evaluateAll(elements=>elements.map(el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {text:el.textContent?.trim(),fontSize:parseFloat(s.fontSize),lineHeight:s.lineHeight,fontWeight:s.fontWeight,top:r.top,width:r.width,height:r.height,visible:r.width>0&&r.height>0};}));
 }
@@ -52,6 +68,7 @@ for (const width of [390,1440]) {
     await expect(page.getByRole('searchbox',{name:'店名・エリアから探す'})).toHaveCSS('font-size','16px');
     await expect(page.getByRole('button',{name:'個室',exact:true})).toHaveCount(0);
     await expect(page.locator('.home-catalog-card .catalog-decision-facts')).toHaveCount(3);
+    await illustrativeImages(page.locator('.home-discovery-list'), 3);
     const discoveryReviewOrder = await reviewBeforeFacts(page.locator('.home-catalog-card').first(), '.home-private-reviews');
     await expect(page.locator('.home-private-reviews')).toHaveCount(3);
     await expect(page.locator('.home-private-reviews').first()).toContainText('この非公開一覧には、公開口コミを表示していません。');
@@ -63,7 +80,8 @@ for (const width of [390,1440]) {
     await capture(page,info,`redesign-find-${width}`);
     await page.getByRole('link',{name:'全10店を見る',exact:true}).click();
     const first=page.locator(`[data-pilot-id="${catalog[0].id}"]`);
-    await expect(page.locator('.verified-list img,.catalog-decision details')).toHaveCount(0);
+    await expect(page.locator('.catalog-decision details')).toHaveCount(0);
+    await illustrativeImages(page.locator('.verified-list'), catalog.length);
     const price=catalog[0].facts.find(f=>f.field==='price')!.value, room=catalog[0].facts.find(f=>f.field==='private_room')!.value;
     await expect(first.getByText(price,{exact:true})).toBeVisible();await expect(first.getByText(room,{exact:true})).toBeVisible();
     await expect(first.locator('.catalog-decision-facts dt')).toHaveText(['掲載コース・料金','個室']);
@@ -77,6 +95,7 @@ for (const width of [390,1440]) {
     await capture(page,info,`redesign-list-${width}`);
     await first.getByRole('button',{name:'店舗の詳細を見る',exact:true}).click();
     await expect(page.getByRole('heading',{level:1})).toHaveText(catalog[0].name);
+    await illustrativeImages(page.locator('.pilot-detail'), 2);
     await expect(page.locator('.detail-decision').getByText(price,{exact:true})).toBeVisible();await expect(page.locator('.detail-decision').getByText(room,{exact:true})).toBeVisible();
     await expect(page.locator('.pilot-detail .private-catalog-reviews')).toContainText('この非公開一覧には、公開口コミを表示していません。');
     await expect(page.locator('.pilot-detail .review-count, .pilot-detail .review-comment, .pilot-detail .review-meta')).toHaveCount(0);

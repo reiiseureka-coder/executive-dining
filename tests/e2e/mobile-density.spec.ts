@@ -7,6 +7,22 @@ test.setTimeout(120_000);
 const widths = [320, 375, 390, 430];
 const viewportHeight = 844;
 
+// The approved samples are UI illustrations, never evidence about a specific venue.
+async function illustrativeImages(scope: Locator, count: number) {
+  await expect(scope.locator('img:visible')).toHaveCount(count);
+  const figures = scope.locator('figure:visible:has(img)');
+  await expect(figures).toHaveCount(count);
+  for (const figure of await figures.all()) {
+    await expect(figure.locator('img')).toHaveCount(1);
+    await expect(figure.locator('img')).toHaveAttribute('src', /^\/images\/dining-(japanese|chinese|room)\.webp$/);
+    await expect(figure.locator('img')).toHaveAttribute('alt', /実店舗|実際の店舗/);
+    const caption = figure.locator('figcaption');
+    await expect(caption).toBeVisible();
+    await expect(caption.getByText('実店舗の写真ではないイメージ画像', { exact: true })).toBeVisible();
+    await expect(caption.getByText('生成 / UI確認用', { exact: true })).toBeVisible();
+  }
+}
+
 // Document coordinates keep this check honest even if an earlier interaction scrolled.
 async function documentBounds(locator: Locator) {
   await expect(locator).toBeVisible();
@@ -94,7 +110,8 @@ for (const width of widths) {
       expect(type.lineHeight).toBeGreaterThanOrEqual(24);
       expect(['none', '0', '']).toContain(type.clamp);
     }
-    await expect(first.locator('details, img')).toHaveCount(0);
+    await expect(first.locator('details')).toHaveCount(0);
+    await illustrativeImages(first, 1);
     await expect(page.locator('.quick-links')).toHaveCount(0);
     await fits(page);
     await screenshot(page, info, `find-available-private-fixture-${width}`);
