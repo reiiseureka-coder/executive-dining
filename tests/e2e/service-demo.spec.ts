@@ -44,7 +44,9 @@ async function noLiveControls(page: Page) {
   await expect(page.getByRole('button', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /ログイン|投稿を送信|プロフィールを作成|予約する/ })).toHaveCount(0);
   await expect(page.locator('.review-draft, .feedback-draft, .pilot-profile, .star-rating, .review-entry, .draft-body, [data-review-id]')).toHaveCount(0);
-  await expect(page.locator('.service-demo').getByText(/(?:[0-5](?:\.\d+)?\s*\/\s*5|[★☆])/)).toHaveCount(0);
+  // Official evidence contains dates such as 10/5; only review UI can imply a rating.
+  await expect(page.locator('.service-demo-reviews').getByText(/(?:[0-5](?:\.\d+)?\s*\/\s*5|[★☆])/)).toHaveCount(0);
+  await expect(page.locator('.service-demo .star-rating, .service-demo .review-rating, .service-demo .review-meta, .service-demo [data-rating]')).toHaveCount(0);
   await expect(page.getByText('閲覧専用デモ', { exact: true }).first()).toBeVisible();
 }
 

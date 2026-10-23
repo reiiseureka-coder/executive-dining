@@ -267,6 +267,6 @@ test('official correction and review report drafts remain distinct, unsent and w
   await report.getByLabel('確認してほしい内容', { exact: true }).fill('個人を特定できる記載の確認を希望します。');
   await report.getByRole('button', { name: 'メモの入力内容を確認', exact: true }).click();
   await expect(report.getByRole('button', { name: '通報の受付は準備中', exact: true })).toBeDisabled();
-  await expect(page.getByText('利用者の体験や感想を掲載しています。店舗の公式情報とは分けてご覧ください。')).toBeVisible();
+  await expect(page.getByText('利用者の体験・感想を、店舗の公式情報とは分けて掲載しています。')).toBeVisible();
   expect(calls).toEqual([]);
 });
